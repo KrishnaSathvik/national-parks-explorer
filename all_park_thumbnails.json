@@ -1,0 +1,307 @@
+[
+  {
+    "parkCode": "acad",
+    "name": "Acadia National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Bass_Harbor_Head_Light_2007.jpg"
+  },
+  {
+    "parkCode": "arch",
+    "name": "Arches National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Delicate_Arch_-_Arches_National_Park.jpg"
+  },
+  {
+    "parkCode": "badl",
+    "name": "Badlands National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Badlands_National_Park%2C_South_Dakota%2C_USA.jpg"
+  },
+  {
+    "parkCode": "bibe",
+    "name": "Big Bend National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Big_Bend_National_Park_Panorama.jpg"
+  },
+  {
+    "parkCode": "bisc",
+    "name": "Biscayne National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Biscayne_NP_snorkeling.jpg"
+  },
+  {
+    "parkCode": "blca",
+    "name": "Black Canyon of the Gunnison National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Black_Canyon_of_the_Gunnison_National_Park.jpg"
+  },
+  {
+    "parkCode": "brca",
+    "name": "Bryce Canyon National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bryce_Canyon_National_Park.jpg"
+  },
+  {
+    "parkCode": "cany",
+    "name": "Canyonlands National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Canyonlands_National_Park_-_Mesa_Arch.jpg"
+  },
+  {
+    "parkCode": "care",
+    "name": "Capitol Reef National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Capitol_Reef_National_Park_-_Scenic_Drive.jpg"
+  },
+  {
+    "parkCode": "cave",
+    "name": "Carlsbad Caverns National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Carlsbad_Caverns_Entrance.jpg"
+  },
+  {
+    "parkCode": "chis",
+    "name": "Channel Islands National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Channel_Islands_National_Park.jpg"
+  },
+  {
+    "parkCode": "cong",
+    "name": "Congaree National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Congaree_National_Park.jpg"
+  },
+  {
+    "parkCode": "crla",
+    "name": "Crater Lake National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Crater_Lake_from_Rim_Drive.jpg"
+  },
+  {
+    "parkCode": "cuva",
+    "name": "Cuyahoga Valley National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Brandywine_Falls_in_Cuyahoga_Valley_National_Park.jpg"
+  },
+  {
+    "parkCode": "dena",
+    "name": "Denali National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Denali_Mt_McKinley.jpg"
+  },
+  {
+    "parkCode": "drto",
+    "name": "Dry Tortugas National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Fort_Jefferson_Dry_Tortugas.jpg"
+  },
+  {
+    "parkCode": "ever",
+    "name": "Everglades National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Everglades_Sawgrass.jpg"
+  },
+  {
+    "parkCode": "gaar",
+    "name": "Gates of the Arctic National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Gates_of_the_Arctic_National_Park.jpg"
+  },
+  {
+    "parkCode": "glba",
+    "name": "Glacier Bay National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/47/Glacier_Bay_Johns_Hopkins_Inlet.jpg"
+  },
+  {
+    "parkCode": "glac",
+    "name": "Glacier National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/41/Grinnell_Lake_from_Grinnell_Glacier_Trail.jpg"
+  },
+  {
+    "parkCode": "grca",
+    "name": "Grand Canyon National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Grand_Canyon_view_from_Pima_Point_2010.jpg"
+  },
+  {
+    "parkCode": "grte",
+    "name": "Grand Teton National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Grand_Teton_in_Spring.jpg"
+  },
+  {
+    "parkCode": "grba",
+    "name": "Great Basin National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Wheeler_Peak_and_Great_Basin_NP.jpg"
+  },
+  {
+    "parkCode": "grsa",
+    "name": "Great Sand Dunes National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Great_Sand_Dunes_National_Park.jpg"
+  },
+  {
+    "parkCode": "grsm",
+    "name": "Great Smoky Mountains National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Great_Smoky_Mountains_National_Park.jpg"
+  },
+  {
+    "parkCode": "hale",
+    "name": "Haleakal\u0101 National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Haleakala_Crater.jpg"
+  },
+  {
+    "parkCode": "havo",
+    "name": "Hawai\u02bbi Volcanoes National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Halemaumau_Crater_eruption_2021.jpg"
+  },
+  {
+    "parkCode": "hosp",
+    "name": "Hot Springs National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Hot_Springs_National_Park_Bathhouse_Row.jpg"
+  },
+  {
+    "parkCode": "indu",
+    "name": "Indiana Dunes National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/Indiana_Dunes_National_Park.jpg"
+  },
+  {
+    "parkCode": "isro",
+    "name": "Isle Royale National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Isle_Royale_National_Park.jpg"
+  },
+  {
+    "parkCode": "jotr",
+    "name": "Joshua Tree National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Joshua_Tree_National_Park.jpg"
+  },
+  {
+    "parkCode": "katm",
+    "name": "Katmai National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Brown_bear_at_Brooks_Falls_in_Katmai_National_Park.jpg"
+  },
+  {
+    "parkCode": "kefj",
+    "name": "Kenai Fjords National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Kenai_Fjords_National_Park.jpg"
+  },
+  {
+    "parkCode": "kica",
+    "name": "Kings Canyon National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Kings_Canyon_from_Glacier_Point.jpg"
+  },
+  {
+    "parkCode": "kova",
+    "name": "Kobuk Valley National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Kobuk_Sand_Dunes.jpg"
+  },
+  {
+    "parkCode": "lacl",
+    "name": "Lake Clark National Park & Preserve",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Lake_Clark_National_Park.jpg"
+  },
+  {
+    "parkCode": "lavo",
+    "name": "Lassen Volcanic National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Lassen_Peak_in_Lassen_Volcanic_National_Park.jpg"
+  },
+  {
+    "parkCode": "maca",
+    "name": "Mammoth Cave National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Mammoth_Cave_Entrance.jpg"
+  },
+  {
+    "parkCode": "meve",
+    "name": "Mesa Verde National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Mesa_Verde_Cliff_Palace.jpg"
+  },
+  {
+    "parkCode": "mora",
+    "name": "Mount Rainier National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Mount_Rainier_from_Reflection_Lakes.jpg"
+  },
+  {
+    "parkCode": "npsa",
+    "name": "National Park of American Samoa",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cf/National_Park_of_American_Samoa_Tutuila.jpg"
+  },
+  {
+    "parkCode": "neri",
+    "name": "New River Gorge National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/New_River_Gorge_Bridge_in_Autumn.jpg"
+  },
+  {
+    "parkCode": "noca",
+    "name": "North Cascades National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d4/North_Cascades_National_Park_Diablo_Lake.jpg"
+  },
+  {
+    "parkCode": "olym",
+    "name": "Olympic National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Olympic_National_Park_Hoh_Rainforest.jpg"
+  },
+  {
+    "parkCode": "pefo",
+    "name": "Petrified Forest National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Petrified_Forest_wood.jpg"
+  },
+  {
+    "parkCode": "pinn",
+    "name": "Pinnacles National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Pinnacles_National_Park.jpg"
+  },
+  {
+    "parkCode": "redw",
+    "name": "Redwood National and State Parks",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Redwood_National_and_State_Parks_trail.jpg"
+  },
+  {
+    "parkCode": "romo",
+    "name": "Rocky Mountain National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rocky_Mountain_National_Park_Bear_Lake.jpg"
+  },
+  {
+    "parkCode": "sagu",
+    "name": "Saguaro National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Saguaro_National_Park.jpg"
+  },
+  {
+    "parkCode": "seki",
+    "name": "Sequoia National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/06/General_Sherman_Tree.jpg"
+  },
+  {
+    "parkCode": "shen",
+    "name": "Shenandoah National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Shenandoah_National_Park_in_the_fall.jpg"
+  },
+  {
+    "parkCode": "thro",
+    "name": "Theodore Roosevelt National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Theodore_Roosevelt_National_Park.jpg"
+  },
+  {
+    "parkCode": "viis",
+    "name": "Virgin Islands National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Virgin_Islands_National_Park_St_John.jpg"
+  },
+  {
+    "parkCode": "voya",
+    "name": "Voyageurs National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Voyageurs_National_Park_boating.jpg"
+  },
+  {
+    "parkCode": "whsa",
+    "name": "White Sands National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c8/White_Sands_National_Park_dunes.jpg"
+  },
+  {
+    "parkCode": "wica",
+    "name": "Wind Cave National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Wind_Cave_Entrance.jpg"
+  },
+  {
+    "parkCode": "wrst",
+    "name": "Wrangell\u2013St. Elias National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Wrangell_St_Elias_Mountains.jpg"
+  },
+  {
+    "parkCode": "yell",
+    "name": "Yellowstone National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Grand_Prismatic_Spring_and_Excelsior_Geyser.jpg"
+  },
+  {
+    "parkCode": "yose",
+    "name": "Yosemite National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Yosemite_Valley_from_Tunnel_View.jpg"
+  },
+  {
+    "parkCode": "zion",
+    "name": "Zion National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Zion_Canyon.jpg"
+  },
+  {
+    "parkCode": "jeff",
+    "name": "Gateway Arch National Park",
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Gateway_Arch_St_Louis.jpg"
+  }
+]
