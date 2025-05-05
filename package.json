@@ -2,7 +2,6 @@
   "name": "national-parks-explorer",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -10,8 +9,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "date-fns": "^4.1.0",
+    "dompurify": "^3.2.5",
+    "firebase": "^11.6.1",
+    "firebase-admin": "^13.3.0",
+    "framer-motion": "^12.9.4",
+    "leaflet": "^1.9.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-big-calendar": "^1.18.0",
+    "react-datepicker": "^8.3.0",
+    "react-dom": "^19.0.0",
+    "react-icons": "^5.5.0",
+    "react-leaflet": "^5.0.0",
+    "react-router-dom": "^6.30.0",
+    "react-share": "^5.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
@@ -26,5 +37,10 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1",
     "vite": "^6.3.1"
-  }
+  },
+  "description": "A responsive React + Firebase app to explore U.S. National Parks, view seasonal tips, plan visits, and discover nearby food and lodging. Includes features like map views, weather forecasts, NPS alerts, favorites, and social sharing.",
+  "main": "bulkUpload.cjs.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

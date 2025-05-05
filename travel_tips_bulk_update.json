@@ -1,0 +1,446 @@
+{
+  "1": {
+    "nearbyAirports": [
+      {
+        "name": "Hancock County\u2013Bar Harbor Airport (BHB)",
+        "googleMapsUrl": "https://maps.google.com/?q=Hancock+County+Bar+Harbor+Airport"
+      },
+      {
+        "name": "Portland International Jetport (PWM)",
+        "googleMapsUrl": "https://maps.google.com/?q=Portland+International+Jetport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore Bar Harbor and Jordan Pond.",
+      "Day 2: Hike Cadillac Mountain and Beehive Trail.",
+      "Day 3: Visit Thunder Hole and Sand Beach before heading back."
+    ],
+    "packingEssentials": [
+      "Hiking shoes",
+      "Bug spray",
+      "Rain jacket",
+      "Water bottle",
+      "Binoculars for wildlife watching"
+    ]
+  },
+  "2": {
+    "nearbyAirports": [
+      {
+        "name": "Canyonlands Field Airport (CNY)",
+        "googleMapsUrl": "https://maps.google.com/?q=Canyonlands+Field+Airport"
+      },
+      {
+        "name": "Grand Junction Regional Airport (GJT)",
+        "googleMapsUrl": "https://maps.google.com/?q=Grand+Junction+Regional+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Arrive in Moab, visit Park Avenue and Balanced Rock.",
+      "Day 2: Hike to Delicate Arch and Devil\u2019s Garden.",
+      "Day 3: Scenic drive and sunset at Windows Section."
+    ],
+    "packingEssentials": [
+      "Wide-brim hat",
+      "Sunscreen",
+      "Plenty of water",
+      "Hiking boots",
+      "Camera with extra memory"
+    ]
+  },
+  "3": {
+    "nearbyAirports": [
+      {
+        "name": "Rapid City Regional Airport (RAP)",
+        "googleMapsUrl": "https://maps.google.com/?q=Rapid+City+Regional+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Drive the Badlands Loop Road.",
+      "Day 2: Hike Notch Trail and visit Ben Reifel Visitor Center.",
+      "Day 3: Watch sunrise at Big Badlands Overlook and depart."
+    ],
+    "packingEssentials": [
+      "Sun protection (hat, sunglasses, sunscreen)",
+      "Sturdy shoes",
+      "Hydration backpack",
+      "Snacks and a cooler",
+      "Binoculars"
+    ]
+  },
+  "4": {
+    "nearbyAirports": [
+      {
+        "name": "Midland International Air & Space Port (MAF)",
+        "googleMapsUrl": "https://maps.google.com/?q=Midland+International+Airport"
+      },
+      {
+        "name": "El Paso International Airport (ELP)",
+        "googleMapsUrl": "https://maps.google.com/?q=El+Paso+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore Chisos Basin and Lost Mine Trail.",
+      "Day 2: Drive Ross Maxwell Scenic Drive and hike Santa Elena Canyon.",
+      "Day 3: Visit Boquillas Canyon and the Hot Springs."
+    ],
+    "packingEssentials": [
+      "Sunblock and sunglasses",
+      "Hat and cooling towel",
+      "Hydration supplies",
+      "Map or GPS (limited service)",
+      "Flashlight for dark skies"
+    ]
+  },
+  "5": {
+    "nearbyAirports": [
+      {
+        "name": "Miami International Airport (MIA)",
+        "googleMapsUrl": "https://maps.google.com/?q=Miami+International+Airport"
+      },
+      {
+        "name": "Fort Lauderdale-Hollywood International Airport (FLL)",
+        "googleMapsUrl": "https://maps.google.com/?q=Fort+Lauderdale+Hollywood+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Visit Dante Fascell Visitor Center and book boat tour.",
+      "Day 2: Snorkel or kayak around the reefs and mangroves.",
+      "Day 3: Relax with a picnic and enjoy shoreline views."
+    ],
+    "packingEssentials": [
+      "Swimwear and snorkel gear",
+      "Dry bag for electronics",
+      "Reef-safe sunscreen",
+      "Reusable water bottle",
+      "Towel and change of clothes"
+    ]
+  },
+  "6": {
+    "nearbyAirports": [
+      {
+        "name": "Montrose Regional Airport (MTJ)",
+        "googleMapsUrl": "https://maps.google.com/?q=Montrose+Regional+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore South Rim viewpoints and visitor center.",
+      "Day 2: Hike the Rim Rock Nature Trail and Warner Point Trail.",
+      "Day 3: Drive East Portal Road or explore North Rim if accessible."
+    ],
+    "packingEssentials": [
+      "Hiking boots",
+      "Snacks and water",
+      "Binoculars for scenic views",
+      "Sun protection",
+      "Warm clothing for higher elevations"
+    ]
+  },
+  "7": {
+    "nearbyAirports": [
+      {
+        "name": "Cedar City Regional Airport (CDC)",
+        "googleMapsUrl": "https://maps.google.com/?q=Cedar+City+Regional+Airport"
+      },
+      {
+        "name": "St. George Regional Airport (SGU)",
+        "googleMapsUrl": "https://maps.google.com/?q=St+George+Regional+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore Bryce Amphitheater and Sunrise Point.",
+      "Day 2: Hike Navajo Loop and Queen\u2019s Garden Trail.",
+      "Day 3: Scenic drive to Rainbow Point and return."
+    ],
+    "packingEssentials": [
+      "Layered clothing",
+      "Camera and extra batteries",
+      "Trail snacks and hydration",
+      "Hiking poles (optional for steep trails)",
+      "Sunscreen"
+    ]
+  },
+  "8": {
+    "nearbyAirports": [
+      {
+        "name": "Canyonlands Field Airport (CNY)",
+        "googleMapsUrl": "https://maps.google.com/?q=Canyonlands+Field+Airport"
+      },
+      {
+        "name": "Salt Lake City International Airport (SLC)",
+        "googleMapsUrl": "https://maps.google.com/?q=Salt+Lake+City+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Island in the Sky district scenic drive.",
+      "Day 2: Hike Mesa Arch and Grand View Point.",
+      "Day 3: Visit Needles District for longer hikes or viewpoints."
+    ],
+    "packingEssentials": [
+      "Topographic map or GPS",
+      "Water and electrolyte drinks",
+      "Sturdy boots for rocky terrain",
+      "Layered sun protection",
+      "Permit printout if backpacking"
+    ]
+  },
+  "9": {
+    "nearbyAirports": [
+      {
+        "name": "Canyonlands Field Airport (CNY)",
+        "googleMapsUrl": "https://maps.google.com/?q=Canyonlands+Field+Airport"
+      },
+      {
+        "name": "Salt Lake City International Airport (SLC)",
+        "googleMapsUrl": "https://maps.google.com/?q=Salt+Lake+City+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore Fruita Historic District and Visitor Center.",
+      "Day 2: Hike Capitol Gorge and Cassidy Arch.",
+      "Day 3: Scenic drive on Highway 24 and Cathedral Valley loop (if time allows)."
+    ],
+    "packingEssentials": [
+      "Sun hat and sunglasses",
+      "Sturdy hiking shoes",
+      "Ample snacks and water",
+      "Offline maps or GPS",
+      "Camera for scenic overlooks"
+    ]
+  },
+  "10": {
+    "nearbyAirports": [
+      {
+        "name": "Cavern City Air Terminal (CNM)",
+        "googleMapsUrl": "https://maps.google.com/?q=Cavern+City+Air+Terminal"
+      },
+      {
+        "name": "El Paso International Airport (ELP)",
+        "googleMapsUrl": "https://maps.google.com/?q=El+Paso+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Take the self-guided Carlsbad Caverns tour.",
+      "Day 2: Hike the Natural Entrance Trail and watch the evening bat flight.",
+      "Day 3: Explore nearby Guadalupe Mountains if you have extra time."
+    ],
+    "packingEssentials": [
+      "Closed-toe shoes (required for cave tours)",
+      "Jacket (caves are 56\u00b0F year-round)",
+      "Flashlight or headlamp",
+      "Refillable water bottle",
+      "Camera with low-light capabilities"
+    ]
+  },
+    "11": {
+    "nearbyAirports": [
+      {
+        "name": "Santa Barbara Airport (SBA)",
+        "googleMapsUrl": "https://maps.google.com/?q=Santa+Barbara+Airport"
+      },
+      {
+        "name": "Los Angeles International Airport (LAX)",
+        "googleMapsUrl": "https://maps.google.com/?q=Los+Angeles+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Take a boat to Santa Cruz Island and hike the Scorpion Anchorage trails.",
+      "Day 2: Kayak through sea caves or snorkel in marine reserves.",
+      "Day 3: Return and explore mainland coastal areas."
+    ],
+    "packingEssentials": [
+      "Dry bag",
+      "Snorkel gear or wetsuit",
+      "Motion sickness pills",
+      "Sturdy shoes for rocky terrain",
+      "Plenty of drinking water"
+    ]
+  },
+  "12": {
+    "nearbyAirports": [
+      {
+        "name": "Columbia Metropolitan Airport (CAE)",
+        "googleMapsUrl": "https://maps.google.com/?q=Columbia+Metropolitan+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Explore Boardwalk Loop Trail.",
+      "Day 2: Kayak Cedar Creek and hike Weston Lake Loop.",
+      "Day 3: Join a ranger-led tour and visit the Harry Hampton Visitor Center."
+    ],
+    "packingEssentials": [
+      "Bug repellent",
+      "Waterproof boots",
+      "Sunscreen",
+      "Reusable water bottle",
+      "Binoculars for bird watching"
+    ]
+  },
+  "13": {
+    "nearbyAirports": [
+      {
+        "name": "Rogue Valley International-Medford Airport (MFR)",
+        "googleMapsUrl": "https://maps.google.com/?q=Medford+Airport"
+      },
+      {
+        "name": "Klamath Falls Airport (LMT)",
+        "googleMapsUrl": "https://maps.google.com/?q=Klamath+Falls+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Drive Rim Drive and stop at viewpoints.",
+      "Day 2: Hike down to Cleetwood Cove and take a boat tour.",
+      "Day 3: Explore Pinnacles Valley and Wizard Island (seasonal)."
+    ],
+    "packingEssentials": [
+      "Layered clothing",
+      "Sunglasses",
+      "Water bottle",
+      "Hiking shoes",
+      "Camera"
+    ]
+  },
+  "14": {
+    "nearbyAirports": [
+      {
+        "name": "Cleveland Hopkins International Airport (CLE)",
+        "googleMapsUrl": "https://maps.google.com/?q=Cleveland+Hopkins+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Visit Boston Mill Visitor Center and walk the Towpath Trail.",
+      "Day 2: Ride the Cuyahoga Valley Scenic Railroad.",
+      "Day 3: Hike Brandywine Falls and explore the ledges."
+    ],
+    "packingEssentials": [
+      "Comfortable shoes",
+      "Camera for waterfalls",
+      "Hat and sunscreen",
+      "Trail snacks",
+      "Hydration pack"
+    ]
+  },
+  "15": {
+    "nearbyAirports": [
+      {
+        "name": "Ted Stevens Anchorage International Airport (ANC)",
+        "googleMapsUrl": "https://maps.google.com/?q=Ted+Stevens+Anchorage+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Travel to Denali and explore visitor center.",
+      "Day 2: Take a wildlife bus tour on Denali Park Road.",
+      "Day 3: Hike Horseshoe Lake or Savage River Loop."
+    ],
+    "packingEssentials": [
+      "Binoculars for wildlife",
+      "Rain gear and layers",
+      "Bear spray (if hiking deeper trails)",
+      "Reusable water bottle",
+      "Bug spray"
+    ]
+  },
+  "16": {
+    "nearbyAirports": [
+      {
+        "name": "Key West International Airport (EYW)",
+        "googleMapsUrl": "https://maps.google.com/?q=Key+West+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Ferry or seaplane to the island and set up camp.",
+      "Day 2: Explore Fort Jefferson and snorkel the coral reef.",
+      "Day 3: Watch sunrise and explore the moat before return."
+    ],
+    "packingEssentials": [
+      "Snorkel gear",
+      "Reef-safe sunscreen",
+      "Dry bag",
+      "Food and water (no services on the island)",
+      "Tent and camping gear"
+    ]
+  },
+  "17": {
+    "nearbyAirports": [
+      {
+        "name": "Miami International Airport (MIA)",
+        "googleMapsUrl": "https://maps.google.com/?q=Miami+International+Airport"
+      },
+      {
+        "name": "Fort Lauderdale-Hollywood International Airport (FLL)",
+        "googleMapsUrl": "https://maps.google.com/?q=Fort+Lauderdale+Hollywood+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Visit Shark Valley and take the tram tour.",
+      "Day 2: Airboat ride and walk Anhinga Trail.",
+      "Day 3: Kayak the mangroves and visit Flamingo area."
+    ],
+    "packingEssentials": [
+      "Bug spray (essential!)",
+      "Sun protection",
+      "Waterproof shoes",
+      "Reusable bottle",
+      "Snacks and light food"
+    ]
+  },
+  "18": {
+    "nearbyAirports": [
+      {
+        "name": "Fairbanks International Airport (FAI)",
+        "googleMapsUrl": "https://maps.google.com/?q=Fairbanks+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Charter flight into the park.",
+      "Day 2: Hike alpine tundra and observe caribou.",
+      "Day 3: Return flight and visit the Gates of the Arctic Visitor Center in Bettles."
+    ],
+    "packingEssentials": [
+      "Backpacking gear",
+      "Bear spray and satellite phone",
+      "Layered clothing and rain gear",
+      "Water filtration system",
+      "High-calorie food"
+    ]
+  },
+  "19": {
+    "nearbyAirports": [
+      {
+        "name": "Juneau International Airport (JNU)",
+        "googleMapsUrl": "https://maps.google.com/?q=Juneau+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Take a cruise to Glacier Bay and attend a ranger talk.",
+      "Day 2: Explore Bartlett Cove trails and kayak.",
+      "Day 3: Take a boat tour to see calving glaciers and wildlife."
+    ],
+    "packingEssentials": [
+      "Rain jacket",
+      "Waterproof boots",
+      "Camera with zoom lens",
+      "Layered clothing",
+      "Binoculars"
+    ]
+  },
+  "20": {
+    "nearbyAirports": [
+      {
+        "name": "Glacier Park International Airport (FCA)",
+        "googleMapsUrl": "https://maps.google.com/?q=Glacier+Park+International+Airport"
+      }
+    ],
+    "suggestedItinerary": [
+      "Day 1: Drive Going-to-the-Sun Road and visit Logan Pass.",
+      "Day 2: Hike Hidden Lake or Grinnell Glacier Trail.",
+      "Day 3: Explore Many Glacier and take a boat tour."
+    ],
+    "packingEssentials": [
+      "Bear spray",
+      "Daypack with layers and snacks",
+      "Reusable water bottle",
+      "Hiking boots",
+      "Trail map or downloaded AllTrails map"
+    ]
+  }
+}
