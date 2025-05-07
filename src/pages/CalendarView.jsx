@@ -119,14 +119,16 @@ const CalendarView = () => {
     fetchAllEvents();
   }, []);
 
-  const selectedDay = selectedDate.toDateString();
+  const isSameDay = (d1, d2) =>
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate();
 
   const filteredEvents = events.filter(
     (e) =>
       (selectedPark === "All" || e.park === selectedPark) &&
-      e.start.toDateString() === selectedDay
+      isSameDay(e.start, selectedDate)
   );
-
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
       <button
