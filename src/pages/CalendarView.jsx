@@ -85,31 +85,34 @@ const CalendarView = () => {
       const todayDate = new Date();
       todayDate.setHours(0, 0, 0, 0);
 
-      for (let code of parkCodes) {
-        try {
-          const res = await fetch(
-            `https://developer.nps.gov/api/v1/events?parkCode=${code}&api_key=${NPS_API_KEY}`
-          );
-          const data = await res.json();
-          data.data.forEach((event) => {
-            if (event.datestart) {
-              const startDate = new Date(event.datestart);
-              if (startDate >= todayDate) {
-                allEvents.push({
-                  id: event.id,
-                  title: event.title,
-                  park: event.parkfullname || code.toUpperCase(),
-                  start: startDate,
-                  end: event.dateend ? new Date(event.dateend) : startDate,
-                  description: event.description,
-                });
+      await Promise.allSettled(
+        parkCodes.map(async (code) => {
+          try {
+            const res = await fetch(
+              `https://developer.nps.gov/api/v1/events?parkCode=${code}&api_key=${NPS_API_KEY}`
+            );
+            const data = await res.json();
+
+            data.data.forEach((event) => {
+              if (event.datestart) {
+                const startDate = new Date(event.datestart);
+                if (startDate >= todayDate) {
+                  allEvents.push({
+                    id: event.id,
+                    title: event.title,
+                    park: event.parkfullname || code.toUpperCase(),
+                    start: startDate,
+                    end: event.dateend ? new Date(event.dateend) : startDate,
+                    description: event.description,
+                  });
+                }
               }
-            }
-          });
-        } catch (err) {
-          console.error(`Error fetching events for ${code}:`, err);
-        }
-      }
+            });
+          } catch (err) {
+            console.error(`❌ Failed to fetch for park: ${code}`, err);
+          }
+        })
+      );
 
       const sorted = allEvents.sort((a, b) => a.start - b.start);
       setEvents(sorted);
