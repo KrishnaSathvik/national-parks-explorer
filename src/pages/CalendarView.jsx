@@ -124,11 +124,21 @@ const CalendarView = () => {
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 
-  const filteredEvents = events.filter(
-    (e) =>
-      (selectedPark === "All" || e.park === selectedPark) &&
-      isSameDay(e.start, selectedDate)
-  );
+    const selectedISODate = selectedDate.toISOString().split("T")[0];
+
+    const filteredEvents = events.filter((e) => {
+      if (!e.start || isNaN(e.start)) return false;
+      const eventISODate = e.start.toISOString().split("T")[0];
+      const matchesDate = eventISODate === selectedISODate;
+      const matchesPark = selectedPark === "All" || e.park === selectedPark;
+      return matchesDate && matchesPark;
+    });
+
+    // Debug Logs
+    console.log("🧭 Selected Date:", selectedISODate);
+    console.log("📆 All Event Dates:", events.map((e) => e.start?.toISOString().split("T")[0]));
+    console.log("🎯 Filtered Events:", filteredEvents);
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
       <button
