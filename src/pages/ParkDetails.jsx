@@ -125,9 +125,7 @@
         if (!park?.name) return;
         const fetchWeather = async () => {
           const res = await fetch(
-            `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${encodeURIComponent(
-              park.name
-            )}&days=7`
+            `https://api.weatherapi.com/v1/forecast.json?key=${WEATHER_API_KEY}&q=${park.coordinates}&days=7`
           );
           const data = await res.json();
           setWeather(data.forecast?.forecastday || []);
