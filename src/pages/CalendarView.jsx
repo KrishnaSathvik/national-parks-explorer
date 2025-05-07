@@ -89,7 +89,7 @@ const CalendarView = () => {
         parkCodes.map(async (code) => {
           try {
             const res = await fetch(
-              `https://developer.nps.gov/api/v1/events?parkCode=${code}&api_key=${NPS_API_KEY}`
+              `https://getparkevents-wqrkpofo6a-uc.a.run.app?parkCode=${code}`
             );
             const data = await res.json();
 
