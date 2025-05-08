@@ -1,25 +1,26 @@
+// functions/index.js or functions/getParkEvents.js
 const functions = require("firebase-functions");
+const express = require("express");
+const cors = require("cors");
 const fetch = require("node-fetch");
-const cors = require("cors")({ origin: true });
 
-const NPS_API_KEY = "9Yw8gMTPlraXuJxFmDj2RRYHzIuD1KrUm54Bp29w";
+const app = express();
+app.use(cors({ origin: true })); // ✅ Allow all origins
 
-exports.getParkEvents = functions.https.onRequest((req, res) => {
-  cors(req, res, async () => {
-    const parkCode = req.query.parkCode;
-    if (!parkCode) {
-      return res.status(400).json({ error: "Missing parkCode" });
-    }
+app.get("/", async (req, res) => {
+  const parkCode = req.query.parkCode;
+  const apiKey = "9Yw8gMTPlraXuJxFmDj2RRYHzIuD1KrUm54Bp29w";
 
-    try {
-      const response = await fetch(
-        `https://developer.nps.gov/api/v1/events?parkCode=${parkCode}&api_key=${NPS_API_KEY}`
-      );
-      const data = await response.json();
-      res.json(data);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Failed to fetch events" });
-    }
-  });
+  if (!parkCode) return res.status(400).json({ error: "Missing parkCode" });
+
+  try {
+    const response = await fetch(`https://developer.nps.gov/api/v1/events?parkCode=${parkCode}&api_key=${apiKey}`);
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("❌ Error fetching park events:", error);
+    res.status(500).json({ error: "Failed to fetch park events" });
+  }
 });
+
+exports.getParkEvents = functions.https.onRequest(app);
