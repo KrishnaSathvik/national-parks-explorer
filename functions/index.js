@@ -5,7 +5,10 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 
 const app = express();
-app.use(cors({ origin: true })); // ✅ Allow all origins
+app.use(cors({
+  origin: ["https://national-parks-explorer.vercel.app"],
+  methods: ["GET"]
+}));
 
 app.get("/", async (req, res) => {
   const parkCode = req.query.parkCode;
