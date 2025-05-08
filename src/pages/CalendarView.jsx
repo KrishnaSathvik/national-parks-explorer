@@ -88,9 +88,8 @@ const CalendarView = () => {
       await Promise.allSettled(
         parkCodes.map(async (code) => {
           try {
-            const res = await fetch(
-              `https://getparkevents-wqrkpofo6a-uc.a.run.app?parkCode=${code}`
-            );
+            const FUNCTION_BASE_URL = "https://getparkevents-wqrkpofo6a-uc.a.run.app";
+            const res = await fetch(`${FUNCTION_BASE_URL}/?parkCode=${code}`);
             const data = await res.json();
 
             data.data.forEach((event) => {
