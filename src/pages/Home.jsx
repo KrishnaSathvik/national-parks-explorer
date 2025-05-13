@@ -1,11 +1,10 @@
-// Home.jsx (updated with FadeInWrapper)
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import FadeInWrapper from "../components/FadeInWrapper";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
-
+import { useAuth } from "../context/AuthContext";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -21,6 +20,8 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const navigate = useNavigate();
+  const { currentUser, logout } = useAuth();
+
 
   const parksPerPage = 9;
 
@@ -49,19 +50,43 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-heading font-bold">🌍 Explore National Parks</h1>
         <div className="flex gap-2">
-    <Link
-      to="/calendar"
-      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-    >
-      📅 View Park Events
-    </Link>
-        <button
-          onClick={() => navigate("/favorites")}
-          className="text-xl font-heading font-semibold text-black hover:underline transition"
-        >
-          ❤️ View Favorites
-        </button>
-      </div>
+          <Link
+            to="/calendar"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+          >
+            📅 View Park Events
+          </Link>
+          {currentUser ? (
+            <>
+            <button
+              onClick={() => navigate("/favorites")}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+            >
+              ❤️ View Favorites
+            </button>
+            <button
+              onClick={async () => {
+                await logout();
+                toast.success("👋 Logged out successfully");
+                navigate("/");
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+            >
+              Logout
+            </button>
+
+            </>
+          ) : (
+          <Link
+            to="/login"
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+          >
+            🔐 Login to save your favorites
+          </Link>
+
+          )}
+
+        </div>
       </div>
 
       <MapContainer
@@ -72,7 +97,10 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {parks.map((park) => {
-          const [lat, lng] = park.coordinates?.split(",").map((val) => parseFloat(val.trim()));
+          if (!park.coordinates || !park.coordinates.includes(",")) return null;
+          const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
+          if (isNaN(lat) || isNaN(lng)) return null;
+
           return (
             <Marker key={park.id} position={[lat, lng]}>
               <Popup>
@@ -133,19 +161,30 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
               className="border p-4 rounded shadow hover:shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer relative bg-white"
               onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
             >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleFavorite(park.id);
-                }}
-                className="absolute top-2 right-2 text-xl"
-              >
-                {favorites.includes(park.id) ? (
-                  <span className="text-red-500">❤️</span>
-                ) : (
-                  <span className="text-gray-400 hover:text-red-500">🤍</span>
-                )}
-              </button>
+              {currentUser && (
+                <button
+                 title={currentUser ? "Remove from favorites" : "Login to save"}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (currentUser) {
+                      toggleFavorite(park.id);
+                    } else {
+                      toast.info("🔐 Please log in to save favorites");
+                    }
+                  }}
+                  disabled={!currentUser}
+                  className={`absolute top-2 right-2 text-xl transition ${
+                    currentUser ? "" : "opacity-40 cursor-not-allowed"
+                  }`}
+                >
+                  {favorites.includes(park.id) ? (
+                    <span className="text-red-500">❤️</span>
+                  ) : (
+                    <span className="text-gray-400">🤍</span>
+                  )}
+                </button>
+
+              )}
               <h2 className="text-xl font-heading font-semibold">{park.name}</h2>
               <p className="text-gray-600">{park.state}</p>
               <p className="text-sm text-gray-500 mt-1">

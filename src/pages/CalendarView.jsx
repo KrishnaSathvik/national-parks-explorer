@@ -1,148 +1,92 @@
-// Updated CalendarView.jsx with calendar date picker
+// 📅 CalendarView.jsx — Final Version with Bug Fixes & Enhancements
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-const NPS_API_KEY = "***REMOVED***";
+import { useAuth } from "../context/AuthContext";
+import { db } from "../firebase";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedPark, setSelectedPark] = useState("All");
+  const [savedEventIds, setSavedEventIds] = useState([]);
+  const [lastUpdated, setLastUpdated] = useState(null);
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    const fetchAllEvents = async () => {
-      const parkCodes = [
-  "acad", // Acadia
-  "arch", // Arches
-  "badl", // Badlands
-  "bibe", // Big Bend
-  "bisc", // Biscayne
-  "blca", // Black Canyon of the Gunnison
-  "brca", // Bryce Canyon
-  "cany", // Canyonlands
-  "care", // Capitol Reef
-  "cave", // Carlsbad Caverns
-  "chis", // Channel Islands
-  "cong", // Congaree
-  "crla", // Crater Lake
-  "cuva", // Cuyahoga Valley
-  "dena", // Denali
-  "drto", // Dry Tortugas
-  "ever", // Everglades
-  "gaar", // Gates of the Arctic
-  "glba", // Glacier Bay
-  "glac", // Glacier
-  "grca", // Grand Canyon
-  "grte", // Grand Teton
-  "grba", // Great Basin
-  "grsa", // Great Sand Dunes
-  "grsm", // Great Smoky Mountains
-  "hale", // Haleakalā
-  "havo", // Hawaiʻi Volcanoes
-  "hosp", // Hot Springs
-  "indu", // Indiana Dunes
-  "isro", // Isle Royale
-  "jotr", // Joshua Tree
-  "katm", // Katmai
-  "kefj", // Kenai Fjords
-  "kica", // Kings Canyon
-  "kova", // Kobuk Valley
-  "lacl", // Lake Clark
-  "lavo", // Lassen Volcanic
-  "maca", // Mammoth Cave
-  "meve", // Mesa Verde
-  "mora", // Mount Rainier
-  "noca", // North Cascades
-  "olym", // Olympic
-  "pefo", // Petrified Forest
-  "pinn", // Pinnacles
-  "redw", // Redwood
-  "romo", // Rocky Mountain
-  "sagu", // Saguaro
-  "seki", // Sequoia
-  "shen", // Shenandoah
-  "thro", // Theodore Roosevelt
-  "viis", // Virgin Islands
-  "voya", // Voyageurs
-  "whsa", // White Sands
-  "wica", // Wind Cave
-  "wrst", // Wrangell–St. Elias
-  "yell", // Yellowstone
-  "yose", // Yosemite
-  "zion", // Zion
-  "npsa", // National Park of American Samoa
-  "neri", // New River Gorge
-  "jeff", // Gateway Arch
-  "deva"  // Death Valley
-      ];
-
-      const allEvents = [];
-      const todayDate = new Date();
-      todayDate.setHours(0, 0, 0, 0);
-
-      await Promise.allSettled(
-        parkCodes.map(async (code) => {
-          try {
-            const FUNCTION_BASE_URL = "https://getparkevents-wqrkpofo6a-uc.a.run.app";
-            const res = await fetch(`${FUNCTION_BASE_URL}/?parkCode=${code}`);
-            const data = await res.json();
-
-            data.data.forEach((event) => {
-              if (event.datestart) {
-                const startDate = new Date(event.datestart);
-                if (startDate >= todayDate) {
-                  allEvents.push({
-                    id: event.id,
-                    title: event.title,
-                    park: event.parkfullname || code.toUpperCase(),
-                    start: startDate,
-                    end: event.dateend ? new Date(event.dateend) : startDate,
-                    description: event.description,
-                  });
-                }
-              }
-            });
-          } catch (err) {
-            console.error(`❌ Failed to fetch for park: ${code}`, err);
-          }
-        })
-      );
-
-      const sorted = allEvents.sort((a, b) => a.start - b.start);
-      setEvents(sorted);
+    const fetchEvents = async () => {
+      const snapshot = await getDoc(doc(db, "cache", "events"));
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        setLastUpdated(data.updatedAt);
+        const parsed = data.events.map((e) => ({
+          ...e,
+          start: e.start ? new Date(e.start) : new Date(),
+          end: e.end ? new Date(e.end) : new Date(e.start),
+        }));
+        setEvents(parsed.sort((a, b) => a.start - b.start));
+      }
       setLoading(false);
     };
-
-    fetchAllEvents();
+    fetchEvents();
   }, []);
 
-  const isSameDay = (d1, d2) =>
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate();
+  useEffect(() => {
+    const fetchSavedEvents = async () => {
+      if (!currentUser) return;
+      const docSnap = await getDoc(doc(db, "users", currentUser.uid));
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setSavedEventIds(data.favoriteEvents || []);
+      }
+    };
+    fetchSavedEvents();
+  }, [currentUser]);
 
-    const selectedISODate = selectedDate.toISOString().split("T")[0];
-
-    const filteredEvents = events.filter((e) => {
-      if (!e.start || isNaN(e.start)) return false;
-      const eventISODate = e.start.toISOString().split("T")[0];
-      const matchesDate = eventISODate === selectedISODate;
-      const matchesPark = selectedPark === "All" || e.park === selectedPark;
-      return matchesDate && matchesPark;
+  const toggleEventSave = async (eventObj) => {
+    if (!currentUser) {
+      toast.info("Please log in to save events");
+      return;
+    }
+    const userRef = doc(db, "users", currentUser.uid);
+    const alreadySaved = savedEventIds.includes(eventObj.id);
+    await updateDoc(userRef, {
+      favoriteEvents: alreadySaved ? arrayRemove(eventObj.id) : arrayUnion(eventObj.id),
     });
+    setSavedEventIds((prev) =>
+      alreadySaved ? prev.filter((id) => id !== eventObj.id) : [...prev, eventObj.id]
+    );
+    toast.success(alreadySaved ? "Removed from saved events" : "Event saved successfully");
+  };
 
-    // Debug Logs
-    console.log("🧭 Selected Date:", selectedISODate);
-    console.log("📆 All Event Dates:", events.map((e) => e.start?.toISOString().split("T")[0]));
-    console.log("🎯 Filtered Events:", filteredEvents);
+  const selectedISODate = selectedDate.toLocaleDateString("en-CA");
+
+  const filteredEvents = events.filter((e) => {
+    if (!e.start || isNaN(e.start)) return false;
+    const eventISODate = e.start.toLocaleDateString("en-CA");
+    const matchesDate = eventISODate === selectedISODate;
+    const matchesPark = selectedPark === "All" || e.park === selectedPark;
+    return matchesDate && matchesPark;
+  });
+
+  const monthlyEventMap = events.reduce((acc, event) => {
+    const date = event.start.toLocaleDateString("en-CA");
+    acc[date] = acc[date] || { count: 0, parks: new Set() };
+    acc[date].count++;
+    acc[date].parks.add(event.park);
+    return acc;
+  }, {});
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
+      <ToastContainer />
       <button
         onClick={() => navigate("/")}
         className="mb-4 text-blue-600 hover:underline text-sm"
@@ -150,63 +94,108 @@ const CalendarView = () => {
         ← Back to Parks
       </button>
 
-      <h1 className="text-3xl font-bold mb-6"> National Park Events by Date</h1>
+      <h1 className="text-3xl font-bold mb-4 text-center">National Park Events by Date</h1>
 
-      <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div>
-          <label className="text-sm font-semibold mr-2">🔎 Filter by Park:</label>
-          <select
-            value={selectedPark}
-            onChange={(e) => setSelectedPark(e.target.value)}
-            className="border px-2 py-1 rounded text-sm"
-          >
-            <option>All</option>
-            {[...new Set(events.map((e) => e.park))]
-              .sort()
-              .map((park) => (
+      {lastUpdated && (
+        <p className="text-sm text-center text-gray-500 mb-6">
+          🕒 Last updated: {new Date(lastUpdated).toLocaleString()}
+        </p>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 items-start">
+        <div className="space-y-6">
+          <div>
+            <label className="text-sm font-semibold block mb-1">🔎 Filter by Park:</label>
+            <select
+              value={selectedPark}
+              onChange={(e) => setSelectedPark(e.target.value)}
+              className="border px-3 py-2 rounded text-sm w-full"
+            >
+              <option>All</option>
+              {[...new Set(events.map((e) => e.park))].sort().map((park) => (
                 <option key={park}>{park}</option>
               ))}
-          </select>
+            </select>
+          </div>
+          <div>
+            <label className="text-sm font-semibold block mb-1">📅 Pick a Date:</label>
+            <DatePicker
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              className="border px-3 py-2 rounded text-sm w-full"
+              minDate={new Date()}
+            />
+          </div>
         </div>
 
-        <div>
-          <label className="text-sm font-semibold mr-2">🗓️ Pick a Date:</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => setSelectedDate(date)}
-            className="border px-2 py-1 rounded text-sm"
-            minDate={new Date()}
-          />
+        <div className="text-center">
+          <h2 className="text-md font-bold mb-2">🔥 Monthly Heatmap Overview</h2>
+          <div className="grid grid-cols-7 gap-1 text-xs">
+            {Array.from({ length: 31 }, (_, i) => {
+              const day = i + 1;
+              const date = new Date(selectedDate);
+              date.setDate(day);
+              const iso = date.toLocaleDateString("en-CA");
+              const data = monthlyEventMap[iso];
+              const count = data?.count || 0;
+              const parkCount = data?.parks?.size || 0;
+              const bg = count >= 10 ? "bg-red-400" : count >= 5 ? "bg-orange-300" : count > 0 ? "bg-yellow-200" : "bg-gray-100";
+
+              return (
+                <div
+                  key={day}
+                  className={`p-2 rounded ${bg} cursor-pointer`}
+                  onClick={() => setSelectedDate(date)}
+                >
+                  <div className="font-semibold">{day}</div>
+                  <div>{count} evt</div>
+                  <div className="text-[10px] text-gray-700">{parkCount} parks</div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
+
+      <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+        📅 Events on {selectedDate.toDateString()}
+      </h2>
 
       {loading ? (
         <p className="text-gray-600">Loading events...</p>
       ) : filteredEvents.length === 0 ? (
         <p className="text-red-500">No events found for this date.</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 gap-6">
           {filteredEvents.map((event) => (
             <div
               key={event.id}
-              className="bg-white rounded shadow p-4 border border-blue-100 hover:border-blue-300"
+              className="bg-white rounded-xl border border-blue-100 shadow p-5 relative"
             >
-              <h3 className="text-lg font-semibold text-blue-700 mb-1">
+              <h3 className="text-xl font-semibold text-blue-700 mb-1">
                 {event.title}
               </h3>
               <p className="text-sm text-gray-600">📍 {event.park}</p>
-              <p className="text-sm text-gray-600">🗓️ {event.start.toDateString()}</p>
-              <p className="text-sm text-gray-600 mb-2">🕒 {event.start.toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
+              <p className="text-sm text-gray-600">
+                🗓️ {event.start.toDateString()} | 🕒 {event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </p>
+              <button
+                onClick={() => toggleEventSave(event)}
+                className={`absolute top-2 right-2 text-xl ${currentUser ? "hover:scale-110" : "opacity-40 cursor-not-allowed"}`}
+              >
+                {savedEventIds.includes(event.id) ? "💾" : "➕"}
+              </button>
               <div
-                className="text-gray-700 text-sm"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(event.description || "No description available."),
-                }}
+                className="text-gray-700 text-sm mt-4"
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description || "No description available.") }}
               />
+              {event.url && (
+                <p className="text-sm text-blue-600 mt-4">
+                  🔗 <a href={event.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-800">
+                    Go to this link for more event information
+                  </a>
+                </p>
+              )}
             </div>
           ))}
         </div>
