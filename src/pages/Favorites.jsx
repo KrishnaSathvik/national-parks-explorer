@@ -1,4 +1,4 @@
-// Favorites.jsx (with real-time Firestore sync for favorite events)
+// Favorites.jsx (final fix for real-time sync, date parsing, and remove bug)
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
@@ -10,9 +10,8 @@ import DOMPurify from "dompurify";
 const Favorites = ({ parks, favorites, toggleFavorite }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
-  const [favoriteEvents, setFavoriteEvents] = useState([]);
+  const [rawEvents, setRawEvents] = useState([]);
 
-  // ✅ Real-time sync with Firestore
   useEffect(() => {
     if (!currentUser) return;
 
@@ -20,23 +19,38 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
     const unsubscribe = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
-        setFavoriteEvents(data.favoriteEvents || []);
+        setRawEvents(data.favoriteEvents || []);
       }
     });
 
-    return () => unsubscribe(); // Cleanup listener
+    return () => unsubscribe();
   }, [currentUser]);
 
-  const handleRemoveEvent = async (event) => {
+  const handleRemoveEvent = async (eventId) => {
     if (!currentUser) return;
     const userRef = doc(db, "users", currentUser.uid);
-    await updateDoc(userRef, {
-      favoriteEvents: arrayRemove(event),
-    });
+    const updated = rawEvents.find((e) => e.id === eventId);
+    if (updated) {
+      await updateDoc(userRef, {
+        favoriteEvents: arrayRemove(updated),
+      });
+    }
   };
 
+  const parsedEvents = rawEvents.map((event) => {
+    const safeStart = event?.start ? new Date(event.start) : null;
+    const safeEnd = event?.end ? new Date(event.end) : safeStart;
+    return {
+      ...event,
+      start: safeStart instanceof Date && !isNaN(safeStart) ? safeStart : null,
+      end: safeEnd instanceof Date && !isNaN(safeEnd) ? safeEnd : null,
+    };
+  });
+
   const noParkFavorites = parks.length === 0;
-  const noEventFavorites = favoriteEvents.length === 0;
+  const noEventFavorites = parsedEvents.length === 0;
+  console.log("🔍 Raw Favorite Events from Firestore:", rawEvents);
+  console.log("🧪 Parsed Events:", parsedEvents);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
@@ -58,7 +72,6 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
         </div>
       ) : (
         <>
-          {/* Favorite Parks */}
           {parks.length > 0 && (
             <>
               <h2 className="text-xl font-bold mb-4">🏞️ Favorite Parks</h2>
@@ -90,20 +103,21 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
               </div>
             </>
           )}
-
-          {/* Favorite Events */}
-          {favoriteEvents.length > 0 && (
+        
+          {parsedEvents.length > 0 && (
             <>
               <h2 className="text-xl font-bold mb-4">📅 Favorite Events</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {favoriteEvents.map((event, idx) => (
+                {parsedEvents.map((event, idx) => (
                   <FadeInWrapper key={event.id} delay={idx * 0.05}>
                     <div className="bg-white rounded shadow p-4 border border-blue-100 hover:border-blue-300 relative">
                       <h3 className="text-lg font-semibold text-blue-700 mb-1">{event.title}</h3>
-                      <p className="text-sm text-gray-600">📍 {event.park}</p>
-                      <p className="text-sm text-gray-600">🗓️ {new Date(event.start).toDateString()}</p>
+                      <p className="text-sm text-gray-600">📍 {event.park || "Unknown Park"}</p>
+                      <p className="text-sm text-gray-600">
+                        🗓️ {event.start ? event.start.toDateString() : "Unknown Date"}
+                      </p>
                       <p className="text-sm text-gray-600 mb-2">
-                        🕒 {new Date(event.start).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        🕒 {event.start ? event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Unknown Time"}
                       </p>
                       {event.url && (
                         <a
@@ -122,7 +136,7 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
                         }}
                       />
                       <button
-                        onClick={() => handleRemoveEvent(event)}
+                        onClick={() => handleRemoveEvent(event.id)}
                         className="absolute top-2 right-2 text-red-500 text-sm underline hover:text-red-700"
                       >
                         ❌ Remove

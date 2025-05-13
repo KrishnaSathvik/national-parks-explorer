@@ -58,7 +58,13 @@ const CalendarView = () => {
     const userRef = doc(db, "users", currentUser.uid);
     const alreadySaved = savedEventIds.includes(eventObj.id);
     await updateDoc(userRef, {
-      favoriteEvents: alreadySaved ? arrayRemove(eventObj.id) : arrayUnion(eventObj.id),
+      favoriteEvents: alreadySaved
+        ? arrayRemove(eventObj)
+        : arrayUnion({
+            ...eventObj,
+            start: eventObj.start instanceof Date ? eventObj.start.toISOString() : eventObj.start,
+            end: eventObj.end instanceof Date ? eventObj.end.toISOString() : eventObj.end,
+          })
     });
     setSavedEventIds((prev) =>
       alreadySaved ? prev.filter((id) => id !== eventObj.id) : [...prev, eventObj.id]
