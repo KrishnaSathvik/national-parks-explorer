@@ -1,8 +1,8 @@
-// Favorites.jsx (parks + saved events with remove option)
+// Favorites.jsx (with real-time Firestore sync for favorite events)
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
-import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
+import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import FadeInWrapper from "../components/FadeInWrapper";
 import DOMPurify from "dompurify";
@@ -12,17 +12,19 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
   const { currentUser } = useAuth();
   const [favoriteEvents, setFavoriteEvents] = useState([]);
 
+  // ✅ Real-time sync with Firestore
   useEffect(() => {
-    const fetchSavedEvents = async () => {
-      if (!currentUser) return;
-      const userRef = doc(db, "users", currentUser.uid);
-      const docSnap = await getDoc(userRef);
+    if (!currentUser) return;
+
+    const userRef = doc(db, "users", currentUser.uid);
+    const unsubscribe = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         setFavoriteEvents(data.favoriteEvents || []);
       }
-    };
-    fetchSavedEvents();
+    });
+
+    return () => unsubscribe(); // Cleanup listener
   }, [currentUser]);
 
   const handleRemoveEvent = async (event) => {
@@ -31,7 +33,6 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
     await updateDoc(userRef, {
       favoriteEvents: arrayRemove(event),
     });
-    setFavoriteEvents((prev) => prev.filter((e) => e.id !== event.id));
   };
 
   const noParkFavorites = parks.length === 0;
