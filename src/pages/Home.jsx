@@ -5,7 +5,9 @@ import L from "leaflet";
 import FadeInWrapper from "../components/FadeInWrapper";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { toast } from "react-toastify";
 
+// Leaflet icon fix
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -21,7 +23,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
-
 
   const parksPerPage = 9;
 
@@ -47,85 +48,75 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 font-sans fade-in">
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
         <h1 className="text-3xl font-heading font-bold">🌍 Explore National Parks</h1>
-        <div className="flex gap-2">
-          <Link
-            to="/calendar"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-          >
+        <div className="flex flex-col sm:flex-row gap-2">
+          <Link to="/calendar" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center">
             📅 View Park Events
           </Link>
           {currentUser ? (
             <>
-            <button
-              onClick={() => navigate("/favorites")}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-            >
-              ❤️ View Favorites
-            </button>
-            <button
-              onClick={async () => {
-                await logout();
-                toast.success("👋 Logged out successfully");
-                navigate("/");
-              }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-            >
-              Logout
-            </button>
-
+              <button
+                onClick={() => navigate("/favorites")}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+              >
+                ❤️ View Favorites
+              </button>
+              <button
+                onClick={async () => {
+                  await logout();
+                  toast.success("👋 Logged out successfully");
+                  navigate("/");
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
+              >
+                Logout
+              </button>
             </>
           ) : (
-          <Link
-            to="/login"
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-          >
-            🔐 Login to save your favorites
-          </Link>
-
+            <Link
+              to="/login"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center"
+            >
+              🔐 Login to save your favorites
+            </Link>
           )}
-
         </div>
       </div>
 
-      <MapContainer
-        center={[39.5, -98.35]}
-        zoom={4}
-        scrollWheelZoom={false}
-        className="h-80 w-full rounded mb-6 shadow"
-      >
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-        {parks.map((park) => {
-          if (!park.coordinates || !park.coordinates.includes(",")) return null;
-          const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
-          if (isNaN(lat) || isNaN(lng)) return null;
+      <div className="w-full h-64 sm:h-80 md:h-96 rounded overflow-hidden shadow mb-6">
+        <MapContainer center={[39.5, -98.35]} zoom={4} scrollWheelZoom={false} className="w-full h-full">
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          {parks.map((park) => {
+            if (!park.coordinates || !park.coordinates.includes(",")) return null;
+            const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
+            if (isNaN(lat) || isNaN(lng)) return null;
+            return (
+              <Marker key={park.id} position={[lat, lng]}>
+                <Popup>
+                  <strong>{park.name}</strong>
+                  <br />
+                  <button
+                    onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
+                    className="text-blue-600 underline mt-1"
+                  >
+                    View Park →
+                  </button>
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+      </div>
 
-          return (
-            <Marker key={park.id} position={[lat, lng]}>
-              <Popup>
-                <strong>{park.name}</strong>
-                <br />
-                <button
-                  onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
-                  className="text-blue-600 underline mt-1"
-                >
-                  View Park →
-                </button>
-              </Popup>
-            </Marker>
-          );
-        })}
-      </MapContainer>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
         <input
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setCurrentPage(1);
           }}
-          className="border px-3 py-2 rounded shadow-sm text-lg font-heading font-semibold focus:outline-none focus:ring focus:ring-blue-200"
+          className="border px-3 py-2 rounded text-sm w-full"
           placeholder="Search parks..."
         />
         <select
@@ -134,7 +125,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             setSelectedState(e.target.value);
             setCurrentPage(1);
           }}
-          className="border px-3 py-2 rounded shadow-sm text-lg font-heading font-semibold focus:outline-none focus:ring focus:ring-blue-200"
+          className="border px-3 py-2 rounded text-sm w-full"
         >
           {uniqueStates.map((state) => (
             <option key={state}>{state}</option>
@@ -146,7 +137,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             setSelectedSeason(e.target.value);
             setCurrentPage(1);
           }}
-          className="border px-3 py-2 rounded shadow-sm text-lg font-heading font-semibold focus:outline-none focus:ring focus:ring-blue-200"
+          className="border px-3 py-2 rounded text-sm w-full"
         >
           {seasons.map((season) => (
             <option key={season}>{season}</option>
@@ -154,7 +145,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         </select>
       </div>
 
-      <ul className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {currentParks.map((park, idx) => (
           <FadeInWrapper key={park.id} delay={idx * 0.1}>
             <li
@@ -163,7 +154,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             >
               {currentUser && (
                 <button
-                 title={currentUser ? "Remove from favorites" : "Login to save"}
+                  title={currentUser ? "Remove from favorites" : "Login to save"}
                   onClick={(e) => {
                     e.stopPropagation();
                     if (currentUser) {
@@ -173,9 +164,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                     }
                   }}
                   disabled={!currentUser}
-                  className={`absolute top-2 right-2 text-xl transition ${
-                    currentUser ? "" : "opacity-40 cursor-not-allowed"
-                  }`}
+                  className={`absolute top-2 right-2 text-xl transition ${currentUser ? "" : "opacity-40 cursor-not-allowed"}`}
                 >
                   {favorites.includes(park.id) ? (
                     <span className="text-red-500">❤️</span>
@@ -183,7 +172,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                     <span className="text-gray-400">🤍</span>
                   )}
                 </button>
-
               )}
               <h2 className="text-xl font-heading font-semibold">{park.name}</h2>
               <p className="text-gray-600">{park.state}</p>
