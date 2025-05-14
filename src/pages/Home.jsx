@@ -48,41 +48,45 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 font-sans fade-in">
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
-        <h1 className="text-2xl sm:text-3xl font-heading font-bold break-words max-w-[90vw]">
-          🌍 Explore <br className="block sm:hidden" /> National Parks
-        </h1>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Link to="/calendar" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center">
-            📅 View Park Events
-          </Link>
-          {currentUser ? (
-            <>
-              <button
-                onClick={() => navigate("/favorites")}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-              >
-                ❤️ View Favorites
-              </button>
-              <button
-                onClick={async () => {
-                  await logout();
-                  toast.success("👋 Logged out successfully");
-                  navigate("/");
-                }}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link
-              to="/login"
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center"
-            >
-              🔐 Login to save your favorites
-            </Link>
-          )}
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+      <h1 className="text-3xl font-heading font-bold text-center sm:text-left">
+        🌍 Explore National Parks
+      </h1>
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+      <Link
+        to="/calendar"
+        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
+      >
+        📅 View Park Events
+      </Link>
+
+      {currentUser ? (
+        <>
+          <button
+            onClick={() => navigate("/favorites")}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
+          >
+            ❤️ View Favorites
+          </button>
+          <button
+            onClick={async () => {
+              await logout();
+              toast.success("👋 Logged out successfully");
+              navigate("/");
+            }}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
+          >
+            Logout
+          </button>
+        </>
+      ) : (
+        <Link
+          to="/login"
+          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
+        >
+          🔐 Login to save your favorites
+        </Link>
+      )}
         </div>
       </div>
 

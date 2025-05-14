@@ -11,9 +11,9 @@
     import { motion } from "framer-motion";
 
 
+    const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
+    const NPS_API_KEY = import.meta.env.VITE_NPS_API_KEY;
 
-    const WEATHER_API_KEY = "***REMOVED***";
-    const NPS_API_KEY = "***REMOVED***";
 
     const backgroundThemes = {
       acad: "bg-gradient-to-r from-blue-100 to-green-100",
