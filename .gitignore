@@ -25,3 +25,7 @@ dist-ssr
 firebase-key.json
 serviceAccountKey.json
 .env
+.env.local
+# BUT allow .env.example (override)
+!.env.example
+
