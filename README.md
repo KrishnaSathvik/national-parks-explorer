@@ -9,8 +9,10 @@ A responsive React + Firebase app to explore U.S. National Parks, view seasonal 
 - 🗺️ Interactive Leaflet map with park markers  
 - 🔍 Search and paginate through all parks  
 - ❤️ Favorite parks (saved in Firebase or localStorage)  
-- 📆 Calendar view with NPS event heatmap & filtering  
-- 🌤️ 7-day weather forecasts for each park  
+- 📅 Calendar view with NPS event heatmap & filtering  
+- 🔥 Favorite and save events (synced to Firestore)  
+- 🕒 Show last event cache time with daily counts  
+- 🌤️ 3-day weather forecasts for each park  
 - 📢 Live NPS alerts and seasonal visit tips  
 - 🍽️ Recommended nearby food and hotels  
 - 📤 Social media sharing support  
@@ -36,6 +38,8 @@ src/
 ├── components/
 │   ├── Layout.jsx
 │   └── EventHeatmap.jsx
+├── context/
+│   └── AuthContext.jsx
 ```
 
 ---
@@ -49,12 +53,13 @@ src/
 | **main.jsx** | App root mount point |
 | **index.css** | Tailwind CSS import and base styles |
 | **Home.jsx** | Map view, search, pagination, and favorites toggle |
-| **Favorites.jsx** | Park cards filtered from user’s saved favorites |
+| **Favorites.jsx** | Park cards & saved events rendered from Firestore |
 | **ParkDetail.jsx** | Park metadata, alerts, weather, food, lodging |
 | **MapPage.jsx** | Dedicated full-screen interactive map |
 | **CalendarView.jsx** | Monthly NPS event heatmap with filters |
 | **EventHeatmap.jsx** | Reusable heatmap component for event overview |
 | **Layout.jsx** | Common layout with navigation/header/footer |
+| **AuthContext.jsx** | Provides global user auth state and actions |
 
 ---
 
