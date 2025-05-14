@@ -13,49 +13,78 @@ const Signup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // clear previous error
     try {
       await signup(email, password);
       toast.success("🎉 Account created successfully!");
       navigate("/");
     } catch (err) {
-      setError("❌ Signup failed. Please try again.");
-      toast.error("Signup failed. Try a different email or password.");
+      console.error("Firebase Signup Error:", err);
+
+      let message = "❌ Signup failed. Please try again.";
+      if (err.code === "auth/email-already-in-use") {
+        message = "📧 Email already in use. Try logging in.";
+      } else if (err.code === "auth/invalid-email") {
+        message = "⚠️ Invalid email address format.";
+      } else if (err.code === "auth/weak-password") {
+        message = "🔒 Password should be at least 6 characters.";
+      } else if (err.code === "auth/operation-not-allowed") {
+        message = "❌ Email/Password sign-up is not enabled in Firebase.";
+      }
+
+      setError(message);
+      toast.error(message);
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto bg-white shadow rounded font-sans mt-10">
-      <h2 className="text-2xl font-heading font-bold mb-4 text-center">📝 Sign Up</h2>
-      {error && <p className="text-red-500 text-sm mb-2 text-center">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-3 border rounded shadow-sm text-sm focus:outline-none focus:ring focus:ring-blue-300"
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-3 border rounded shadow-sm text-sm focus:outline-none focus:ring focus:ring-blue-300"
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button
-          type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded shadow"
-        >
-          Sign Up
-        </button>
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition-transform duration-300 hover:scale-[1.01]">
+        <h2 className="text-3xl font-heading font-bold mb-6 text-center text-pink-600">
+          📝 Create Your Account
+        </h2>
 
-      <p className="text-sm mt-4 text-center">
-        Already have an account?{" "}
-        <Link to="/login" className="text-blue-600 underline">
-          Log in
-        </Link>
-      </p>
+        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            autoFocus
+            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            required
+          />
+
+          <input
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError("");
+            }}
+            required
+          />
+
+          <button
+            type="submit"
+            className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-full shadow-md transition"
+          >
+            Sign Up
+          </button>
+        </form>
+
+        <p className="text-sm text-center mt-6 text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-pink-500 font-medium underline">
+            Log in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 };

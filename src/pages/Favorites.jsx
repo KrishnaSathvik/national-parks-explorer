@@ -1,4 +1,4 @@
-// Favorites.jsx (final fix for real-time sync, date parsing, and remove bug)
+// src/pages/Favorites.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
@@ -6,6 +6,7 @@ import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import FadeInWrapper from "../components/FadeInWrapper";
 import DOMPurify from "dompurify";
+import { toast } from "react-toastify";
 
 const Favorites = ({ parks, favorites, toggleFavorite }) => {
   const navigate = useNavigate();
@@ -14,15 +15,12 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
 
   useEffect(() => {
     if (!currentUser) return;
-
     const userRef = doc(db, "users", currentUser.uid);
     const unsubscribe = onSnapshot(userRef, (docSnap) => {
       if (docSnap.exists()) {
-        const data = docSnap.data();
-        setRawEvents(data.favoriteEvents || []);
+        setRawEvents(docSnap.data().favoriteEvents || []);
       }
     });
-
     return () => unsubscribe();
   }, [currentUser]);
 
@@ -34,6 +32,7 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
       await updateDoc(userRef, {
         favoriteEvents: arrayRemove(updated),
       });
+      toast.success("❌ Removed event from favorites");
     }
   };
 
@@ -47,107 +46,151 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
     };
   });
 
-  const noParkFavorites = parks.length === 0;
-  const noEventFavorites = parsedEvents.length === 0;
-  console.log("🔍 Raw Favorite Events from Firestore:", rawEvents);
-  console.log("🧪 Parsed Events:", parsedEvents);
-
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
+    <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
       <button
         onClick={() => navigate("/")}
-        className="text-blue-600 hover:underline text-sm mb-6 inline-block"
+        className="text-pink-600 hover:underline text-sm mb-6 inline-block"
       >
         ← Back to All Parks
       </button>
 
-      <h1 className="text-3xl font-heading font-bold mb-6">
-        💖 Your Favorites (Parks & Events)
+      <h1 className="text-3xl font-bold text-center text-pink-600 mb-10">
+        💖 Your Favorites
       </h1>
 
-      {noParkFavorites && noEventFavorites ? (
-        <div className="text-center">
-          <h2 className="text-2xl font-heading font-semibold mb-2">💔 No Favorites Yet</h2>
-          <p className="text-gray-500">Save parks or events to see them here.</p>
+      {/* Empty State for Parks */}
+      {parks.length === 0 && (
+        <div className="text-center text-gray-500 mb-10">
+          <p>💤 You haven’t favorited any parks yet.</p>
         </div>
-      ) : (
-        <>
-          {parks.length > 0 && (
-            <>
-              <h2 className="text-xl font-bold mb-4">🏞️ Favorite Parks</h2>
-              <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                {parks.map((park, idx) => (
-                  <FadeInWrapper key={park.id} delay={idx * 0.1}>
-                    <div
-                      className="border p-4 rounded shadow hover:shadow-md transition cursor-pointer bg-white relative"
-                      onClick={() => navigate(`/park/${park.id}?page=1`, { state: { from: "favorites" } })}
+      )}
+
+      {/* Favorite Parks */}
+      {parks.length > 0 && (
+        <section className="mb-12">
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            🏞️ Favorite Parks
+          </h2>
+          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {parks.map((park, idx) => (
+              <FadeInWrapper key={park.id} delay={idx * 0.1}>
+                <div
+                  className="bg-white p-5 rounded-xl border shadow hover:shadow-md transition cursor-pointer relative"
+                  onClick={() =>
+                    navigate(`/park/${park.id}?page=1`, {
+                      state: { from: "favorites" },
+                    })
+                  }
+                >
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(park.id);
+                      toast.info("❌ Removed park from favorites");
+                    }}
+                    className="absolute top-3 right-3 text-xl text-pink-500 hover:scale-110 transition"
+                    title="Remove from favorites"
+                  >
+                    ❤️
+                  </button>
+                  <h2 className="text-lg font-semibold text-pink-600 truncate">
+                    {park.name}
+                  </h2>
+                  <p className="text-sm text-gray-500">📍 {park.state}</p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    📆 Best Season:{" "}
+                    {park.bestSeason && (
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold
+                        ${
+                          park.bestSeason === "Summer"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : park.bestSeason === "Winter"
+                            ? "bg-blue-100 text-blue-800"
+                            : park.bestSeason === "Spring"
+                            ? "bg-green-100 text-green-800"
+                            : park.bestSeason === "Fall"
+                            ? "bg-orange-100 text-orange-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {park.bestSeason}
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </FadeInWrapper>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Empty State for Events */}
+      {parsedEvents.length === 0 && (
+        <div className="text-center text-gray-500 mb-10">
+          <p>📭 You haven’t saved any events yet.</p>
+        </div>
+      )}
+
+      {/* Favorite Events */}
+      {parsedEvents.length > 0 && (
+        <section>
+          <h2 className="text-xl font-semibold mb-4 text-gray-700">
+            📅 Favorite Events
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {parsedEvents.map((event, idx) => (
+              <FadeInWrapper key={event.id} delay={idx * 0.05}>
+                <div className="bg-white rounded-xl p-5 border shadow hover:shadow-lg transition relative">
+                  <button
+                    onClick={() => handleRemoveEvent(event.id)}
+                    className="absolute top-3 right-3 text-sm text-red-500 hover:underline"
+                    title="Remove from favorites"
+                  >
+                    ❌ Remove
+                  </button>
+                  <h3 className="text-lg font-semibold text-pink-600 mb-1">
+                    {event.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    📍 {event.park || "Unknown Park"}
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    🗓️ {event.start ? event.start.toDateString() : "Unknown Date"}
+                  </p>
+                  <p className="text-sm text-gray-600 mb-2">
+                    🕒{" "}
+                    {event.start
+                      ? event.start.toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : "Unknown Time"}
+                  </p>
+                  {event.url && (
+                    <a
+                      href={event.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 text-sm underline block mb-2"
                     >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFavorite(park.id);
-                        }}
-                        className="absolute top-2 right-2 text-xl text-red-500 hover:scale-110 transition"
-                        title="Remove from favorites"
-                      >
-                        ❤️
-                      </button>
-                      <h2 className="text-xl font-heading font-semibold">{park.name}</h2>
-                      <p className="text-gray-600">{park.state}</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        📆 Best Season: {park.bestSeason || "All year"}
-                      </p>
-                    </div>
-                  </FadeInWrapper>
-                ))}
-              </div>
-            </>
-          )}
-        
-          {parsedEvents.length > 0 && (
-            <>
-              <h2 className="text-xl font-bold mb-4">📅 Favorite Events</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {parsedEvents.map((event, idx) => (
-                  <FadeInWrapper key={event.id} delay={idx * 0.05}>
-                    <div className="bg-white rounded shadow p-4 border border-blue-100 hover:border-blue-300 relative">
-                      <h3 className="text-lg font-semibold text-blue-700 mb-1">{event.title}</h3>
-                      <p className="text-sm text-gray-600">📍 {event.park || "Unknown Park"}</p>
-                      <p className="text-sm text-gray-600">
-                        🗓️ {event.start ? event.start.toDateString() : "Unknown Date"}
-                      </p>
-                      <p className="text-sm text-gray-600 mb-2">
-                        🕒 {event.start ? event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "Unknown Time"}
-                      </p>
-                      {event.url && (
-                        <a
-                          href={event.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 text-sm underline"
-                        >
-                          🔗 Official Event Link
-                        </a>
-                      )}
-                      <div
-                        className="text-gray-700 text-sm mt-2"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize(event.description || "No description available."),
-                        }}
-                      />
-                      <button
-                        onClick={() => handleRemoveEvent(event.id)}
-                        className="absolute top-2 right-2 text-red-500 text-sm underline hover:text-red-700"
-                      >
-                        ❌ Remove
-                      </button>
-                    </div>
-                  </FadeInWrapper>
-                ))}
-              </div>
-            </>
-          )}
-        </>
+                      🔗 Official Event Link
+                    </a>
+                  )}
+                  <div
+                    className="text-sm text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: DOMPurify.sanitize(
+                        event.description || "No description available."
+                      ),
+                    }}
+                  />
+                </div>
+              </FadeInWrapper>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );

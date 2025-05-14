@@ -47,50 +47,42 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const totalPages = Math.ceil(filtered.length / parksPerPage);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 font-sans fade-in">
-    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-      <h1 className="text-3xl font-heading font-bold text-center sm:text-left">
-        🌍 Explore National Parks
-      </h1>
-      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-      <Link
-        to="/calendar"
-        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
-      >
-        📅 View Park Events
-      </Link>
-
-      {currentUser ? (
-        <>
-          <button
-            onClick={() => navigate("/favorites")}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
-          >
-            ❤️ View Favorites
-          </button>
-          <button
-            onClick={async () => {
-              await logout();
-              toast.success("👋 Logged out successfully");
-              navigate("/");
-            }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
-          >
-            Logout
-          </button>
-        </>
-      ) : (
-        <Link
-          to="/login"
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center w-full sm:w-auto"
-        >
-          🔐 Login to save your favorites
-        </Link>
-      )}
+    <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
+      {/* Header and Auth Buttons */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+        <h1 className="text-3xl font-semibold text-center sm:text-left text-pink-600">
+          🌍 Explore National Parks
+        </h1>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Link to="/calendar" className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center">
+            📅 View Park Events
+          </Link>
+          {currentUser ? (
+            <>
+              <button onClick={() => navigate("/favorites")} className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm">
+                ❤️ View Favorites
+              </button>
+              <button
+                onClick={async () => {
+                  await logout();
+                  toast.success("👋 Logged out successfully");
+                  navigate("/");
+                }}
+                className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm"
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm">
+              🔐 Login to save your favorites
+            </Link>
+          )}
         </div>
       </div>
 
-      <div className="w-full h-64 sm:h-80 md:h-96 rounded overflow-hidden shadow mb-6">
+      {/* Map */}
+      <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow mb-6">
         <MapContainer center={[39.5, -98.35]} zoom={4} scrollWheelZoom={false} className="w-full h-full">
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {parks.map((park) => {
@@ -100,12 +92,8 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             return (
               <Marker key={park.id} position={[lat, lng]}>
                 <Popup>
-                  <strong>{park.name}</strong>
-                  <br />
-                  <button
-                    onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
-                    className="text-blue-600 underline mt-1"
-                  >
+                  <strong>{park.name}</strong><br />
+                  <button onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)} className="text-blue-600 underline mt-1">
                     View Park →
                   </button>
                 </Popup>
@@ -115,15 +103,16 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         </MapContainer>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+      {/* Search & State Dropdown */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <input
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
             setCurrentPage(1);
           }}
-          className="border px-3 py-2 rounded text-sm w-full"
-          placeholder="Search parks..."
+          className="border px-4 py-2 rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+          placeholder="🔍 Search parks..."
         />
         <select
           value={selectedState}
@@ -131,46 +120,52 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             setSelectedState(e.target.value);
             setCurrentPage(1);
           }}
-          className="border px-3 py-2 rounded text-sm w-full"
+          className="border px-4 py-2 rounded-full text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
         >
-          {uniqueStates.map((state) => (
-            <option key={state}>{state}</option>
-          ))}
-        </select>
-        <select
-          value={selectedSeason}
-          onChange={(e) => {
-            setSelectedSeason(e.target.value);
-            setCurrentPage(1);
-          }}
-          className="border px-3 py-2 rounded text-sm w-full"
-        >
-          {seasons.map((season) => (
-            <option key={season}>{season}</option>
-          ))}
+          {uniqueStates.map((state) => <option key={state}>{state}</option>)}
         </select>
       </div>
 
-      <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Season Filter Pills */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {seasons.map((season) => (
+          <button
+            key={season}
+            onClick={() => {
+              setSelectedSeason(season);
+              setCurrentPage(1);
+            }}
+            className={`px-3 py-1 rounded-full text-sm font-medium border transition ${
+              selectedSeason === season
+                ? "bg-pink-500 text-white border-pink-500"
+                : "bg-white text-pink-500 border-pink-500 hover:bg-pink-50"
+            }`}
+          >
+            {season === "Spring" && "🌸 "}
+            {season === "Summer" && "🌞 "}
+            {season === "Fall" && "🍂 "}
+            {season === "Winter" && "❄️ "}
+            {season}
+          </button>
+        ))}
+      </div>
+
+      {/* Park Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {currentParks.map((park, idx) => (
           <FadeInWrapper key={park.id} delay={idx * 0.1}>
-            <li
-              className="border p-4 rounded shadow hover:shadow-md transition-transform duration-300 hover:scale-105 cursor-pointer relative bg-white"
+            <div
+              className="relative bg-white border-l-4 border-pink-500 rounded-xl p-5 shadow-sm hover:shadow-md transition duration-300 hover:scale-[1.02] cursor-pointer"
               onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
             >
               {currentUser && (
                 <button
-                  title={currentUser ? "Remove from favorites" : "Login to save"}
+                  title={favorites.includes(park.id) ? "Remove from favorites" : "Add to favorites"}
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (currentUser) {
-                      toggleFavorite(park.id);
-                    } else {
-                      toast.info("🔐 Please log in to save favorites");
-                    }
+                    toggleFavorite(park.id);
                   }}
-                  disabled={!currentUser}
-                  className={`absolute top-2 right-2 text-xl transition ${currentUser ? "" : "opacity-40 cursor-not-allowed"}`}
+                  className="absolute top-3 right-3 text-xl"
                 >
                   {favorites.includes(park.id) ? (
                     <span className="text-red-500">❤️</span>
@@ -179,25 +174,41 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                   )}
                 </button>
               )}
-              <h2 className="text-xl font-heading font-semibold">{park.name}</h2>
-              <p className="text-gray-600">{park.state}</p>
-              <p className="text-sm text-gray-500 mt-1">
-                📆 Best Season: {park.bestSeason}
-              </p>
-            </li>
+              <div className="space-y-1">
+                <h2 className="text-lg sm:text-xl font-semibold text-pink-600">{park.name}</h2>
+                <p className="text-sm text-gray-600">📍 {park.state}</p>
+                <p className="text-sm text-gray-500 flex items-center gap-2">
+                  📆 Best Season:
+                  {park.bestSeason && (
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        park.bestSeason === "Summer" ? "bg-yellow-100 text-yellow-800" :
+                        park.bestSeason === "Winter" ? "bg-blue-100 text-blue-800" :
+                        park.bestSeason === "Spring" ? "bg-green-100 text-green-800" :
+                        park.bestSeason === "Fall" ? "bg-orange-100 text-orange-800" :
+                        "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {park.bestSeason}
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
           </FadeInWrapper>
         ))}
-      </ul>
+      </div>
 
+      {/* Pagination */}
       <div className="flex justify-center mt-8 space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (
           <button
             key={i + 1}
             onClick={() => setCurrentPage(i + 1)}
-            className={`px-3 py-1 rounded-full border ${
+            className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
               currentPage === i + 1
-                ? "bg-blue-500 text-white"
-                : "bg-white text-blue-500 border-blue-500"
+                ? "bg-pink-500 text-white border-pink-500"
+                : "bg-white text-pink-500 border-pink-500 hover:bg-pink-50"
             }`}
           >
             {i + 1}
@@ -206,6 +217,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       </div>
     </div>
   );
+
 };
 
 export default Home;

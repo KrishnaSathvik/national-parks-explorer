@@ -1,4 +1,3 @@
-// App.jsx with Firestore-based favorite park syncing and toast notifications
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { db } from "./firebase";
@@ -10,7 +9,7 @@ import {
   updateDoc,
   setDoc,
   arrayUnion,
-  arrayRemove
+  arrayRemove,
 } from "firebase/firestore";
 import { useAuth } from "./context/AuthContext";
 import Home from "./pages/Home";
@@ -29,21 +28,34 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const { currentUser } = useAuth();
 
+  // Fetch parks on load
   useEffect(() => {
     const fetchParks = async () => {
-      const snapshot = await getDocs(collection(db, "parks"));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setParks(data);
+      try {
+        const snapshot = await getDocs(collection(db, "parks"));
+        const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        setParks(data);
+      } catch (error) {
+        toast.error("Failed to load parks data.");
+        console.error("Error fetching parks:", error);
+      }
     };
 
+    fetchParks();
+  }, []);
+
+  // Fetch favorites based on user state
+  useEffect(() => {
     const fetchFavorites = async () => {
       if (!currentUser) {
         const localFavs = JSON.parse(localStorage.getItem("favorites")) || [];
         setFavorites(localFavs);
         return;
       }
+
       const userRef = doc(db, "users", currentUser.uid);
       const docSnap = await getDoc(userRef);
+
       if (docSnap.exists()) {
         setFavorites(docSnap.data().favoriteParks || []);
       } else {
@@ -52,72 +64,75 @@ function App() {
       }
     };
 
-    fetchParks();
     fetchFavorites();
   }, [currentUser]);
 
+  // Toggle favorite parks
   const toggleFavorite = async (id) => {
-    const isFav = favorites.includes(id);
-    const updated = isFav
+    const isFavorite = favorites.includes(id);
+    const updatedFavorites = isFavorite
       ? favorites.filter((f) => f !== id)
       : [...favorites, id];
-    setFavorites(updated);
+    setFavorites(updatedFavorites);
 
     if (!currentUser) {
-      localStorage.setItem("favorites", JSON.stringify(updated));
-      toast.info("🔒 Log in to save favorites across devices");
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      toast.info("🔐 Log in to save favorites across devices");
     } else {
       const userRef = doc(db, "users", currentUser.uid);
       await updateDoc(userRef, {
-        favoriteParks: isFav ? arrayRemove(id) : arrayUnion(id),
+        favoriteParks: isFavorite ? arrayRemove(id) : arrayUnion(id),
       });
     }
 
     toast.success(
-      isFav ? "❌ Removed from favorites" : "💖 Added to favorites"
+      isFavorite ? "❌ Removed from favorites" : "💖 Added to favorites"
     );
   };
 
   return (
-    <Layout>
-    <ToastContainer
-      position="top-center"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      pauseOnHover
-      draggable
-      theme="colored"
-    />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Home
-              parks={parks}
-              favorites={favorites}
-              toggleFavorite={toggleFavorite}
-            />
-          }
+    <div className="font-sans bg-gray-50 min-h-screen">
+      <Layout>
+        <ToastContainer
+          position="top-center"
+          autoClose={2500}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnFocusLoss
+          pauseOnHover
+          draggable
+          theme="colored"
         />
-        <Route
-          path="/favorites"
-          element={
-            <Favorites
-              parks={parks.filter((p) => favorites.includes(p.id))}
-              favorites={favorites}
-              toggleFavorite={toggleFavorite}
-            />
-          }
-        />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/park/:id" element={<ParkDetails />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/calendar" element={<CalendarView />} />
-      </Routes>
-    </Layout>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <Home
+                parks={parks}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+              />
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <Favorites
+                parks={parks.filter((p) => favorites.includes(p.id))}
+                favorites={favorites}
+                toggleFavorite={toggleFavorite}
+              />
+            }
+          />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/park/:id" element={<ParkDetails />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/calendar" element={<CalendarView />} />
+        </Routes>
+      </Layout>
+    </div>
   );
 }
 

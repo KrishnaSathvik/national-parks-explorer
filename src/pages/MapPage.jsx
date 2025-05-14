@@ -1,4 +1,3 @@
-// src/pages/MapPage.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -29,30 +28,40 @@ const MapPage = () => {
   }, []);
 
   return (
-    <div className="h-screen w-full">
-      <MapContainer center={[39.8283, -98.5795]} zoom={4} style={{ height: "100%", width: "100%" }}>
+    <div className="relative h-screen w-full font-sans">
+      <div className="absolute top-4 left-4 z-[999] bg-white rounded-full shadow px-4 py-2 text-sm font-medium text-gray-800">
+        🗺️ Explore Parks on the Map
+      </div>
+
+      <MapContainer
+        center={[39.8283, -98.5795]} // Center of continental US
+        zoom={4}
+        scrollWheelZoom={true}
+        className="h-full w-full z-0"
+      >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         {parks
-          .filter(park => {
-            const [lat, lon] = park.coordinates?.split(",").map(c => parseFloat(c.trim()));
+          .filter((park) => {
+            const [lat, lon] = park.coordinates?.split(",").map((c) => parseFloat(c.trim()));
             return lat && lon && lat !== 0 && lon !== 0 && !isNaN(lat) && !isNaN(lon);
           })
           .map((park) => {
-            const [lat, lon] = park.coordinates.split(",").map(coord => parseFloat(coord.trim()));
+            const [lat, lon] = park.coordinates.split(",").map((coord) => parseFloat(coord.trim()));
             return (
               <Marker
                 key={park.id}
                 position={[lat, lon]}
                 eventHandlers={{
-                  click: () => navigate(`/park/${park.id}`)
+                  click: () => navigate(`/park/${park.id}`),
                 }}
               >
                 <Popup>
-                  <strong>{park.name}</strong><br />
-                  {park.state}
+                  <strong className="text-base text-gray-800">{park.name}</strong>
+                  <br />
+                  <span className="text-sm text-gray-600">{park.state}</span>
                 </Popup>
               </Marker>
             );
