@@ -49,7 +49,9 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 font-sans fade-in">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
-        <h1 className="text-3xl font-heading font-bold">🌍 Explore National Parks</h1>
+        <h1 className="text-2xl sm:text-3xl font-heading font-bold break-words max-w-[90vw]">
+          🌍 Explore <br className="block sm:hidden" /> National Parks
+        </h1>
         <div className="flex flex-col sm:flex-row gap-2">
           <Link to="/calendar" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded text-sm text-center">
             📅 View Park Events
