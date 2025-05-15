@@ -100,10 +100,11 @@ const toggleFavorite = async (id) => {
   }
 };
 
-  return (
-    <div className="font-sans bg-gray-50 min-h-screen">
-      <Layout>
-        <ScrollToTop />
+return (
+  <div className="font-sans bg-gray-50 min-h-screen">
+    <ScrollToTop /> {/* ⬅️ This should be outside Layout to work reliably */}
+    <Layout>
+      <div className="main-scroll overflow-y-auto h-screen">
         <Routes>
           <Route
             path="/"
@@ -131,9 +132,10 @@ const toggleFavorite = async (id) => {
           <Route path="/map" element={<MapPage />} />
           <Route path="/calendar" element={<CalendarView />} />
         </Routes>
-      </Layout>
-    </div>
-  );
+      </div>
+    </Layout>
+  </div>
+);
 }
 
 export default App;

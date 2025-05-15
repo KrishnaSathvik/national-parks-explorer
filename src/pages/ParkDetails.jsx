@@ -132,12 +132,17 @@
       useEffect(() => {
         if (!park?.parkCode) return;
         const fetchAlerts = async () => {
-          const res = await fetch(
-            `https://developer.nps.gov/api/v1/alerts?parkCode=${park.parkCode}&api_key=${NPS_API_KEY}`
-          );
-          const data = await res.json();
-          setAlerts(data.data || []);
+          try {
+            const res = await fetch(
+              `https://developer.nps.gov/api/v1/alerts?parkCode=${park.parkCode}&api_key=${NPS_API_KEY}`
+            );
+            const data = await res.json();
+            setAlerts(data.data || []);
+          } catch (err) {
+            console.error("Failed to fetch alerts:", err);
+          }
         };
+
         fetchAlerts();
       }, [park]);
 
