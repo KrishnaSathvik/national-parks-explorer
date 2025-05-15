@@ -1,27 +1,28 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useToast } from "../context/ToastContext"; // ✅ use custom toast
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signup } = useAuth();
+  const { showToast } = useToast(); // ✅ use custom hook
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // clear previous error
+    setError("");
+
     try {
       await signup(email, password);
-      toast.success("🎉 Account created successfully!");
+      showToast("🎉 Account created successfully!", "success"); // ✅ custom toast
       navigate("/");
     } catch (err) {
       console.error("Firebase Signup Error:", err);
-
       let message = "❌ Signup failed. Please try again.";
+
       if (err.code === "auth/email-already-in-use") {
         message = "📧 Email already in use. Try logging in.";
       } else if (err.code === "auth/invalid-email") {
@@ -33,7 +34,7 @@ const Signup = () => {
       }
 
       setError(message);
-      toast.error(message);
+      showToast(message, "error"); // ✅ show as error
     }
   };
 
@@ -44,7 +45,9 @@ const Signup = () => {
           📝 Create Your Account
         </h2>
 
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input

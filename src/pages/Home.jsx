@@ -5,7 +5,9 @@ import L from "leaflet";
 import FadeInWrapper from "../components/FadeInWrapper";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { toast } from "react-toastify";
+import { useToast } from "../context/ToastContext";
+
+
 
 // Leaflet icon fix
 delete L.Icon.Default.prototype._getIconUrl;
@@ -22,6 +24,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const { currentUser, logout } = useAuth();
 
   const parksPerPage = 9;
@@ -29,6 +32,10 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   useEffect(() => {
     setSearchParams({ page: currentPage });
   }, [currentPage]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   const allStates = parks.flatMap((p) => p.state.split(",").map((s) => s.trim()));
   const uniqueStates = ["All", ...Array.from(new Set(allStates))];
@@ -49,37 +56,47 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
       {/* Header and Auth Buttons */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-        <h1 className="text-3xl font-semibold text-center sm:text-left text-pink-600">
-          🌍 Explore National Parks
-        </h1>
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-          <Link to="/calendar" className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center">
-            📅 View Park Events
+    <div className="mt-4 flex flex-col sm:flex-row sm:justify-center sm:items-center gap-3">
+      <h1 className="text-3xl font-bold text-pink-600 whitespace-nowrap text-center sm:text-left">
+        🌍 Explore National Parks
+      </h1>
+      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-center sm:justify-end">
+        <Link
+          to="/calendar"
+          className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+        >
+          📅 View Park Events
+        </Link>
+
+        {currentUser ? (
+          <>
+            <button
+              onClick={() => navigate("/favorites")}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+            >
+              ❤️ View Favorites
+            </button>
+            <button
+              onClick={async () => {
+                await logout();
+                toast.success("👋 Logged out successfully");
+                navigate("/");
+              }}
+              className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+          >
+            🔐 Login to save your favorites
           </Link>
-          {currentUser ? (
-            <>
-              <button onClick={() => navigate("/favorites")} className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm">
-                ❤️ View Favorites
-              </button>
-              <button
-                onClick={async () => {
-                  await logout();
-                  toast.success("👋 Logged out successfully");
-                  navigate("/");
-                }}
-                className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link to="/login" className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm">
-              🔐 Login to save your favorites
-            </Link>
-          )}
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Map */}
       <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow mb-6">
@@ -150,50 +167,46 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         ))}
       </div>
 
-      {/* Park Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {currentParks.map((park, idx) => (
           <FadeInWrapper key={park.id} delay={idx * 0.1}>
             <div
-              className="relative bg-white border-l-4 border-pink-500 rounded-xl p-5 shadow-sm hover:shadow-md transition duration-300 hover:scale-[1.02] cursor-pointer"
+              className="bg-white rounded-xl border-l-4 border-pink-500 shadow-sm p-5 transition hover:shadow-md hover:scale-[1.01] cursor-pointer relative"
               onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
             >
               {currentUser && (
                 <button
-                  title={favorites.includes(park.id) ? "Remove from favorites" : "Add to favorites"}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(park.id);
                   }}
                   className="absolute top-3 right-3 text-xl"
+                  title={favorites.includes(park.id) ? "Remove from favorites" : "Add to favorites"}
                 >
-                  {favorites.includes(park.id) ? (
-                    <span className="text-red-500">❤️</span>
-                  ) : (
-                    <span className="text-gray-400">🤍</span>
-                  )}
+                  {favorites.includes(park.id) ? "❤️" : "🤍"}
                 </button>
               )}
-              <div className="space-y-1">
-                <h2 className="text-lg sm:text-xl font-semibold text-pink-600">{park.name}</h2>
-                <p className="text-sm text-gray-600">📍 {park.state}</p>
-                <p className="text-sm text-gray-500 flex items-center gap-2">
-                  📆 Best Season:
-                  {park.bestSeason && (
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        park.bestSeason === "Summer" ? "bg-yellow-100 text-yellow-800" :
-                        park.bestSeason === "Winter" ? "bg-blue-100 text-blue-800" :
-                        park.bestSeason === "Spring" ? "bg-green-100 text-green-800" :
-                        park.bestSeason === "Fall" ? "bg-orange-100 text-orange-800" :
-                        "bg-gray-100 text-gray-800"
-                      }`}
-                    >
-                      {park.bestSeason}
-                    </span>
-                  )}
-                </p>
-              </div>
+
+              <h2 className="text-lg font-semibold text-pink-600 mb-1">{park.name}</h2>
+              <p className="text-sm text-gray-600">📍 {park.state}</p>
+              <p className="text-sm text-gray-600">
+                📆 Best Season:{" "}
+                <span
+                  className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                    park.bestSeason === "Spring"
+                      ? "bg-green-100 text-green-800"
+                      : park.bestSeason === "Summer"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : park.bestSeason === "Fall"
+                      ? "bg-orange-100 text-orange-800"
+                      : park.bestSeason === "Winter"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-gray-100 text-gray-700"
+                  }`}
+                >
+                  {park.bestSeason}
+                </span>
+              </p>
             </div>
           </FadeInWrapper>
         ))}

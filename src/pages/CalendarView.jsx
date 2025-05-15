@@ -6,8 +6,11 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify"; // ✅ this line
 import "react-toastify/dist/ReactToastify.css";
+import { showToast } from "../components/showToast"; // adjust path if needed
+
+
 
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
@@ -50,26 +53,34 @@ const CalendarView = () => {
 
   const toggleEventSave = async (eventObj) => {
     if (!currentUser) {
-      toast.info("🔐 Please log in to save events");
+      showToast("🔐 Please log in to save events", "info");
       return;
     }
+
     const userRef = doc(db, "users", currentUser.uid);
+    const eventPayload = {
+      ...eventObj,
+      start: eventObj.start.toISOString(),
+      end: eventObj.end.toISOString(),
+    };
+
     const alreadySaved = savedEventIds.includes(eventObj.id);
+
     await updateDoc(userRef, {
       favoriteEvents: alreadySaved
-        ? arrayRemove(eventObj)
-        : arrayUnion({
-            ...eventObj,
-            start: eventObj.start.toISOString(),
-            end: eventObj.end.toISOString(),
-          }),
+        ? arrayRemove(eventPayload) // 👈 must match structure
+        : arrayUnion(eventPayload),
     });
+
     setSavedEventIds((prev) =>
       alreadySaved ? prev.filter((id) => id !== eventObj.id) : [...prev, eventObj.id]
     );
-    toast.success(alreadySaved ? "❌ Removed from saved events" : "💾 Event saved");
-  };
 
+    showToast(
+      alreadySaved ? "❌ Removed from saved events" : "💾 Event saved",
+      alreadySaved ? "info" : "success"
+    );
+  };
   const selectedISODate = selectedDate.toLocaleDateString("en-CA");
 
   const filteredEvents = events.filter((e) => {

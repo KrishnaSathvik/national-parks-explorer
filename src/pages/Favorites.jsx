@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
+import { useToast } from "../context/ToastContext";
 import { doc, updateDoc, arrayRemove, onSnapshot } from "firebase/firestore";
 import { useAuth } from "../context/AuthContext";
 import FadeInWrapper from "../components/FadeInWrapper";
@@ -11,6 +12,7 @@ import { toast } from "react-toastify";
 const Favorites = ({ parks, favorites, toggleFavorite }) => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const { showToast } = useToast();
   const [rawEvents, setRawEvents] = useState([]);
 
   useEffect(() => {
@@ -32,7 +34,7 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
       await updateDoc(userRef, {
         favoriteEvents: arrayRemove(updated),
       });
-      toast.success("❌ Removed event from favorites");
+      showToast("❌ Removed event from favorites", "success");
     }
   };
 
@@ -87,7 +89,6 @@ const Favorites = ({ parks, favorites, toggleFavorite }) => {
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleFavorite(park.id);
-                      toast.info("❌ Removed park from favorites");
                     }}
                     className="absolute top-3 right-3 text-xl text-pink-500 hover:scale-110 transition"
                     title="Remove from favorites"

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "./components/ScrollToTop";
 import { db } from "./firebase";
 import {
   collection,
@@ -11,24 +12,25 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
+
 import { useAuth } from "./context/AuthContext";
+import { useToast } from "./context/ToastContext"; // ✅ import custom toast hook
+
+import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Favorites from "./pages/Favorites";
 import ParkDetails from "./pages/ParkDetails";
 import MapPage from "./pages/MapPage";
-import Layout from "./components/Layout";
 import CalendarView from "./pages/CalendarView";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const [parks, setParks] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const { currentUser } = useAuth();
+  const { showToast } = useToast(); // ✅ custom toast handler
 
-  // Fetch parks on load
   useEffect(() => {
     const fetchParks = async () => {
       try {
@@ -36,7 +38,7 @@ function App() {
         const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setParks(data);
       } catch (error) {
-        toast.error("Failed to load parks data.");
+        showToast("Failed to load parks data", "error");
         console.error("Error fetching parks:", error);
       }
     };
@@ -44,7 +46,6 @@ function App() {
     fetchParks();
   }, []);
 
-  // Fetch favorites based on user state
   useEffect(() => {
     const fetchFavorites = async () => {
       if (!currentUser) {
@@ -67,43 +68,42 @@ function App() {
     fetchFavorites();
   }, [currentUser]);
 
-  // Toggle favorite parks
-  const toggleFavorite = async (id) => {
-    const isFavorite = favorites.includes(id);
-    const updatedFavorites = isFavorite
-      ? favorites.filter((f) => f !== id)
-      : [...favorites, id];
-    setFavorites(updatedFavorites);
+// inside App.jsx
 
-    if (!currentUser) {
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-      toast.info("🔐 Log in to save favorites across devices");
-    } else {
-      const userRef = doc(db, "users", currentUser.uid);
-      await updateDoc(userRef, {
-        favoriteParks: isFavorite ? arrayRemove(id) : arrayUnion(id),
-      });
-    }
+const toggleFavorite = async (id) => {
+  const isFavorite = favorites.includes(id);
+  const updatedFavorites = isFavorite
+    ? favorites.filter((f) => f !== id)
+    : [...favorites, id];
 
-    toast.success(
-      isFavorite ? "❌ Removed from favorites" : "💖 Added to favorites"
+  setFavorites(updatedFavorites);
+
+  if (!currentUser) {
+    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    showToast("🔐 Log in to save favorites across devices", "info");
+    return;
+  }
+
+  const userRef = doc(db, "users", currentUser.uid);
+  try {
+    await updateDoc(userRef, {
+      favoriteParks: isFavorite ? arrayRemove(id) : arrayUnion(id),
+    });
+
+    showToast(
+      isFavorite ? "❌ Removed from favorites" : "💖 Added to favorites",
+      isFavorite ? "info" : "success"
     );
-  };
+  } catch (err) {
+    console.error("Error updating favorites:", err);
+    showToast("❌ Failed to update favorites", "error");
+  }
+};
 
   return (
     <div className="font-sans bg-gray-50 min-h-screen">
       <Layout>
-        <ToastContainer
-          position="top-center"
-          autoClose={2500}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          pauseOnFocusLoss
-          pauseOnHover
-          draggable
-          theme="colored"
-        />
+        <ScrollToTop />
         <Routes>
           <Route
             path="/"
