@@ -6,6 +6,8 @@ import FadeInWrapper from "../components/FadeInWrapper";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
+import SkeletonLoader from "../components/SkeletonLoader";
+import Blog from "../pages/Blog"; // Adjust the path if your blog file is in a different folder like `../pages/Blog`
 
 
 
@@ -25,7 +27,8 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, userRole, logout } = useAuth();
+
 
   const parksPerPage = 9;
 
@@ -56,33 +59,57 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
       {/* Header and Auth Buttons */}
-    <div className="mt-4 flex flex-col sm:flex-row sm:justify-center sm:items-center gap-3">
-      <h1 className="text-3xl font-bold text-pink-600 whitespace-nowrap text-center sm:text-left">
-        🌍 Explore National Parks
+    <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4 sm:gap-6 mb-6">
+      <h1 className="text-3xl font-extrabold text-pink-600 flex items-center gap-2">
+        🌍 <span>Explore National Parks</span>
       </h1>
-      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto justify-center sm:justify-end">
+
+      <div className="flex flex-wrap gap-3 justify-center sm:justify-end">
         <Link
           to="/calendar"
-          className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+          className="bg-white border border-pink-500 text-pink-600 px-4 py-2 rounded-full text-sm hover:bg-pink-50 transition flex items-center gap-2 shadow-sm"
         >
-          📅 View Park Events
+          📅 <span>Park Events</span>
         </Link>
-
+        <Link
+          to="/blog"
+          className="bg-white border border-pink-500 text-pink-600 px-4 py-2 rounded-full text-sm hover:bg-pink-50 transition flex items-center gap-2 shadow-sm"
+        >
+          📰 <span>Blog Stories</span>
+        </Link>
+        <Link
+          to="/about"
+          className="bg-white border border-pink-500 text-pink-600 px-4 py-2 rounded-full text-sm hover:bg-pink-50 transition flex items-center gap-2 shadow-sm"
+        >
+          📖 <span>About</span>
+        </Link>
         {currentUser ? (
           <>
-            <button
-              onClick={() => navigate("/favorites")}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
-            >
-              ❤️ View Favorites
-            </button>
+            {userRole === "admin" ? (
+              <a
+                href="/admin"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-pink-500 text-white px-4 py-2 rounded-full text-sm hover:bg-pink-600"
+              >
+                ⚙️ Admin Panel
+              </a>
+            ) : (
+              <Link
+                to="/account"
+                className="border border-pink-500 text-pink-600 px-4 py-2 rounded-full text-sm hover:bg-pink-50"
+              >
+                👤 My Account
+              </Link>
+            )}
+
             <button
               onClick={async () => {
                 await logout();
-                toast.success("👋 Logged out successfully");
+                showToast("👋 Logged out successfully", "success");
                 navigate("/");
               }}
-              className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
+              className="bg-gray-200 text-gray-800 px-4 py-2 rounded-full text-sm hover:bg-gray-300 transition shadow"
             >
               Logout
             </button>
@@ -92,9 +119,10 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             to="/login"
             className="bg-pink-500 hover:bg-pink-600 text-white px-5 py-2 rounded-full text-sm text-center"
           >
-            🔐 Login to save your favorites
+            🔐 Login
           </Link>
         )}
+
       </div>
     </div>
 
@@ -167,51 +195,69 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-        {currentParks.map((park, idx) => (
-          <FadeInWrapper key={park.id} delay={idx * 0.1}>
-            <div
-              className="bg-white rounded-xl border-l-4 border-pink-500 shadow-sm p-5 transition hover:shadow-md hover:scale-[1.01] cursor-pointer relative"
-              onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
+{parks.length === 0 ? (
+  // Skeleton Loader while parks are loading
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    {Array.from({ length: 9 }).map((_, i) => (
+      <div
+        key={i}
+        className="animate-pulse bg-gray-200 rounded-xl h-48 w-full shadow-sm"
+      />
+    ))}
+  </div>
+) : (
+  // Actual Park Cards
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+    {currentParks.map((park, idx) => (
+      <FadeInWrapper key={park.id} delay={idx * 0.1}>
+        <div
+          className="bg-white rounded-xl border-l-4 border-pink-500 shadow-sm p-5 transition hover:shadow-md hover:scale-[1.01] cursor-pointer relative"
+          onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
+        >
+          {currentUser && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(park.id);
+              }}
+              className="absolute top-3 right-3 text-xl"
+              title={
+                favorites.includes(park.id)
+                  ? "Remove from favorites"
+                  : "Add to favorites"
+              }
             >
-              {currentUser && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(park.id);
-                  }}
-                  className="absolute top-3 right-3 text-xl"
-                  title={favorites.includes(park.id) ? "Remove from favorites" : "Add to favorites"}
-                >
-                  {favorites.includes(park.id) ? "❤️" : "🤍"}
-                </button>
-              )}
+              {favorites.includes(park.id) ? "❤️" : "🤍"}
+            </button>
+          )}
 
-              <h2 className="text-lg font-semibold text-pink-600 mb-1">{park.name}</h2>
-              <p className="text-sm text-gray-600">📍 {park.state}</p>
-              <p className="text-sm text-gray-600">
-                📆 Best Season:{" "}
-                <span
-                  className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                    park.bestSeason === "Spring"
-                      ? "bg-green-100 text-green-800"
-                      : park.bestSeason === "Summer"
-                      ? "bg-yellow-100 text-yellow-800"
-                      : park.bestSeason === "Fall"
-                      ? "bg-orange-100 text-orange-800"
-                      : park.bestSeason === "Winter"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-gray-100 text-gray-700"
-                  }`}
-                >
-                  {park.bestSeason}
-                </span>
-              </p>
-            </div>
-          </FadeInWrapper>
-        ))}
-      </div>
-
+          <h2 className="text-lg font-semibold text-pink-600 mb-1">
+            {park.name}
+          </h2>
+          <p className="text-sm text-gray-600">📍 {park.state}</p>
+          <p className="text-sm text-gray-600">
+            📆 Best Season:{" "}
+            <span
+              className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                park.bestSeason === "Spring"
+                  ? "bg-green-100 text-green-800"
+                  : park.bestSeason === "Summer"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : park.bestSeason === "Fall"
+                  ? "bg-orange-100 text-orange-800"
+                  : park.bestSeason === "Winter"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-gray-100 text-gray-700"
+              }`}
+            >
+              {park.bestSeason}
+            </span>
+          </p>
+        </div>
+      </FadeInWrapper>
+    ))}
+  </div>
+)}
       {/* Pagination */}
       <div className="flex justify-center mt-8 space-x-2">
         {Array.from({ length: totalPages }, (_, i) => (

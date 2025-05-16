@@ -9,6 +9,8 @@
     import { FaStar, FaRegStar } from "react-icons/fa";
     import Accordion from "./Accordion";
     import { motion } from "framer-motion";
+    import SkeletonLoader from "../components/SkeletonLoader";
+
 
 
     const WEATHER_API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
@@ -97,6 +99,10 @@
       const [editComment, setEditComment] = useState("");
       const [successMessage, setSuccessMessage] = useState("");
       const [fadeOut, setFadeOut] = useState(false);
+      const [reviewsLoading, setReviewsLoading] = useState(true);
+      const [alertsLoading, setAlertsLoading] = useState(true);
+
+
 
       const averageRating = reviews.length
         ? (reviews.reduce((sum, r) => sum + (parseInt(r.rating) || 0), 0) / reviews.length).toFixed(1)
@@ -112,13 +118,14 @@
 
       useEffect(() => {
         const fetchReviews = async () => {
+          setReviewsLoading(true); // Start loading
           const q = query(collection(db, "reviews"), where("parkId", "==", id));
           const snapshot = await getDocs(q);
           setReviews(snapshot.docs.map((doc) => doc.data()));
+          setReviewsLoading(false); // Done loading
         };
         fetchReviews();
       }, [id]);
-
       useEffect(() => {
         if (!park?.name) return;
         const fetchWeather = async () => {
@@ -133,6 +140,7 @@
         if (!park?.parkCode) return;
         const fetchAlerts = async () => {
           try {
+            setAlertsLoading(true);
             const res = await fetch(
               `https://developer.nps.gov/api/v1/alerts?parkCode=${park.parkCode}&api_key=${NPS_API_KEY}`
             );
@@ -140,6 +148,8 @@
             setAlerts(data.data || []);
           } catch (err) {
             console.error("Failed to fetch alerts:", err);
+          } finally {
+            setAlertsLoading(false);
           }
         };
 
@@ -190,7 +200,14 @@
         setEditComment("");
       };
 
-      if (!park) return <div className="p-6 text-center text-gray-600">Loading...</div>;
+      if (!park) {
+        return (
+          <div className="max-w-5xl mx-auto px-4 py-8">
+            <SkeletonLoader type="line" count={3} />
+            <SkeletonLoader type="box" count={2} />
+          </div>
+        );
+      }
 
       return (
         <motion.div
@@ -219,7 +236,9 @@
             <p className="text-sm text-gray-600 mb-6">🗓️ Best Season: {park.bestSeason}</p>
 
             {/* Alerts */}
-            {alerts.length > 0 && (
+            {alertsLoading ? (
+              <SkeletonLoader type="line" count={2} />
+            ) : alerts.length > 0 && (
               <div className="bg-yellow-100 border-l-4 border-yellow-500 p-4 rounded mb-6 text-sm">
                 <h3 className="font-semibold text-yellow-700 mb-1">⚠️ Park Alerts</h3>
                 <ul className="list-disc ml-5 text-yellow-800">
@@ -229,9 +248,8 @@
                 </ul>
               </div>
             )}
-
             {/* Weather Forecast */}
-            {weather.length > 0 && (
+            {weather.length > 0 ? (
               <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-2">🌦️ 3-Day Weather Forecast</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
@@ -246,8 +264,9 @@
                   ))}
                 </div>
               </div>
+            ) : (
+              <SkeletonLoader type="card" count={3} />
             )}
-
             {/* Best Time To Visit */}
             {park.bestTimeToVisit && (
               <div className="mb-6">
@@ -353,8 +372,9 @@
                     Submit Review
                   </button>
                 </form>
-
-                {reviews.length === 0 ? (
+                {reviewsLoading ? (
+                  <SkeletonLoader type="line" count={3} />
+                ) : reviews.length === 0 ? (
                   <p className="text-gray-500 text-sm">No reviews yet. Be the first!</p>
                 ) : (
                   <ul className="space-y-3 text-sm">

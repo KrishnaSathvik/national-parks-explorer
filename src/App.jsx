@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
+import UserAccount from "./pages/UserAccount"; // Add this at the top
 import { db } from "./firebase";
+import ScrollToTopButton from "./components/ScrollToTopButton";
 import {
   collection,
   getDocs,
@@ -18,12 +20,26 @@ import { useToast } from "./context/ToastContext"; // ✅ import custom toast ho
 
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import Favorites from "./pages/Favorites";
 import ParkDetails from "./pages/ParkDetails";
 import MapPage from "./pages/MapPage";
 import CalendarView from "./pages/CalendarView";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+// NEW Admin Imports
+import AdminLogin from "./admin/AdminLogin";
+import AdminRoute from "./admin/AdminRoute";
+import AdminPage from "./admin/AdminPage";
+import "react-quill/dist/quill.snow.css";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost"; // We’ll create this next
+import AdminBlogEditor from "./admin/AdminBlogEditor";
+import EditBlog from "./admin/EditBlog";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import About from "./pages/About"; // Adjust path if your About.jsx is in a different folder
+
+
+
+
 
 function App() {
   const [parks, setParks] = useState([]);
@@ -54,14 +70,19 @@ function App() {
         return;
       }
 
-      const userRef = doc(db, "users", currentUser.uid);
-      const docSnap = await getDoc(userRef);
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        const docSnap = await getDoc(userRef);
 
-      if (docSnap.exists()) {
-        setFavorites(docSnap.data().favoriteParks || []);
-      } else {
-        await setDoc(userRef, { favoriteParks: [], favoriteEvents: [] });
-        setFavorites([]);
+        if (docSnap.exists()) {
+          setFavorites(docSnap.data().favoriteParks || []);
+        } else {
+          console.log("Creating user document for:", currentUser.email);
+          await setDoc(userRef, { favoriteParks: [], favoriteEvents: [] });
+          setFavorites([]);
+        }
+      } catch (err) {
+        console.error("🔥 Firestore permission error:", err);
       }
     };
 
@@ -99,10 +120,10 @@ const toggleFavorite = async (id) => {
     showToast("❌ Failed to update favorites", "error");
   }
 };
-
 return (
   <div className="font-sans bg-gray-50 min-h-screen">
-    <ScrollToTop /> {/* ⬅️ This should be outside Layout to work reliably */}
+    <ScrollToTop /> {/* Smooth scroll on route change */}
+
     <Layout>
       <div className="main-scroll overflow-y-auto h-screen">
         <Routes>
@@ -116,24 +137,38 @@ return (
               />
             }
           />
-          <Route
-            path="/favorites"
-            element={
-              <Favorites
-                parks={parks.filter((p) => favorites.includes(p.id))}
-                favorites={favorites}
-                toggleFavorite={toggleFavorite}
-              />
-            }
-          />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/park/:id" element={<ParkDetails />} />
           <Route path="/map" element={<MapPage />} />
           <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
+          <Route path="/admin/edit-blog/:id" element={<EditBlog />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/account" element={<UserAccount />} />
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminPage />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/admin/blog-editor"
+            element={
+              <AdminRoute>
+                <AdminBlogEditor />
+              </AdminRoute>
+            }
+          />
         </Routes>
       </div>
     </Layout>
+
+    <ScrollToTopButton /> {/* Floating back-to-top button */}
   </div>
 );
 }

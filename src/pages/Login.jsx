@@ -1,24 +1,36 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useToast } from "../context/ToastContext"; // ✅ use custom toast context
+import { useToast } from "../context/ToastContext";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { login, loginWithGoogle } = useAuth();
-  const { showToast } = useToast(); // ✅ access showToast
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // clear old errors
+    setError("");
 
     try {
-      await login(email, password);
-      showToast("✅ Logged in successfully!", "success"); // ✅ custom toast
-      navigate("/");
+      const userCredential = await login(email, password);
+      const uid = userCredential.user.uid;
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+
+      let role = "user";
+      if (userSnap.exists()) {
+        role = userSnap.data().role || "user";
+      }
+
+      showToast("✅ Logged in successfully!", "success");
+
+      navigate(role === "admin" ? "/admin" : "/account");
     } catch (err) {
       console.error("Firebase Login Error:", err);
 
@@ -34,7 +46,39 @@ const Login = () => {
       }
 
       setError(message);
-      showToast(message, "error"); // ✅ show as error
+      showToast(message, "error");
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const userCredential = await loginWithGoogle();
+      const user = userCredential.user;
+      const uid = user.uid;
+      const userRef = doc(db, "users", uid);
+      const userSnap = await getDoc(userRef);
+
+      let role = "user";
+
+      if (userSnap.exists()) {
+        role = userSnap.data().role || "user";
+      } else {
+        // Create user doc if not exists
+        await setDoc(userRef, {
+          email: user.email,
+          displayName: user.displayName,
+          role: "user",
+          favoriteParks: [],
+          favoriteEvents: [],
+        });
+      }
+
+      showToast("✅ Logged in with Google!", "success");
+
+      navigate(role === "admin" ? "/admin" : "/account");
+    } catch (err) {
+      console.error("Google Login Error:", err);
+      showToast("❌ Google login failed", "error");
     }
   };
 
@@ -77,7 +121,7 @@ const Login = () => {
         <div className="my-4 text-center text-sm text-gray-500">OR</div>
 
         <button
-          onClick={loginWithGoogle}
+          onClick={handleGoogleLogin}
           className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-3 rounded-full shadow text-sm transition"
         >
           Continue with Google

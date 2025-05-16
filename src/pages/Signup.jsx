@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { useToast } from "../context/ToastContext"; // ✅ use custom toast
+import { useToast } from "../context/ToastContext";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { signup } = useAuth();
-  const { showToast } = useToast(); // ✅ use custom hook
+  const { showToast } = useToast();
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
@@ -16,9 +18,21 @@ const Signup = () => {
     setError("");
 
     try {
-      await signup(email, password);
-      showToast("🎉 Account created successfully!", "success"); // ✅ custom toast
-      navigate("/");
+      const userCredential = await signup(email, password);
+      const uid = userCredential.user.uid;
+
+      // Create Firestore user document
+      const userRef = doc(db, "users", uid);
+      await setDoc(userRef, {
+        email,
+        displayName: "", // optional: add name input if needed
+        role: "user",
+        favoriteParks: [],
+        favoriteEvents: [],
+      });
+
+      showToast("🎉 Account created successfully!", "success");
+      navigate("/account");
     } catch (err) {
       console.error("Firebase Signup Error:", err);
       let message = "❌ Signup failed. Please try again.";
@@ -34,7 +48,7 @@ const Signup = () => {
       }
 
       setError(message);
-      showToast(message, "error"); // ✅ show as error
+      showToast(message, "error");
     }
   };
 

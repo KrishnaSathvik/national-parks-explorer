@@ -1,4 +1,4 @@
-// 📦 Gen 2 Cloud Functions for Firebase — Events API + Firestore Caching
+// 📦 Gen 2 Firebase Functions – Events API + Firestore Caching (with Secret)
 
 const express = require("express");
 const cors = require("cors");
@@ -6,9 +6,12 @@ const fetch = require("node-fetch");
 const admin = require("firebase-admin");
 const axios = require("axios");
 
-// ✅ Firebase v2 Functions (Gen 2 syntax)
 const { onRequest } = require("firebase-functions/v2/https");
 const { setGlobalOptions } = require("firebase-functions/v2/options");
+const { defineSecret } = require("firebase-functions/params");
+
+// ✅ Secure secret injection for Gen 2 functions
+const NPS_API_KEY = defineSecret("NPS_API_KEY");
 
 setGlobalOptions({
   region: "us-central1",
@@ -21,18 +24,21 @@ const db = admin.firestore();
 
 const app = express();
 
-app.use(cors({
+// ✅ CORS middleware
+const corsHandler = cors({
   origin: [
     "https://national-parks-explorer.vercel.app",
     "http://localhost:5173"
   ],
   methods: ["GET"],
-}));
+});
 
-// 🔁 Live NPS Events API Proxy
+app.use(corsHandler);
+
+// 🔁 Live NPS Events Proxy
 app.get("/", async (req, res) => {
   const parkCode = req.query.parkCode;
-  const apiKey = "***REMOVED***";
+  const apiKey = process.env.NPS_API_KEY;
 
   if (!parkCode) return res.status(400).json({ error: "Missing parkCode" });
 
@@ -60,64 +66,68 @@ app.get("/", async (req, res) => {
   }
 });
 
-exports.getParkEvents = onRequest(app);
+exports.getParkEvents = onRequest({ secrets: [NPS_API_KEY] }, app);
 
-// 📥 Manual Cache All NPS Events to Firestore
-const parkCodes = ["acad", "arch", "badl", "bibe", "bisc", "blca", "brca", "cany", "care", "cave",
+// 🧭 Full List of NPS Park Codes
+const parkCodes = [
+  "acad", "arch", "badl", "bibe", "bisc", "blca", "brca", "cany", "care", "cave",
   "chis", "cong", "crla", "cuva", "dena", "drto", "ever", "gaar", "glba", "glac", "grca",
   "grte", "grba", "grsa", "grsm", "hale", "havo", "hosp", "indu", "isro", "jotr", "katm",
   "kefj", "kica", "kova", "lacl", "lavo", "maca", "meve", "mora", "noca", "olym", "pefo",
   "pinn", "redw", "romo", "sagu", "seki", "shen", "thro", "viis", "voya", "whsa", "wica",
-  "wrst", "yell", "yose", "zion", "npsa", "neri", "jeff", "deva"];
+  "wrst", "yell", "yose", "zion", "npsa", "neri", "jeff", "deva"
+];
 
-exports.cacheNPSEvents = onRequest(async (req, res) => {
-  console.log("🚀 Starting cacheNPSEvents...");
+// 🔁 Cache All Events to Firestore
+exports.cacheNPSEvents = onRequest({ secrets: [NPS_API_KEY] }, (req, res) => {
+  corsHandler(req, res, async () => {
+    console.log("🚀 Starting cacheNPSEvents...");
+    const allEvents = [];
+    const apiKey = process.env.NPS_API_KEY;
 
-  const allEvents = [];
-  const apiKey = "***REMOVED***";
+    for (const code of parkCodes) {
+      try {
+        const response = await axios.get(
+          `https://developer.nps.gov/api/v1/events?parkCode=${code}&api_key=${apiKey}`
+        );
 
-  for (const code of parkCodes) {
-    try {
-      const response = await axios.get(
-        `https://developer.nps.gov/api/v1/events?parkCode=${code}&api_key=${apiKey}`
-      );
+        const data = response.data?.data;
+        if (!Array.isArray(data)) {
+          console.error(`❌ Invalid data for ${code}`, response.data);
+          continue;
+        }
 
-      const data = response.data?.data;
-      if (!Array.isArray(data)) {
-        console.error(`❌ Invalid data for ${code}`, response.data);
-        continue;
+        console.log(`📦 ${code}: ${data.length} events`);
+
+        const events = data.map((event) => ({
+          id: event.id,
+          title: event.title,
+          park: event.parkfullname || code.toUpperCase(),
+          start: event.datestart,
+          end: event.dateend,
+          description: event.description,
+          url: event.url || `https://www.nps.gov/planyourvisit/event-details.htm?id=${event.id}`,
+        }));
+
+        allEvents.push(...events);
+      } catch (error) {
+        console.error(`🔥 Error for park ${code}:`, error.message);
       }
-
-      console.log(`📦 ${code}: ${data.length} events`);
-
-      const events = data.map((event) => ({
-        id: event.id,
-        title: event.title,
-        park: event.parkfullname || code.toUpperCase(),
-        start: event.datestart,
-        end: event.dateend,
-        description: event.description,
-        url: event.url || `https://www.nps.gov/planyourvisit/event-details.htm?id=${event.id}`,
-      }));
-
-      allEvents.push(...events);
-    } catch (error) {
-      console.error(`🔥 Error for park ${code}:`, error.message);
     }
-  }
 
-  console.log(`✅ Total events collected: ${allEvents.length}`);
+    console.log(`✅ Total events collected: ${allEvents.length}`);
 
-  try {
-    await db.collection("cache").doc("events").set({
-      updatedAt: new Date().toISOString(),
-      events: allEvents,
-    });
+    try {
+      await db.collection("cache").doc("events").set({
+        updatedAt: new Date().toISOString(),
+        events: allEvents,
+      });
 
-    console.log("✅ Successfully saved events to Firestore");
-    res.send(`✅ Cached ${allEvents.length} events and saved to Firestore`);
-  } catch (err) {
-    console.error("❌ Firestore write failed:", err.message);
-    res.status(500).send("❌ Failed to write to Firestore");
-  }
+      console.log("✅ Successfully saved events to Firestore");
+      res.status(200).send(`✅ Cached ${allEvents.length} events and saved to Firestore`);
+    } catch (err) {
+      console.error("❌ Firestore write failed:", err.message);
+      res.status(500).send("❌ Failed to write to Firestore");
+    }
+  });
 });

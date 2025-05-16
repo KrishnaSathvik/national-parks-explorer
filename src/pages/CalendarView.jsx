@@ -8,6 +8,7 @@ import { db } from "../firebase";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { ToastContainer } from "react-toastify"; // ✅ this line
 import "react-toastify/dist/ReactToastify.css";
+import SkeletonLoader from "../components/SkeletonLoader";
 import { showToast } from "../components/showToast"; // adjust path if needed
 
 
@@ -191,7 +192,23 @@ const CalendarView = () => {
       </h2>
 
       {loading ? (
-        <p className="text-gray-600">Loading events...</p>
+        <>
+          {/* Filters skeleton */}
+          <div className="grid md:grid-cols-2 gap-8 mb-10">
+            <div className="space-y-4">
+              <SkeletonLoader type="line" count={2} />
+            </div>
+            <div>
+              <SkeletonLoader type="box" count={1} />
+            </div>
+          </div>
+
+          {/* Daily events skeleton */}
+          <h2 className="text-xl font-semibold mb-4 border-b pb-2">
+            📍 Events on {selectedDate.toDateString()}
+          </h2>
+          <SkeletonLoader type="card" count={3} />
+        </>
       ) : filteredEvents.length === 0 ? (
         <p className="text-red-500">No events found for this date.</p>
       ) : (
