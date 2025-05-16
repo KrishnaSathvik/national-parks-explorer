@@ -1,12 +1,12 @@
-/* Airbnb-style fonts */
+/* ✅ Fonts inspired by Airbnb-style UI */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Montserrat:wght@600&display=swap');
 
-/* Tailwind base styles */
+/* ✅ Tailwind Directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Global body styles */
+/* ✅ Global Styles */
 body {
   @apply font-sans text-gray-800 bg-gray-50 antialiased;
 }

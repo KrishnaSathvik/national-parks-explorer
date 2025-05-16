@@ -6,64 +6,40 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const { login, loginWithGoogle } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  // 🔐 Email/Password Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
     try {
       const userCredential = await login(email, password);
-      const uid = userCredential.user.uid;
-      const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
-
-      let role = "user";
-      if (userSnap.exists()) {
-        role = userSnap.data().role || "user";
-      }
+      const role = await resolveUserRole(userCredential.user.uid);
 
       showToast("✅ Logged in successfully!", "success");
-
       navigate(role === "admin" ? "/admin" : "/account");
     } catch (err) {
-      console.error("Firebase Login Error:", err);
-
-      let message = "❌ Login failed. Please try again.";
-      if (err.code === "auth/user-not-found") {
-        message = "🙅 No account found with this email.";
-      } else if (err.code === "auth/wrong-password") {
-        message = "🔑 Incorrect password. Please try again.";
-      } else if (err.code === "auth/too-many-requests") {
-        message = "⏳ Too many attempts. Try again later.";
-      } else if (err.code === "auth/invalid-email") {
-        message = "⚠️ Invalid email address format.";
-      }
-
-      setError(message);
-      showToast(message, "error");
+      console.error("Login Error:", err);
+      handleAuthError(err);
     }
   };
 
+  // 🔐 Google OAuth Login
   const handleGoogleLogin = async () => {
     try {
       const userCredential = await loginWithGoogle();
       const user = userCredential.user;
-      const uid = user.uid;
-      const userRef = doc(db, "users", uid);
+      const userRef = doc(db, "users", user.uid);
       const userSnap = await getDoc(userRef);
 
-      let role = "user";
-
-      if (userSnap.exists()) {
-        role = userSnap.data().role || "user";
-      } else {
-        // Create user doc if not exists
+      if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: user.email,
           displayName: user.displayName,
@@ -73,13 +49,32 @@ const Login = () => {
         });
       }
 
+      const role = userSnap.data()?.role || "user";
       showToast("✅ Logged in with Google!", "success");
-
       navigate(role === "admin" ? "/admin" : "/account");
     } catch (err) {
       console.error("Google Login Error:", err);
       showToast("❌ Google login failed", "error");
     }
+  };
+
+  // 🧠 Role Resolver
+  const resolveUserRole = async (uid) => {
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+    return userSnap.exists() ? userSnap.data().role || "user" : "user";
+  };
+
+  // 🚨 Error Handling
+  const handleAuthError = (err) => {
+    let message = "❌ Login failed. Please try again.";
+    if (err.code === "auth/user-not-found") message = "🙅 No account found with this email.";
+    else if (err.code === "auth/wrong-password") message = "🔑 Incorrect password.";
+    else if (err.code === "auth/too-many-requests") message = "⏳ Too many attempts. Try again later.";
+    else if (err.code === "auth/invalid-email") message = "⚠️ Invalid email format.";
+
+    setError(message);
+    showToast(message, "error");
   };
 
   return (
@@ -96,7 +91,10 @@ const Login = () => {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />
@@ -105,7 +103,10 @@ const Login = () => {
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError("");
+            }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />

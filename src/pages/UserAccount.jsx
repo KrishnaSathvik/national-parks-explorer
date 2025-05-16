@@ -121,7 +121,7 @@ const UserAccount = () => {
     };
   });
 
-  // 🔐 Show login prompt if user not authenticated
+  // 🔐 Login prompt
   if (!currentUser) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 font-sans text-center">
@@ -274,12 +274,8 @@ const UserAccount = () => {
                       🗓️ {event.start ? event.start.toDateString() : "Unknown Date"}
                     </p>
                     <p className="text-sm text-gray-600 mb-2">
-                      🕒{" "}
-                      {event.start
-                        ? event.start.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })
+                      🕒 {event.start
+                        ? event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                         : "Unknown Time"}
                     </p>
                     {event.url && (
@@ -295,9 +291,7 @@ const UserAccount = () => {
                     <div
                       className="text-sm text-gray-700"
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(
-                          event.description || "No description available."
-                        ),
+                        __html: DOMPurify.sanitize(event.description || "No description available."),
                       }}
                     />
                   </div>

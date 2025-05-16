@@ -4,22 +4,31 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 const Accordion = ({ title, children, defaultOpen = false }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  const toggleAccordion = () => setIsOpen((prev) => !prev);
+
   return (
-    <div className="rounded-2xl border border-gray-200 mb-6 shadow-sm transition">
+    <div className="rounded-2xl border border-gray-200 mb-6 shadow-sm transition-all duration-200">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex justify-between items-center w-full px-5 py-4 font-medium text-left bg-gray-50 hover:bg-gray-100 rounded-t-2xl transition duration-200"
+        type="button"
+        aria-expanded={isOpen}
+        onClick={toggleAccordion}
+        className="flex justify-between items-center w-full px-5 py-4 bg-gray-50 hover:bg-gray-100 text-left rounded-t-2xl font-medium focus:outline-none focus:ring-2 focus:ring-pink-400"
       >
         <span className="text-gray-800">{title}</span>
-        <span className="text-gray-500">
+        <span className="text-gray-500 transition-transform duration-200">
           {isOpen ? <FaChevronUp /> : <FaChevronDown />}
         </span>
       </button>
-      {isOpen && (
-        <div className="px-5 py-4 text-sm text-gray-700 bg-white rounded-b-2xl">
-          {children}
-        </div>
-      )}
+
+      <div
+        className={`overflow-hidden transition-all duration-300 ${
+          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+        } bg-white rounded-b-2xl`}
+      >
+        {isOpen && (
+          <div className="px-5 py-4 text-sm text-gray-700">{children}</div>
+        )}
+      </div>
     </div>
   );
 };

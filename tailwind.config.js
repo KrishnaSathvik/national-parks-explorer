@@ -6,19 +6,13 @@ export default {
   ],
   theme: {
     extend: {
-      keyframes: {
-        'fade-in-up': {
-          '0%': { opacity: 0, transform: 'translateY(10px)' },
-          '100%': { opacity: 1, transform: 'translateY(0)' },
-        },
-      },
-      animation: {
-        'fade-in-up': 'fade-in-up 0.3s ease-out',
-      },
+      // 🔤 Fonts
       fontFamily: {
         sans: ['"Open Sans"', 'sans-serif'],
         heading: ['"Montserrat"', 'sans-serif'],
       },
+
+      // 🎨 Colors
       colors: {
         pink: {
           DEFAULT: '#FF385C',
@@ -30,14 +24,33 @@ export default {
           800: '#1f2937',
         },
       },
+
+      // 🌟 Shadows
       boxShadow: {
         card: '0 2px 12px rgba(0,0,0,0.08)',
       },
+
+      // 🟦 Border Radius
       borderRadius: {
         xl: '1.5rem',
         '2xl': '2rem',
       },
+
+      // 🎞️ Keyframes
+      keyframes: {
+        'fade-in-up': {
+          '0%': { opacity: 0, transform: 'translateY(10px)' },
+          '100%': { opacity: 1, transform: 'translateY(0)' },
+        },
+      },
+
+      // 🎬 Animations
+      animation: {
+        'fade-in-up': 'fade-in-up 0.3s ease-out',
+      },
     },
   },
-  plugins: [require('@tailwindcss/typography')],
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 };

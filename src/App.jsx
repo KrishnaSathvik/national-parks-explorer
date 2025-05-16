@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
 import ScrollToTop from "./components/ScrollToTop";
-import UserAccount from "./pages/UserAccount"; // Add this at the top
-import { db } from "./firebase";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import { db } from "./firebase";
 import {
   collection,
   getDocs,
@@ -14,38 +13,34 @@ import {
   arrayUnion,
   arrayRemove,
 } from "firebase/firestore";
-
 import { useAuth } from "./context/AuthContext";
-import { useToast } from "./context/ToastContext"; // ✅ import custom toast hook
-
+import { useToast } from "./context/ToastContext";
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
-import ParkDetails from "./pages/ParkDetails";
-import MapPage from "./pages/MapPage";
-import CalendarView from "./pages/CalendarView";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-// NEW Admin Imports
-import AdminLogin from "./admin/AdminLogin";
-import AdminRoute from "./admin/AdminRoute";
-import AdminPage from "./admin/AdminPage";
-import "react-quill/dist/quill.snow.css";
-import Blog from "./pages/Blog";
-import BlogPost from "./pages/BlogPost"; // We’ll create this next
-import AdminBlogEditor from "./admin/AdminBlogEditor";
-import EditBlog from "./admin/EditBlog";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import About from "./pages/About"; // Adjust path if your About.jsx is in a different folder
 
+// ✅ Lazy-loaded pages for performance
+const Home = lazy(() => import("./pages/Home"));
+const ParkDetails = lazy(() => import("./pages/ParkDetails"));
+const MapPage = lazy(() => import("./pages/MapPage"));
+const CalendarView = lazy(() => import("./pages/CalendarView"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const About = lazy(() => import("./pages/About"));
+const UserAccount = lazy(() => import("./pages/UserAccount"));
 
-
-
+// ✅ Admin lazy-loaded
+const AdminLogin = lazy(() => import("./admin/AdminLogin"));
+const AdminRoute = lazy(() => import("./admin/AdminRoute"));
+const AdminPage = lazy(() => import("./admin/AdminPage"));
+const AdminBlogEditor = lazy(() => import("./admin/AdminBlogEditor"));
+const EditBlog = lazy(() => import("./admin/EditBlog"));
 
 function App() {
   const [parks, setParks] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const { currentUser } = useAuth();
-  const { showToast } = useToast(); // ✅ custom toast handler
+  const { showToast } = useToast();
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -58,7 +53,6 @@ function App() {
         console.error("Error fetching parks:", error);
       }
     };
-
     fetchParks();
   }, []);
 
@@ -85,92 +79,96 @@ function App() {
         console.error("🔥 Firestore permission error:", err);
       }
     };
-
     fetchFavorites();
   }, [currentUser]);
 
-// inside App.jsx
+  const toggleFavorite = async (id) => {
+    const isFavorite = favorites.includes(id);
+    const updatedFavorites = isFavorite
+      ? favorites.filter((f) => f !== id)
+      : [...favorites, id];
+    setFavorites(updatedFavorites);
 
-const toggleFavorite = async (id) => {
-  const isFavorite = favorites.includes(id);
-  const updatedFavorites = isFavorite
-    ? favorites.filter((f) => f !== id)
-    : [...favorites, id];
+    if (!currentUser) {
+      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      showToast("🔐 Log in to save favorites across devices", "info");
+      return;
+    }
 
-  setFavorites(updatedFavorites);
+    try {
+      const userRef = doc(db, "users", currentUser.uid);
+      await updateDoc(userRef, {
+        favoriteParks: isFavorite ? arrayRemove(id) : arrayUnion(id),
+      });
 
-  if (!currentUser) {
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-    showToast("🔐 Log in to save favorites across devices", "info");
-    return;
-  }
+      showToast(
+        isFavorite ? "❌ Removed from favorites" : "💖 Added to favorites",
+        isFavorite ? "info" : "success"
+      );
+    } catch (err) {
+      console.error("Error updating favorites:", err);
+      showToast("❌ Failed to update favorites", "error");
+    }
+  };
 
-  const userRef = doc(db, "users", currentUser.uid);
-  try {
-    await updateDoc(userRef, {
-      favoriteParks: isFavorite ? arrayRemove(id) : arrayUnion(id),
-    });
-
-    showToast(
-      isFavorite ? "❌ Removed from favorites" : "💖 Added to favorites",
-      isFavorite ? "info" : "success"
-    );
-  } catch (err) {
-    console.error("Error updating favorites:", err);
-    showToast("❌ Failed to update favorites", "error");
-  }
-};
-return (
-  <div className="font-sans bg-gray-50 min-h-screen">
-    <ScrollToTop /> {/* Smooth scroll on route change */}
-
-    <Layout>
-      <div className="main-scroll">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Home
-                parks={parks}
-                favorites={favorites}
-                toggleFavorite={toggleFavorite}
+  return (
+    <div className="font-sans bg-gray-50 min-h-screen">
+      <ScrollToTop />
+      <Layout>
+        <div className="main-scroll">
+          <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Home
+                    parks={parks}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
+                  />
+                }
               />
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/park/:id" element={<ParkDetails />} />
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/calendar" element={<CalendarView />} />
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogPost />} />
-          <Route path="/admin/edit-blog/:id" element={<EditBlog />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/account" element={<UserAccount />} />
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminPage />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path="/admin/blog-editor"
-            element={
-              <AdminRoute>
-                <AdminBlogEditor />
-              </AdminRoute>
-            }
-          />
-        </Routes>
-      </div>
-    </Layout>
-
-    <ScrollToTopButton /> {/* Floating back-to-top button */}
-  </div>
-);
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/park/:id" element={<ParkDetails />} />
+              <Route path="/map" element={<MapPage />} />
+              <Route path="/calendar" element={<CalendarView />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/account" element={<UserAccount />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:id" element={<BlogPost />} />
+              <Route path="/admin/login" element={<AdminLogin />} />
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminPage />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/blog-editor"
+                element={
+                  <AdminRoute>
+                    <AdminBlogEditor />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/edit-blog/:id"
+                element={
+                  <AdminRoute>
+                    <EditBlog />
+                  </AdminRoute>
+                }
+              />
+            </Routes>
+          </Suspense>
+        </div>
+      </Layout>
+      <ScrollToTopButton />
+    </div>
+  );
 }
 
 export default App;

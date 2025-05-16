@@ -17,42 +17,43 @@ const About = () => {
         </Link>
       </div>
 
-      {/* 📄 About Content Card */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md space-y-6">
+      {/* 📄 About Content */}
+      <section className="bg-white p-6 sm:p-8 rounded-2xl shadow-md space-y-6">
         {/* 👤 About Me Section */}
-        <h1 className="text-4xl font-extrabold text-pink-600">👋 About Me</h1>
-        <p className="text-gray-700 text-base leading-relaxed">
-          Hello everyone, I'm <strong>Krishna</strong>, a travel enthusiast who loves exploring new places
-          and sharing my experiences with others. From beautiful destinations to insightful travel tips,
-          my blog is the perfect place to find inspiration for your next adventure.
+        <header>
+          <h1 className="text-4xl font-extrabold text-pink-600 mb-2">👋 About Me</h1>
+        </header>
+        <p className="text-gray-700 leading-relaxed">
+          Hi, I’m <strong>Krishna</strong>—a passionate traveler and explorer. I love visiting stunning places,
+          capturing memories, and helping others discover the joy of travel through stories, tips, and reviews.
         </p>
-        <p className="text-gray-700 text-base leading-relaxed">
-          I'm thrilled to share all my travel experiences, curated with accurate reviews and helpful insights.
-          As a <strong>Google Level 8 reviewer</strong>, I’ve dedicated countless hours to writing detailed,
-          honest reviews—whether it’s for accommodations, restaurants, attractions, or hidden gems.
+        <p className="text-gray-700 leading-relaxed">
+          As a proud <strong>Google Level 8 Reviewer</strong>, I’ve shared hundreds of honest insights about
+          places to stay, eat, and explore. I believe in helping people make informed decisions before they set off.
         </p>
-        <p className="text-gray-700 text-base leading-relaxed">
-          Helping others plan unforgettable trips brings me joy. Whether you're a weekend explorer or a
-          seasoned traveler, I hope my tips make your journeys smoother and more memorable.
+        <p className="text-gray-700 leading-relaxed">
+          Whether you’re planning a weekend escape or a cross-country adventure, I hope my experiences guide
+          and inspire your next trip.
         </p>
 
         {/* 🧭 About the App Section */}
-        <h2 className="text-3xl font-bold text-pink-600 pt-6">🛠️ About This App</h2>
-        <p className="text-gray-700 text-base leading-relaxed">
-          This <strong>National Parks Explorer</strong> app is a labor of love—designed to make it easier for
-          nature lovers, hikers, and road trippers to discover the magic of U.S. National Parks.
+        <header className="pt-6">
+          <h2 className="text-3xl font-bold text-pink-600">🛠️ About This App</h2>
+        </header>
+        <p className="text-gray-700 leading-relaxed">
+          The <strong>National Parks Explorer</strong> is a passion project I built to help fellow nature lovers,
+          hikers, and photographers find the best experiences in U.S. national parks.
         </p>
-        <p className="text-gray-700 text-base leading-relaxed">
-          Built entirely using <strong>React</strong>, <strong>Firebase</strong>, and modern tools, the app features
-          detailed park pages, seasonal guides, interactive maps, user reviews, weather updates, a travel blog,
-          and more—all wrapped in a clean, mobile-friendly interface.
+        <p className="text-gray-700 leading-relaxed">
+          Developed using <strong>React</strong> and <strong>Firebase</strong>, it features rich park pages,
+          travel tips, seasonal info, real-time weather, interactive maps, and a travel blog—all packed into
+          a beautiful, mobile-friendly design.
         </p>
-        <p className="text-gray-700 text-base leading-relaxed">
-          Every piece of this project—from design to deployment—was handcrafted with a deep love for both travel
-          and technology. My goal is to build a community of explorers who can share, learn, and be inspired to
-          visit these breathtaking landscapes.
+        <p className="text-gray-700 leading-relaxed">
+          My mission is simple: to encourage more people to explore the outdoors, connect with nature, and
+          make unforgettable memories—one trail at a time.
         </p>
-      </div>
+      </section>
     </motion.div>
   );
 };

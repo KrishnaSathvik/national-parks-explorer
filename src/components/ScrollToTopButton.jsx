@@ -2,32 +2,25 @@
 import React, { useEffect, useState } from "react";
 
 const ScrollToTopButton = () => {
-  const [visible, setVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      setVisible(window.scrollY > 300); // ✅ Simple and reliable
-    };
-
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
+    const handleScroll = () => setIsVisible(window.scrollY > 300);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  if (!visible) return null;
-
-  return (
+  return isVisible ? (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 bg-pink-500 text-white p-3 rounded-full shadow-xl hover:bg-pink-600 transition"
-      title="Back to Top"
+      aria-label="Scroll to top"
+      className="fixed bottom-6 right-6 z-50 bg-pink-500 text-white p-3 rounded-full shadow-lg hover:bg-pink-600 transition"
     >
       ⬆️
     </button>
-  );
+  ) : null;
 };
 
 export default ScrollToTopButton;

@@ -21,11 +21,9 @@ const Signup = () => {
       const userCredential = await signup(email, password);
       const uid = userCredential.user.uid;
 
-      // Create Firestore user document
-      const userRef = doc(db, "users", uid);
-      await setDoc(userRef, {
+      await setDoc(doc(db, "users", uid), {
         email,
-        displayName: "", // optional: add name input if needed
+        displayName: "",
         role: "user",
         favoriteParks: [],
         favoriteEvents: [],
@@ -54,38 +52,46 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition-transform duration-300 hover:scale-[1.01]">
+      <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">
         <h2 className="text-3xl font-heading font-bold mb-6 text-center text-pink-600">
           📝 Create Your Account
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+          <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            autoFocus
-            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError("");
-            }}
-            required
-          />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="sr-only" htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              autoFocus
+              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setError("");
+              }}
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError("");
-            }}
-            required
-          />
+          <div>
+            <label className="sr-only" htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="Password"
+              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setError("");
+              }}
+              required
+            />
+          </div>
 
           <button
             type="submit"

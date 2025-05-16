@@ -1,38 +1,44 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { ToastContainer } from "react-toastify"; // ✅ this line
+import {
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove,
+} from "firebase/firestore";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SkeletonLoader from "../components/SkeletonLoader";
-import { showToast } from "../components/showToast"; // adjust path if needed
-
-
+import { showToast } from "../components/showToast";
 
 const CalendarView = () => {
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [savedEventIds, setSavedEventIds] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedPark, setSelectedPark] = useState("All");
-  const [savedEventIds, setSavedEventIds] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState(null);
+
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
+  // Fetch cached events
   useEffect(() => {
     const fetchEvents = async () => {
       const snapshot = await getDoc(doc(db, "cache", "events"));
       if (snapshot.exists()) {
-        const data = snapshot.data();
-        setLastUpdated(data.updatedAt);
-        const parsed = data.events.map((e) => ({
+        const { updatedAt, events: rawEvents } = snapshot.data();
+        setLastUpdated(updatedAt);
+        const parsed = rawEvents.map((e) => ({
           ...e,
-          start: e.start ? new Date(e.start) : new Date(),
-          end: e.end ? new Date(e.end) : new Date(e.start),
+          start: new Date(e.start),
+          end: new Date(e.end || e.start),
         }));
         setEvents(parsed.sort((a, b) => a.start - b.start));
       }
@@ -41,40 +47,43 @@ const CalendarView = () => {
     fetchEvents();
   }, []);
 
+  // Fetch user's saved events
   useEffect(() => {
-    const fetchSavedEvents = async () => {
-      if (!currentUser) return;
+    if (!currentUser) return;
+    const fetchUserEvents = async () => {
       const docSnap = await getDoc(doc(db, "users", currentUser.uid));
       if (docSnap.exists()) {
         setSavedEventIds(docSnap.data().favoriteEvents || []);
       }
     };
-    fetchSavedEvents();
+    fetchUserEvents();
   }, [currentUser]);
 
-  const toggleEventSave = async (eventObj) => {
+  // Toggle save/remove event
+  const toggleEventSave = async (event) => {
     if (!currentUser) {
       showToast("🔐 Please log in to save events", "info");
       return;
     }
 
     const userRef = doc(db, "users", currentUser.uid);
-    const eventPayload = {
-      ...eventObj,
-      start: eventObj.start.toISOString(),
-      end: eventObj.end.toISOString(),
+    const formattedEvent = {
+      ...event,
+      start: event.start.toISOString(),
+      end: event.end.toISOString(),
     };
 
-    const alreadySaved = savedEventIds.includes(eventObj.id);
-
+    const alreadySaved = savedEventIds.includes(event.id);
     await updateDoc(userRef, {
       favoriteEvents: alreadySaved
-        ? arrayRemove(eventPayload) // 👈 must match structure
-        : arrayUnion(eventPayload),
+        ? arrayRemove(formattedEvent)
+        : arrayUnion(formattedEvent),
     });
 
     setSavedEventIds((prev) =>
-      alreadySaved ? prev.filter((id) => id !== eventObj.id) : [...prev, eventObj.id]
+      alreadySaved
+        ? prev.filter((id) => id !== event.id)
+        : [...prev, event.id]
     );
 
     showToast(
@@ -82,20 +91,28 @@ const CalendarView = () => {
       alreadySaved ? "info" : "success"
     );
   };
-  const selectedISODate = selectedDate.toLocaleDateString("en-CA");
 
-  const filteredEvents = events.filter((e) => {
-    const iso = e.start.toLocaleDateString("en-CA");
-    return iso === selectedISODate && (selectedPark === "All" || e.park === selectedPark);
-  });
+  const selectedISO = selectedDate.toLocaleDateString("en-CA");
 
-  const monthlyEventMap = events.reduce((acc, event) => {
-    const date = event.start.toLocaleDateString("en-CA");
-    acc[date] = acc[date] || { count: 0, parks: new Set() };
-    acc[date].count++;
-    acc[date].parks.add(event.park);
-    return acc;
-  }, {});
+  const filteredEvents = useMemo(
+    () =>
+      events.filter(
+        (e) =>
+          e.start.toLocaleDateString("en-CA") === selectedISO &&
+          (selectedPark === "All" || e.park === selectedPark)
+      ),
+    [events, selectedDate, selectedPark]
+  );
+
+  const monthlyHeatmap = useMemo(() => {
+    return events.reduce((acc, e) => {
+      const iso = e.start.toLocaleDateString("en-CA");
+      acc[iso] = acc[iso] || { count: 0, parks: new Set() };
+      acc[iso].count += 1;
+      acc[iso].parks.add(e.park);
+      return acc;
+    }, {});
+  }, [events]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
@@ -118,7 +135,7 @@ const CalendarView = () => {
       )}
 
       <div className="grid md:grid-cols-2 gap-8 mb-10">
-        {/* Filters */}
+        {/* 🔍 Filters */}
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -130,8 +147,8 @@ const CalendarView = () => {
               className="w-full border px-4 py-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             >
               <option>All</option>
-              {[...new Set(events.map((e) => e.park))].sort().map((park) => (
-                <option key={park}>{park}</option>
+              {[...new Set(events.map((e) => e.park))].sort().map((p) => (
+                <option key={p}>{p}</option>
               ))}
             </select>
           </div>
@@ -142,14 +159,14 @@ const CalendarView = () => {
             </label>
             <DatePicker
               selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
+              onChange={setSelectedDate}
               className="w-full border px-4 py-2 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
               minDate={new Date()}
             />
           </div>
         </div>
 
-        {/* Monthly Heatmap */}
+        {/* 🔥 Heatmap */}
         <div>
           <h2 className="text-md font-bold mb-3 text-center">🔥 Monthly Heatmap</h2>
           <div className="grid grid-cols-7 gap-2 text-xs text-center">
@@ -158,9 +175,9 @@ const CalendarView = () => {
               const date = new Date(selectedDate);
               date.setDate(day);
               const iso = date.toLocaleDateString("en-CA");
-              const data = monthlyEventMap[iso];
+              const data = monthlyHeatmap[iso];
               const count = data?.count || 0;
-              const parkCount = data?.parks?.size || 0;
+              const parkCount = data?.parks.size || 0;
 
               const bg =
                 count >= 10
@@ -174,8 +191,8 @@ const CalendarView = () => {
               return (
                 <div
                   key={day}
-                  className={`p-2 rounded-lg cursor-pointer ${bg} hover:ring-2 hover:ring-pink-400 transition`}
                   onClick={() => setSelectedDate(date)}
+                  className={`p-2 rounded-lg cursor-pointer ${bg} hover:ring-2 hover:ring-pink-400 transition`}
                 >
                   <div className="font-semibold">{day}</div>
                   <div>{count} evt</div>
@@ -187,26 +204,17 @@ const CalendarView = () => {
         </div>
       </div>
 
+      {/* 📍 Filtered Event List */}
       <h2 className="text-xl font-semibold mb-4 border-b pb-2">
         📍 Events on {selectedDate.toDateString()}
       </h2>
 
       {loading ? (
         <>
-          {/* Filters skeleton */}
           <div className="grid md:grid-cols-2 gap-8 mb-10">
-            <div className="space-y-4">
-              <SkeletonLoader type="line" count={2} />
-            </div>
-            <div>
-              <SkeletonLoader type="box" count={1} />
-            </div>
+            <SkeletonLoader type="line" count={2} />
+            <SkeletonLoader type="box" count={1} />
           </div>
-
-          {/* Daily events skeleton */}
-          <h2 className="text-xl font-semibold mb-4 border-b pb-2">
-            📍 Events on {selectedDate.toDateString()}
-          </h2>
           <SkeletonLoader type="card" count={3} />
         </>
       ) : filteredEvents.length === 0 ? (
@@ -222,7 +230,10 @@ const CalendarView = () => {
               <p className="text-sm text-gray-600">📍 {event.park}</p>
               <p className="text-sm text-gray-600">
                 🗓️ {event.start.toDateString()} | 🕒{" "}
-                {event.start.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {event.start.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </p>
 
               <button
@@ -247,6 +258,7 @@ const CalendarView = () => {
                   __html: DOMPurify.sanitize(event.description || "No description available."),
                 }}
               />
+
               {event.url && (
                 <p className="text-sm text-blue-600 mt-4">
                   🔗{" "}

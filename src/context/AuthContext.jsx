@@ -1,5 +1,4 @@
-// src/context/AuthContext.jsx
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import {
   getAuth,
   onAuthStateChanged,
@@ -9,52 +8,63 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
+// Create context
 const AuthContext = createContext();
 
+// Hook to consume Auth context
 export const useAuth = () => useContext(AuthContext);
 
+// Provider component
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Check for authenticated user
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user);
+
       if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          setUserRole(data.role || "user"); // default to "user" if missing
-        } else {
+        try {
+          const userSnap = await getDoc(doc(db, "users", user.uid));
+          setUserRole(userSnap.exists() ? userSnap.data().role || "user" : "user");
+        } catch (error) {
+          console.error("Error fetching user role:", error);
           setUserRole("user");
         }
       } else {
         setUserRole(null);
       }
+
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsubscribe; // cleanup
   }, []);
 
-  const signup = (email, password) => createUserWithEmailAndPassword(auth, email, password);
-  const login = (email, password) => signInWithEmailAndPassword(auth, email, password);
-  const logout = () => signOut(auth);
-  const loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+  // Auth actions
+  const signup = useCallback((email, password) => createUserWithEmailAndPassword(auth, email, password), []);
+  const login = useCallback((email, password) => signInWithEmailAndPassword(auth, email, password), []);
+  const logout = useCallback(() => signOut(auth), []);
+  const loginWithGoogle = useCallback(() => signInWithPopup(auth, new GoogleAuthProvider()), []);
 
+  // Context value
   const value = {
     currentUser,
     userRole,
-    login,
     signup,
+    login,
     logout,
     loginWithGoogle,
   };
 
-  return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };

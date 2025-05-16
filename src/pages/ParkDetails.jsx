@@ -1,4 +1,3 @@
-    // Enhanced ParkDetails.jsx
     import React, { useEffect, useState } from "react";
     import { useParams, useSearchParams, useLocation, Link } from "react-router-dom";
     import {

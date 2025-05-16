@@ -1,10 +1,12 @@
-import React from 'react';
+// src/components/Footer.jsx
+import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="bg-green-700 text-white py-4 mt-10">
-      <div className="container mx-auto text-center">
-        © 2025 National Parks Explorer. All Rights Reserved.
+    <footer className="bg-white border-t border-pink-100 py-6 text-center text-sm text-gray-500 font-sans shadow-inner">
+      <div className="max-w-7xl mx-auto px-4">
+        © {new Date().getFullYear()}{" "}
+        <span className="font-semibold text-gray-700">National Parks Explorer</span>. All rights reserved.
       </div>
     </footer>
   );
