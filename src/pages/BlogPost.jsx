@@ -23,6 +23,7 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true);
   const [user] = useAuthState(auth);
 
+  // ✅ Load blog content
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -37,16 +38,14 @@ const BlogPost = () => {
         setLoading(false);
       }
     };
-
     fetchPost();
   }, [id]);
 
+  // ✅ Live comment updates
   useEffect(() => {
     const q = query(collection(db, "comments"), where("blogId", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setComments(
-        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
-      );
+      setComments(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
     return () => unsubscribe();
   }, [id]);
@@ -54,11 +53,9 @@ const BlogPost = () => {
   const isAuthor = user?.email === post?.author;
   const isAdmin = user?.email === "krishnasathvikm@gmail.com";
 
+  // ✅ Submit comment
   const handleCommentSubmit = async () => {
-    if (!user) {
-      alert("Please login to comment.");
-      return;
-    }
+    if (!user) return alert("Please login to comment.");
     if (!newComment.trim()) return;
 
     try {
@@ -75,6 +72,7 @@ const BlogPost = () => {
     }
   };
 
+  // 🌀 Loading/Error State
   if (loading)
     return <div className="p-6 text-gray-500 font-sans">Loading blog...</div>;
   if (!post)
@@ -82,14 +80,16 @@ const BlogPost = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
+      {/* 🔙 Back Link */}
       <div className="mb-4">
         <Link to="/blog" className="text-sm text-blue-600 hover:underline">
           ← Back to Blogs
         </Link>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md max-w-5xl mx-auto">
-        <h1 className="text-4xl font-heading font-bold mb-3 text-gray-800">
+      {/* 📝 Blog Card */}
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md max-w-5xl mx-auto">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-800 mb-3">
           {post.title}
         </h1>
         <p className="text-sm text-gray-500 mb-4">
@@ -98,14 +98,16 @@ const BlogPost = () => {
             : "Unknown date"} · ✍️ {post.author}
         </p>
 
+        {/* 📸 Cover Image */}
         {post.imageUrl && (
           <img
             src={post.imageUrl}
             alt="cover"
-            className="rounded-xl w-full h-64 object-cover mb-6 shadow"
+            className="rounded-xl w-full h-60 sm:h-72 object-cover mb-6 shadow"
           />
         )}
 
+        {/* 📄 Blog HTML Content */}
         <div
           className="prose prose-sm sm:prose-base max-w-none text-gray-800 leading-relaxed space-y-4"
           dangerouslySetInnerHTML={{
@@ -117,6 +119,7 @@ const BlogPost = () => {
           }}
         />
 
+        {/* ✏️ Edit Post */}
         {(isAuthor || isAdmin) && (
           <Link
             to={`/admin/edit-blog/${id}`}
@@ -126,32 +129,34 @@ const BlogPost = () => {
           </Link>
         )}
 
-        <hr className="my-6" />
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">💬 Comments</h3>
+        {/* 💬 Comments */}
+        <hr className="my-8" />
+        <div>
+          <h3 className="text-lg font-semibold mb-4">💬 Comments</h3>
 
-          {comments.length === 0 && (
+          {comments.length === 0 ? (
             <p className="text-sm text-gray-500 mb-4">No comments yet.</p>
+          ) : (
+            <div className="space-y-4 mb-6">
+              {comments.map((c) => (
+                <div key={c.id} className="bg-gray-50 border p-3 rounded-lg">
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm font-medium text-gray-800">{c.author}</p>
+                    <span className="text-xs text-gray-400">
+                      {c.date?.seconds
+                        ? new Date(c.date.seconds * 1000).toLocaleString()
+                        : ""}
+                    </span>
+                  </div>
+                  <p className="text-sm mt-2 text-gray-700">{c.text}</p>
+                </div>
+              ))}
+            </div>
           )}
 
-          <div className="space-y-4 mb-6">
-            {comments.map((c) => (
-              <div key={c.id} className="bg-gray-50 border p-3 rounded-lg">
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-gray-800 font-medium">{c.author}</p>
-                  <span className="text-xs text-gray-400">
-                    {c.date?.seconds
-                      ? new Date(c.date.seconds * 1000).toLocaleString()
-                      : ""}
-                  </span>
-                </div>
-                <p className="text-sm mt-2 text-gray-700">{c.text}</p>
-              </div>
-            ))}
-          </div>
-
+          {/* 📝 Add Comment */}
           <textarea
-            className="w-full border rounded p-3 text-sm"
+            className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             rows="3"
             placeholder="Write a comment..."
             value={newComment}
@@ -159,7 +164,7 @@ const BlogPost = () => {
           />
           <button
             onClick={handleCommentSubmit}
-            className="mt-2 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded text-sm"
+            className="mt-3 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm"
           >
             Post Comment
           </button>

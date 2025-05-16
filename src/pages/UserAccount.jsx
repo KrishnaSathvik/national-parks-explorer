@@ -33,6 +33,7 @@ const UserAccount = () => {
   const [eventsLoading, setEventsLoading] = useState(true);
   const [parksLoading, setParksLoading] = useState(true);
 
+  // 🧠 Load user, favorites, reviews
   useEffect(() => {
     if (!currentUser) return;
 
@@ -46,21 +47,18 @@ const UserAccount = () => {
         const userData = userSnap.data();
         setUserDoc(userData);
 
-        // Get all parks
         const parksSnap = await getDocs(collection(db, "parks"));
         const allParks = parksSnap.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        // Filter favorites
         const favorites = allParks.filter((p) =>
           userData.favoriteParks?.includes(p.id)
         );
         setFavoriteParks(favorites);
         setParksLoading(false);
 
-        // Get reviews
         const reviewsRef = collection(db, "reviews");
         const q = query(
           reviewsRef,
@@ -76,6 +74,7 @@ const UserAccount = () => {
     fetchData();
   }, [currentUser]);
 
+  // 🔁 Listen for favorite event changes
   useEffect(() => {
     if (!currentUser) return;
     const userRef = doc(db, "users", currentUser.uid);
@@ -88,6 +87,7 @@ const UserAccount = () => {
     return () => unsub();
   }, [currentUser]);
 
+  // ❌ Remove favorite park
   const handleRemoveFavorite = async (parkId) => {
     if (!currentUser) return;
     const userRef = doc(db, "users", currentUser.uid);
@@ -97,6 +97,7 @@ const UserAccount = () => {
     showToast("❌ Removed park from favorites", "success");
   };
 
+  // ❌ Remove favorite event
   const handleRemoveEvent = async (eventId) => {
     if (!currentUser) return;
     const userRef = doc(db, "users", currentUser.uid);
@@ -109,6 +110,7 @@ const UserAccount = () => {
     }
   };
 
+  // 📅 Safe date parsing
   const parsedEvents = rawEvents.map((event) => {
     const safeStart = event?.start ? new Date(event.start) : null;
     const safeEnd = event?.end ? new Date(event.end) : safeStart;
@@ -119,10 +121,13 @@ const UserAccount = () => {
     };
   });
 
+  // 🔐 Show login prompt if user not authenticated
   if (!currentUser) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-10 font-sans text-center">
-        <h1 className="text-2xl font-bold text-pink-600 mb-4">Please log in to view your account.</h1>
+        <h1 className="text-2xl font-bold text-pink-600 mb-4">
+          Please log in to view your account.
+        </h1>
         <Link
           to="/login"
           className="bg-pink-500 text-white px-5 py-2 rounded-full hover:bg-pink-600"
@@ -146,23 +151,28 @@ const UserAccount = () => {
         </Link>
       </div>
 
-      <div className="bg-white p-6 rounded-xl shadow-md max-w-7xl mx-auto">
-        <h1 className="text-4xl font-heading font-bold mb-6 text-pink-600">👤 My Account</h1>
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md max-w-7xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 text-pink-600">
+          👤 My Account
+        </h1>
 
-        <div className="grid gap-4">
+        {/* 🧾 Account Info */}
+        <div className="grid gap-4 mb-6">
           <p><strong>Email:</strong> {currentUser.email}</p>
           <p><strong>UID:</strong> {currentUser.uid}</p>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-1">Display Name:</label>
-            <div className="flex gap-2">
+            <label className="block text-sm font-semibold text-gray-600 mb-1">
+              Display Name:
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
               <input
                 type="text"
                 value={userDoc?.displayName || ""}
                 onChange={(e) =>
                   setUserDoc((prev) => ({ ...prev, displayName: e.target.value }))
                 }
-                className="border px-3 py-2 rounded text-sm w-full max-w-xs"
+                className="border px-3 py-2 rounded text-sm w-full sm:max-w-xs"
                 placeholder="Enter your name"
               />
               <button
@@ -179,7 +189,7 @@ const UserAccount = () => {
           </div>
         </div>
 
-        {/* Favorite Parks */}
+        {/* 💖 Favorite Parks */}
         <div className="mt-10">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">💖 Favorite Parks</h2>
           {parksLoading ? (
@@ -215,20 +225,17 @@ const UserAccount = () => {
                     <p className="text-sm text-gray-500 mt-1">
                       📆 Best Season:{" "}
                       {park.bestSeason && (
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold
-                            ${
-                              park.bestSeason === "Summer"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : park.bestSeason === "Winter"
-                                ? "bg-blue-100 text-blue-800"
-                                : park.bestSeason === "Spring"
-                                ? "bg-green-100 text-green-800"
-                                : park.bestSeason === "Fall"
-                                ? "bg-orange-100 text-orange-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                        >
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          park.bestSeason === "Summer"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : park.bestSeason === "Winter"
+                            ? "bg-blue-100 text-blue-800"
+                            : park.bestSeason === "Spring"
+                            ? "bg-green-100 text-green-800"
+                            : park.bestSeason === "Fall"
+                            ? "bg-orange-100 text-orange-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}>
                           {park.bestSeason}
                         </span>
                       )}
@@ -240,7 +247,7 @@ const UserAccount = () => {
           )}
         </div>
 
-        {/* Favorite Events */}
+        {/* 📅 Favorite Events */}
         <div className="mt-10">
           <h2 className="text-xl font-semibold mb-4 text-gray-700">📅 Favorite Events</h2>
           {eventsLoading ? (
@@ -300,7 +307,7 @@ const UserAccount = () => {
           )}
         </div>
 
-        {/* Reviews */}
+        {/* 📝 Reviews */}
         {userReviews.length > 0 && (
           <div className="mt-10">
             <h2 className="text-xl font-semibold text-pink-600 mb-4">📝 My Reviews</h2>

@@ -125,7 +125,7 @@ return (
     <ScrollToTop /> {/* Smooth scroll on route change */}
 
     <Layout>
-      <div className="main-scroll overflow-y-auto h-screen">
+      <div className="main-scroll">
         <Routes>
           <Route
             path="/"

@@ -6,26 +6,15 @@ const ScrollToTopButton = () => {
 
   useEffect(() => {
     const toggleVisibility = () => {
-      const scrolled =
-        window.scrollY ||
-        document.querySelector(".main-scroll")?.scrollTop ||
-        0;
-
-      setVisible(scrolled > 300);
+      setVisible(window.scrollY > 300); // ✅ Simple and reliable
     };
 
-    const scrollTarget = document.querySelector(".main-scroll") || window;
-    scrollTarget.addEventListener("scroll", toggleVisibility);
-    return () => scrollTarget.removeEventListener("scroll", toggleVisibility);
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
   }, []);
 
   const scrollToTop = () => {
-    const container = document.querySelector(".main-scroll");
-    if (container) {
-      container.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (!visible) return null;
@@ -33,7 +22,7 @@ const ScrollToTopButton = () => {
   return (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-6 right-6 z-50 bg-pink-500 text-white p-3 rounded-full shadow-lg hover:bg-pink-600 transition"
+      className="fixed bottom-6 right-6 z-50 bg-pink-500 text-white p-3 rounded-full shadow-xl hover:bg-pink-600 transition"
       title="Back to Top"
     >
       ⬆️
