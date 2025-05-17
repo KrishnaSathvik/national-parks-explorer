@@ -7,6 +7,14 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import SkeletonLoader from "../components/SkeletonLoader";
+import {
+  FaCalendarAlt,
+  FaNewspaper,
+  FaBookOpen,
+  FaUser,
+  FaLock,
+  FaCogs,
+} from "react-icons/fa";
 
 // Fix Leaflet icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -37,11 +45,18 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const allStates = useMemo(() =>
-    parks.flatMap((p) => p.state?.split(",").map((s) => s.trim()) || []), [parks]);
+  const handleLogout = async () => {
+    await logout();
+    showToast("👋 Logged out successfully", "success");
+    navigate("/");
+  };
 
+  const allStates = useMemo(
+    () => parks.flatMap((p) => p.state?.split(",").map((s) => s.trim()) || []),
+    [parks]
+  );
   const uniqueStates = useMemo(() => ["All", ...Array.from(new Set(allStates))], [allStates]);
-  const seasons = useMemo(() => ["All", "Spring", "Summer", "Fall", "Winter"], []);
+  const seasons = ["All", "Spring", "Summer", "Fall", "Winter"];
 
   const filtered = parks.filter((p) => {
     const name = p.name?.toLowerCase() || "";
@@ -67,30 +82,35 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         <h1 className="text-2xl sm:text-3xl font-extrabold text-pink-600 flex items-center gap-2 text-center sm:text-left">
           🌍 Explore National Parks
         </h1>
-        <div className="flex flex-wrap justify-center sm:justify-end gap-3">
-          <Link to="/calendar" className="btn-outline">📅 Park Events</Link>
-          <Link to="/blog" className="btn-outline">📰 Blog Stories</Link>
-          <Link to="/about" className="btn-outline">📖 About</Link>
+        <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 text-sm font-medium">
+          <Link to="/calendar" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+            <FaCalendarAlt /> Park Events
+          </Link>
+          <Link to="/blog" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+            <FaNewspaper /> Blog Stories
+          </Link>
+          <Link to="/about" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+            <FaBookOpen /> About
+          </Link>
           {currentUser ? (
             <>
               {userRole === "admin" ? (
-                <a href="/admin" target="_blank" rel="noopener noreferrer" className="btn-filled">⚙️ Admin Panel</a>
+                <a href="/admin" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">
+                  <FaCogs /> Admin Panel
+                </a>
               ) : (
-                <Link to="/account" className="btn-outline">👤 My Account</Link>
+                <Link to="/account" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+                  <FaUser /> My Account
+                </Link>
               )}
-              <button
-                onClick={async () => {
-                  await logout();
-                  showToast("👋 Logged out successfully", "success");
-                  navigate("/");
-                }}
-                className="btn-gray"
-              >
+              <button onClick={handleLogout} className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border hover:bg-red-50 hover:text-red-500 transition">
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/login" className="btn-filled">🔐 Login</Link>
+            <Link to="/login" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">
+              <FaLock /> Login
+            </Link>
           )}
         </div>
       </div>

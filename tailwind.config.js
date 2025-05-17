@@ -42,15 +42,32 @@ export default {
           '0%': { opacity: 0, transform: 'translateY(10px)' },
           '100%': { opacity: 1, transform: 'translateY(0)' },
         },
+        shimmer: {
+          '0%': { backgroundPosition: '-100% 0' },
+          '100%': { backgroundPosition: '100% 0' },
+        },
       },
 
       // 🎬 Animations
       animation: {
         'fade-in-up': 'fade-in-up 0.3s ease-out',
+        shimmer: 'shimmer 1.5s infinite linear',
+      },
+
+      // 💎 Background Image (for shimmer loader if needed)
+      backgroundImage: {
+        shimmer: 'linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%)',
+      },
+
+      // 🔠 Line clamp
+      lineClamp: {
+        3: '3',
+        5: '5',
       },
     },
   },
   plugins: [
     require('@tailwindcss/typography'),
+    require('@tailwindcss/line-clamp'),
   ],
 };

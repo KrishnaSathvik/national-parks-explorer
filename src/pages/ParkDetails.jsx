@@ -223,7 +223,7 @@
               to={from === "favorites" ? "/favorites" : `/?page=${page}`}
               className="text-sm text-blue-600 hover:underline"
             >
-              ← Back to results
+              ← Back to parks
             </Link>
           </div>
 
