@@ -48,7 +48,8 @@
     "globals": "^16.0.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.1",
-    "vite": "^6.3.1"
+    "vite": "^6.3.1",
+    "vite-plugin-pwa": "^1.0.0"
   },
   "description": "A responsive React + Firebase app to explore U.S. National Parks, view seasonal tips, plan visits, and discover nearby food and lodging. Includes features like map views, weather forecasts, NPS alerts, favorites, and social sharing.",
   "main": "bulkUpload.cjs.js",
