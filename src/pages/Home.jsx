@@ -83,32 +83,76 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
           🌍 Explore National Parks
         </h1>
         <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 text-sm font-medium">
-          <Link to="/calendar" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+          <Link
+            to="/calendar"
+            role="button"
+            tabIndex={0}
+            onTouchStart={() => {}}
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+          >
             <FaCalendarAlt /> Park Events
           </Link>
-          <Link to="/blog" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+          <Link
+            to="/blog"
+            role="button"
+            tabIndex={0}
+            onTouchStart={() => {}}
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+          >
             <FaNewspaper /> Blog Stories
           </Link>
-          <Link to="/about" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+          <Link
+            to="/about"
+            role="button"
+            tabIndex={0}
+            onTouchStart={() => {}}
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+          >
             <FaBookOpen /> About
           </Link>
+
           {currentUser ? (
             <>
               {userRole === "admin" ? (
-                <a href="/admin" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">
+                <a
+                  href="/admin"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  role="button"
+                  tabIndex={0}
+                  onTouchStart={() => {}}
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"
+                >
                   <FaCogs /> Admin Panel
                 </a>
               ) : (
-                <Link to="/account" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition">
+                <Link
+                  to="/account"
+                  role="button"
+                  tabIndex={0}
+                  onTouchStart={() => {}}
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                >
                   <FaUser /> My Account
                 </Link>
               )}
-              <button onClick={handleLogout} className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border hover:bg-red-50 hover:text-red-500 transition">
+
+              <button
+                onClick={handleLogout}
+                type="button"
+                className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border hover:bg-red-50 hover:text-red-500 transition"
+              >
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/login" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition">
+            <Link
+              to="/login"
+              role="button"
+              tabIndex={0}
+              onTouchStart={() => {}}
+              className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"
+            >
               <FaLock /> Login
             </Link>
           )}
@@ -166,28 +210,28 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       </div>
 
       {/* 🍂 Season Filter */}
-      <div className="flex flex-wrap gap-2 mb-6 justify-center">
-        {seasons.map((season) => (
-          <button
-            key={season}
-            onClick={() => {
-              setSelectedSeason(season);
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-1 rounded-full text-sm font-medium border transition ${
-              selectedSeason === season
-                ? "bg-pink-500 text-white border-pink-500"
-                : "bg-white text-pink-500 border-pink-500 hover:bg-pink-50"
-            }`}
-          >
-            {season === "Spring" && "🌸 "}
-            {season === "Summer" && "🌞 "}
-            {season === "Fall" && "🍂 "}
-            {season === "Winter" && "❄️ "}
-            {season}
-          </button>
-        ))}
-      </div>
+     <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-3 mb-6 justify-center text-center">
+       {seasons.map((season) => (
+         <button
+           key={season}
+           onClick={() => {
+             setSelectedSeason(season);
+             setCurrentPage(1);
+           }}
+           className={`w-full px-3 py-2 rounded-full text-sm font-medium border transition ${
+             selectedSeason === season
+               ? "bg-pink-500 text-white border-pink-500"
+               : "bg-white text-pink-500 border-pink-500 hover:bg-pink-50"
+           }`}
+         >
+           {season === "Spring" && "🌸 "}
+           {season === "Summer" && "🌞 "}
+           {season === "Fall" && "🍂 "}
+           {season === "Winter" && "❄️ "}
+           {season}
+         </button>
+       ))}
+     </div>
 
       {/* 🏞️ Park Cards */}
       {parks.length === 0 ? (
