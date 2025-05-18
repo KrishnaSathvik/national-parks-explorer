@@ -1,73 +1,99 @@
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
-import { useToast } from "../context/ToastContext";
+import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 
 const ReviewModeration = () => {
   const [reviews, setReviews] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const { showToast } = useToast();
-
-  const fetchReviews = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "reviews"));
-      const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-      setReviews(data);
-    } catch (err) {
-      console.error("Error fetching reviews:", err);
-      showToast("❌ Failed to fetch reviews", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteDoc(doc(db, "reviews", id));
-      showToast("🗑️ Review deleted", "success");
-      setReviews((prev) => prev.filter((r) => r.id !== id));
-    } catch (err) {
-      console.error("Delete error:", err);
-      showToast("❌ Failed to delete review", "error");
-    }
-  };
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const reviewSnap = await getDocs(collection(db, "reviews"));
+        const reviewData = reviewSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReviews(reviewData);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+      }
+    };
+
     fetchReviews();
   }, []);
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 py-10 font-sans">
-      <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-pink-600 mb-6 text-center">
-        🗂️ Review Moderation
-      </h1>
+  const deleteReview = async (id) => {
+    const confirm = window.confirm("Are you sure you want to delete this review?");
+    if (!confirm) return;
 
-      {loading ? (
-        <p className="text-center text-gray-500">⏳ Loading reviews...</p>
-      ) : reviews.length === 0 ? (
-        <p className="text-center text-gray-400">🚫 No reviews available.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {reviews.map((review) => (
-            <div
-              key={review.id}
-              className="bg-white border rounded-xl p-5 shadow hover:shadow-md transition relative"
-            >
-              <p className="text-sm text-gray-700 mb-2">
-                <span className="font-medium text-pink-600">{review.user}</span>{" "}
-                on <span className="font-semibold">{review.parkName}</span>
-              </p>
-              <p className="text-gray-800 text-sm mb-4">{review.text}</p>
-              <button
-                onClick={() => handleDelete(review.id)}
-                className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1 rounded-full shadow transition"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+    try {
+      await deleteDoc(doc(db, "reviews", id));
+      setReviews(reviews.filter((r) => r.id !== id));
+      alert("✅ Review deleted.");
+    } catch (error) {
+      console.error("Delete failed:", error);
+      alert("❌ Failed to delete review.");
+    }
+  };
+
+  const filteredReviews = reviews.filter((r) =>
+    r.parkId?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    r.author?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="p-6 bg-gray-50 min-h-screen font-sans">
+      <h1 className="text-2xl font-bold mb-4">🛠 Review Moderation</h1>
+
+      {/* Search */}
+      <input
+        type="text"
+        placeholder="Search by park ID or author..."
+        className="mb-6 p-3 border w-full max-w-xl rounded-lg"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+
+      {/* Table */}
+      <div className="overflow-x-auto bg-white rounded-2xl shadow">
+        <table className="w-full text-sm">
+          <thead className="bg-gray-100">
+            <tr className="text-left">
+              <th className="p-4">Park ID</th>
+              <th className="p-4">Author</th>
+              <th className="p-4">Rating</th>
+              <th className="p-4">Comment</th>
+              <th className="p-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredReviews.map((r) => (
+              <tr key={r.id} className="border-t hover:bg-gray-50">
+                <td className="p-4">{r.parkId}</td>
+                <td className="p-4">{r.author}</td>
+                <td className="p-4">{r.rating}⭐</td>
+                <td className="p-4 max-w-md break-words">{r.comment}</td>
+                <td className="p-4">
+                  <button
+                    onClick={() => deleteReview(r.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {filteredReviews.length === 0 && (
+              <tr>
+                <td colSpan="5" className="p-4 text-center text-gray-500">
+                  No reviews found.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

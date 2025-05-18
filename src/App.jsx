@@ -155,6 +155,14 @@ function App() {
                 }
               />
               <Route
+                path="/admin/editor"
+                element={
+                  <AdminRoute>
+                    <AdminBlogEditor />
+                  </AdminRoute>
+                }
+              />
+              <Route
                 path="/admin/edit-blog/:id"
                 element={
                   <AdminRoute>
