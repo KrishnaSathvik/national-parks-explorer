@@ -1,4 +1,3 @@
-// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -10,6 +9,36 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/national-parks-explorer\.vercel\.app\/.*$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages-cache',
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'google-fonts-stylesheets',
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-webfonts',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365, // 1 year
+              },
+            },
+          }
+        ]
+      },
       manifest: {
         id: '/',
         name: 'National Parks Explorer',
@@ -46,7 +75,7 @@ export default defineConfig({
             src: 'screenshots/screen2.png',
             sizes: '1080x1920',
             type: 'image/png'
-            // ✅ No form_factor set = default/fallback
+            // ✅ No form_factor set = default/fallback for desktop
           }
         ]
       }

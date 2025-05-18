@@ -1,5 +1,8 @@
 import React, { useEffect, useState, lazy, Suspense } from "react";
 import { Routes, Route } from "react-router-dom";
+import { messaging } from './firebase';
+import { onMessage } from 'firebase/messaging';
+import InstallButton from './components/InstallButton';
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import { db } from "./firebase";
@@ -16,6 +19,7 @@ import {
 import { useAuth } from "./context/AuthContext";
 import { useToast } from "./context/ToastContext";
 import Layout from "./components/Layout";
+import { requestNotificationPermission } from './firebase';
 
 // ✅ Lazy-loaded pages for performance
 const Home = lazy(() => import("./pages/Home"));
@@ -55,6 +59,34 @@ function App() {
     };
     fetchParks();
   }, []);
+
+    useEffect(() => {
+      const handleOffline = () => {
+        showToast('⚠️ You are offline. Some features may not work.', 'warning');
+      };
+      const handleOnline = () => {
+        showToast('✅ Back online!', 'success');
+      };
+
+      window.addEventListener('offline', handleOffline);
+      window.addEventListener('online', handleOnline);
+
+      return () => {
+        window.removeEventListener('offline', handleOffline);
+        window.removeEventListener('online', handleOnline);
+      };
+    }, []);
+
+    useEffect(() => {
+      const unsubscribe = onMessage(messaging, (payload) => {
+        if (payload?.notification) {
+          const { title, body } = payload.notification;
+          showToast(`🔔 ${title}: ${body}`, 'info');
+        }
+      });
+      return () => unsubscribe();
+    }, []);
+
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -174,6 +206,16 @@ function App() {
           </Suspense>
         </div>
       </Layout>
+      {/* 📲 Install + 🔔 Notifications Buttons */}
+            <div className="flex justify-center gap-4 p-4 bg-white border-t shadow-sm z-50">
+              <InstallButton />
+              <button
+                onClick={requestNotificationPermission}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                🔔 Enable Notifications
+              </button>
+            </div>
       <ScrollToTopButton />
     </div>
   );

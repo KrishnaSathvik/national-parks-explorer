@@ -5,7 +5,7 @@ const cors = require("cors");
 const fetch = require("node-fetch");
 const admin = require("firebase-admin");
 const axios = require("axios");
-
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest } = require("firebase-functions/v2/https");
 const { setGlobalOptions } = require("firebase-functions/v2/options");
 const { defineSecret } = require("firebase-functions/params");
@@ -131,3 +131,175 @@ exports.cacheNPSEvents = onRequest({ secrets: [NPS_API_KEY] }, (req, res) => {
     }
   });
 });
+
+  // ✅ Broadcast Push Notification to All Devices (users & anonymous)
+  exports.broadcastPush = onRequest(async (req, res) => {
+    try {
+      const FCM_API_KEY = process.env.FCM_API_KEY; // Secure key from env
+      const tokens = [];
+
+      // 🔹 Get all user tokens
+      const usersSnapshot = await db.collection("users").get();
+      for (const userDoc of usersSnapshot.docs) {
+        const tokensSnapshot = await db.collection(`users/${userDoc.id}/tokens`).get();
+        tokensSnapshot.forEach(doc => {
+          if (doc.data()?.token) tokens.push(doc.data().token);
+        });
+      }
+
+      // 🔹 Get all anonymous tokens
+      const anonSnapshot = await db.collection("anonymousTokens").get();
+      anonSnapshot.forEach(doc => {
+        if (doc.data()?.token) tokens.push(doc.data().token);
+      });
+
+      if (tokens.length === 0) {
+        console.warn("⚠️ No tokens found");
+        return res.status(200).send("⚠️ No tokens found.");
+      }
+
+      console.log(`📡 Sending push to ${tokens.length} tokens...`);
+
+      const message = {
+        notification: {
+          title: "📢 New Alert from National Parks Explorer!",
+          body: "Check out the latest events, tips, and blog stories.",
+        }
+      };
+
+      const responses = await Promise.all(tokens.map(token =>
+        axios.post("https://fcm.googleapis.com/fcm/send", {
+          to: token,
+          ...message
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `key=${FCM_API_KEY}`
+          }
+        })
+      ));
+
+      console.log(`✅ Push sent to ${tokens.length} devices`);
+      res.status(200).send(`✅ Push sent to ${tokens.length} devices`);
+    } catch (err) {
+      console.error("❌ Broadcast push failed:", err.message);
+      res.status(500).send("❌ Broadcast push failed");
+    }
+  });
+
+  exports.scheduledWeeklyPush = onSchedule("every monday 09:00", async (event) => {
+    try {
+      const tokens = [];
+      const usersSnap = await db.collection("users").get();
+
+      for (const user of usersSnap.docs) {
+        const prefs = user.data().notificationPrefs;
+        if (prefs?.weeklyTips) {
+          const tokenSnap = await db.collection(`users/${user.id}/tokens`).get();
+          tokenSnap.forEach(doc => {
+            if (doc.data()?.token) tokens.push(doc.data().token);
+          });
+        }
+      }
+
+      const anonSnap = await db.collection("anonymousTokens").get();
+      anonSnap.forEach(doc => {
+        // Send to all anon users for now
+        if (doc.data()?.token) tokens.push(doc.data().token);
+      });
+
+      const payload = {
+        notification: {
+          title: "🗓 Weekly Tip from National Parks Explorer",
+          body: "Discover new parks and tips every Monday!",
+        }
+      };
+
+      await Promise.all(tokens.map(token =>
+        axios.post("https://fcm.googleapis.com/fcm/send", {
+          to: token,
+          ...payload
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `key=${process.env.FCM_API_KEY}`
+          }
+        })
+      ));
+
+      // Log it
+      await db.collection("pushLogs").add({
+        type: "weekly",
+        message: payload.notification,
+        recipients: tokens.length,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        triggeredBy: "scheduled"
+      });
+
+      console.log(`✅ Weekly push sent to ${tokens.length} devices`);
+    } catch (err) {
+      console.error("❌ Weekly push failed:", err);
+    }
+  });
+
+  exports.sendCustomPush = onRequest(async (req, res) => {
+  const { title, body } = req.body;
+
+  if (!title || !body) {
+    return res.status(400).send("Missing title or body");
+  }
+
+  try {
+    const tokens = [];
+    const usersSnap = await db.collection("users").get();
+
+    for (const user of usersSnap.docs) {
+      const prefs = user.data().notificationPrefs;
+      if (prefs?.blogUpdates !== false) {
+        const tokenSnap = await db.collection(`users/${user.id}/tokens`).get();
+        tokenSnap.forEach(doc => {
+          if (doc.data()?.token) tokens.push(doc.data().token);
+        });
+      }
+    }
+
+    const anonSnap = await db.collection("anonymousTokens").get();
+    anonSnap.forEach(doc => {
+      if (doc.data()?.token) tokens.push(doc.data().token);
+    });
+
+    const payload = {
+      notification: {
+        title,
+        body
+      }
+    };
+
+    await Promise.all(tokens.map(token =>
+      axios.post("https://fcm.googleapis.com/fcm/send", {
+        to: token,
+        ...payload
+      }, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `key=${process.env.FCM_API_KEY}`
+        }
+      })
+    ));
+
+    // Log push
+    await db.collection("pushLogs").add({
+      type: "custom",
+      message: { title, body },
+      recipients: tokens.length,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      triggeredBy: "admin"
+    });
+
+    res.status(200).send(`✅ Push sent to ${tokens.length} devices`);
+  } catch (err) {
+    console.error("❌ Push failed:", err);
+    res.status(500).send("Push failed");
+  }
+});
+
