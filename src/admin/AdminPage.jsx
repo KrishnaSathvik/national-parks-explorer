@@ -8,7 +8,7 @@ import { signOut } from "firebase/auth";
 import MediaManager from "./MediaManager";
 import EventsManager from "./EventsManager";
 import AdminBlogEditor from "./AdminBlogEditor";
-
+import { Link } from "react-router-dom";
 
 
 const AdminPage = () => {
@@ -39,6 +39,7 @@ const AdminPage = () => {
   };
 
   return (
+
     <div className="min-h-screen bg-gray-50 font-sans">
       {/* Top Bar */}
       <div className="p-6 border-b flex flex-wrap gap-4 items-center justify-between bg-white shadow">
@@ -63,6 +64,9 @@ const AdminPage = () => {
           <button className={tabClass(activeTab === "blog")} onClick={() => setActiveTab("blog")}>
             ✍️ Blog
           </button>
+          <Link to="/" className="inline-block px-5 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-sm transition">
+            🌲 Explore National Parks
+          </Link>
         </div>
 
         {/* Admin Info + Logout */}
@@ -86,5 +90,4 @@ const tabClass = (isActive) =>
   `px-4 py-2 rounded-lg ${
     isActive ? "bg-green-100 text-green-800 font-semibold" : "text-gray-600 hover:text-green-700"
   }`;
-
 export default AdminPage;
