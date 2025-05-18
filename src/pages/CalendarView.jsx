@@ -124,7 +124,7 @@ const CalendarView = () => {
         ← Back to Parks
       </button>
 
-      <h1 className="text-3xl font-bold text-center mb-2 text-pink-600">
+      <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-4 text-pink-600">
         🗓️ National Park Events
       </h1>
 
@@ -134,7 +134,7 @@ const CalendarView = () => {
         </p>
       )}
 
-      <div className="grid md:grid-cols-2 gap-8 mb-10">
+      <div className="flex flex-col md:flex-row gap-8 mb-10">
         {/* 🔍 Filters */}
         <div className="space-y-6">
           <div>
@@ -169,7 +169,7 @@ const CalendarView = () => {
         {/* 🔥 Heatmap */}
         <div>
           <h2 className="text-md font-bold mb-3 text-center">🔥 Monthly Heatmap</h2>
-          <div className="grid grid-cols-7 gap-2 text-xs text-center">
+          <div className="grid grid-cols-4 sm:grid-cols-7 gap-2 text-xs text-center">
             {Array.from({ length: 31 }, (_, i) => {
               const day = i + 1;
               const date = new Date(selectedDate);
@@ -224,7 +224,7 @@ const CalendarView = () => {
           {filteredEvents.map((event) => (
             <div
               key={event.id}
-              className="bg-white rounded-xl shadow hover:shadow-md border border-gray-100 p-6 relative transition"
+              className="bg-white rounded-xl shadow hover:shadow-md border border-gray-100 p-5 sm:p-6 relative transition"
             >
               <h3 className="text-lg font-semibold text-pink-600 mb-1">{event.title}</h3>
               <p className="text-sm text-gray-600">📍 {event.park}</p>

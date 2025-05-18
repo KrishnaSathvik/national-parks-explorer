@@ -1,90 +1,39 @@
-import React, { useState } from "react";
-import { auth } from "../firebase";
-import { useAuthState } from "react-firebase-hooks/auth";
-import Dashboard from "./Dashboard";
-import ReviewModeration from "./ReviewModeration";
-import UserManagement from "./UserManagement";
-import { signOut } from "firebase/auth";
-import MediaManager from "./MediaManager";
-import EventsManager from "./EventsManager";
-import AdminBlogEditor from "./AdminBlogEditor";
+import React from "react";
+import { Link } from "react-router-dom";
+import { FaPen, FaImages, FaUsers, FaStar, FaCalendar, FaBook } from "react-icons/fa";
 
-
+const adminSections = [
+  { path: "/admin/editor", icon: <FaPen />, label: "Blog Editor" },
+  { path: "/admin/media", icon: <FaImages />, label: "Media Manager" },
+  { path: "/admin/users", icon: <FaUsers />, label: "User Management" },
+  { path: "/admin/reviews", icon: <FaStar />, label: "Review Moderation" },
+  { path: "/admin/events", icon: <FaCalendar />, label: "Events Manager" },
+  { path: "/admin/edit-blog", icon: <FaBook />, label: "Edit Blog Posts" },
+];
 
 const AdminPage = () => {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [user] = useAuthState(auth);
-
-  const renderTab = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <Dashboard />;
-      case "reviews":
-        return <ReviewModeration />;
-      case "users":
-        return <UserManagement />;
-      case "media":
-        return <MediaManager />;
-      case "events":
-        return <EventsManager />;
-      case "blog":
-          return <AdminBlogEditor />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
-  const handleLogout = () => {
-    signOut(auth);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
-      {/* Top Bar */}
-      <div className="p-6 border-b flex flex-wrap gap-4 items-center justify-between bg-white shadow">
-        <div className="flex gap-4 items-center flex-wrap">
-          <h1 className="text-2xl font-bold text-green-700 mr-4">🧭 Admin Panel</h1>
-          <button className={tabClass(activeTab === "dashboard")} onClick={() => setActiveTab("dashboard")}>
-            📊 Dashboard
-          </button>
-          <button className={tabClass(activeTab === "reviews")} onClick={() => setActiveTab("reviews")}>
-            🛠 Reviews
-          </button>
-          <button className={tabClass(activeTab === "users")} onClick={() => setActiveTab("users")}>
-            👥 Users
-          </button>
-          <button className={tabClass(activeTab === "media")} onClick={() => setActiveTab("media")}>
-            🖼 Media
-          </button>
-          <button
-            className={tabClass(activeTab === "events")} onClick={() => setActiveTab("events")}>
-            🎪 Events
-          </button>
-          <button className={tabClass(activeTab === "blog")} onClick={() => setActiveTab("blog")}>
-            ✍️ Blog
-          </button>
-        </div>
+    <div className="min-h-screen px-4 py-10 bg-gray-50 font-sans">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-green-700 mb-8 text-center">
+          ⚙️ Admin Dashboard
+        </h1>
 
-        {/* Admin Info + Logout */}
-        <div className="flex items-center gap-4">
-          {user && <span className="text-sm text-gray-600">🔐 {user.email}</span>}
-          <button
-            onClick={handleLogout}
-            className="text-red-600 text-sm font-medium hover:underline"
-          >
-            Logout
-          </button>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {adminSections.map((section) => (
+            <Link
+              key={section.path}
+              to={section.path}
+              className="flex items-center justify-center gap-3 px-6 py-5 bg-white border rounded-2xl shadow hover:shadow-md transition hover:scale-[1.02] text-gray-800 text-sm sm:text-base font-medium"
+            >
+              <span className="text-xl">{section.icon}</span>
+              {section.label}
+            </Link>
+          ))}
         </div>
       </div>
-
-      <div className="p-6">{renderTab()}</div>
     </div>
   );
 };
-
-const tabClass = (isActive) =>
-  `px-4 py-2 rounded-lg ${
-    isActive ? "bg-green-100 text-green-800 font-semibold" : "text-gray-600 hover:text-green-700"
-  }`;
 
 export default AdminPage;

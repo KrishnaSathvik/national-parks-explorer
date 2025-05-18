@@ -10,7 +10,7 @@ const SkeletonLoader = ({ type = "box", count = 3, className = "" }) => {
   const selectedStyle = baseStyles[type] || baseStyles.box;
 
   return (
-    <div role="status" aria-busy="true">
+    <div role="status" aria-busy="true" aria-label="Loading content">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className={`${selectedStyle} ${className}`} />
       ))}

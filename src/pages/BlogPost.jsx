@@ -1,4 +1,4 @@
-// src/pages/BlogPost.jsx
+// ✅ BlogPost.jsx (updated with font improvements and share buttons)
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { db, auth } from "../firebase";
@@ -14,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import draftToHtml from "draftjs-to-html";
+import ShareButtons from "../components/ShareButtons";
 
 const BlogPost = () => {
   const { id } = useParams();
@@ -23,7 +24,6 @@ const BlogPost = () => {
   const [loading, setLoading] = useState(true);
   const [user] = useAuthState(auth);
 
-  // ✅ Load blog content
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -41,7 +41,6 @@ const BlogPost = () => {
     fetchPost();
   }, [id]);
 
-  // ✅ Live comment updates
   useEffect(() => {
     const q = query(collection(db, "comments"), where("blogId", "==", id));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -53,7 +52,6 @@ const BlogPost = () => {
   const isAuthor = user?.email === post?.author;
   const isAdmin = user?.email === "krishnasathvikm@gmail.com";
 
-  // ✅ Submit comment
   const handleCommentSubmit = async () => {
     if (!user) return alert("Please login to comment.");
     if (!newComment.trim()) return;
@@ -72,7 +70,6 @@ const BlogPost = () => {
     }
   };
 
-  // 🌀 Loading/Error State
   if (loading)
     return <div className="p-6 text-gray-500 font-sans">Loading blog...</div>;
   if (!post)
@@ -80,25 +77,30 @@ const BlogPost = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 font-sans">
-      {/* 🔙 Back Link */}
       <div className="mb-4">
         <Link to="/blog" className="text-sm text-blue-600 hover:underline">
           ← Back to Blogs
         </Link>
       </div>
 
-      {/* 📝 Blog Card */}
-      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md max-w-5xl mx-auto">
-        <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-800 mb-3">
+      <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg max-w-3xl mx-auto border border-gray-100">
+        <h1 className="text-2xl sm:text-4xl font-extrabold text-gray-800 mb-3 font-heading">
           {post.title}
         </h1>
+
         <p className="text-sm text-gray-500 mb-4">
           📅 {post.date?.seconds
             ? new Date(post.date.seconds * 1000).toLocaleDateString()
-            : "Unknown date"} · ✍️ {post.author}
+            : "Unknown date"} · 📖 {(() => {
+            const wordCount = draftToHtml(
+              typeof post.content === "string" ? JSON.parse(post.content) : post.content
+            ).split(" ").length;
+            return `${Math.ceil(wordCount / 200)} min read`;
+          })()}
         </p>
 
-        {/* 📸 Cover Image */}
+        <ShareButtons title={post.title} />
+
         {post.imageUrl && (
           <img
             src={post.imageUrl}
@@ -107,9 +109,8 @@ const BlogPost = () => {
           />
         )}
 
-        {/* 📄 Blog HTML Content */}
         <div
-          className="prose prose-sm sm:prose-base max-w-none text-gray-800 leading-relaxed space-y-4"
+          className="prose prose-sm sm:prose-base max-w-none text-gray-800 leading-relaxed space-y-4 font-sans"
           dangerouslySetInnerHTML={{
             __html: draftToHtml(
               typeof post.content === "string"
@@ -119,7 +120,6 @@ const BlogPost = () => {
           }}
         />
 
-        {/* ✏️ Edit Post */}
         {(isAuthor || isAdmin) && (
           <Link
             to={`/admin/edit-blog/${id}`}
@@ -129,7 +129,6 @@ const BlogPost = () => {
           </Link>
         )}
 
-        {/* 💬 Comments */}
         <hr className="my-8" />
         <div>
           <h3 className="text-lg font-semibold mb-4">💬 Comments</h3>
@@ -154,7 +153,6 @@ const BlogPost = () => {
             </div>
           )}
 
-          {/* 📝 Add Comment */}
           <textarea
             className="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
             rows="3"

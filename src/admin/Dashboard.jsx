@@ -39,19 +39,23 @@ const AdminDashboard = () => {
 
   return (
     <div className="p-6 font-sans bg-gray-50 min-h-screen">
-      <h1 className="text-3xl font-bold mb-6">📊 Admin Dashboard</h1>
+      <h1 className="text-3xl sm:text-4xl font-heading font-extrabold mb-8 text-green-700 text-center">
+        📊 Admin Dashboard
+      </h1>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card title="Total Parks" value={parks.length} />
-        <Card title="Total Reviews" value={reviews.length} />
-        <Card title="Total Users" value={users.length} />
-        <Card title="Total Favorites" value={totalFavorites} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <Card title="🌲 Total Parks" value={parks.length} />
+        <Card title="💬 Total Reviews" value={reviews.length} />
+        <Card title="👥 Total Users" value={users.length} />
+        <Card title="❤️ Total Favorites" value={totalFavorites} />
       </div>
 
       {/* Chart */}
       <div className="bg-white p-6 rounded-2xl shadow-md">
-        <h2 className="text-xl font-semibold mb-4">🏞️ Top 5 Most Liked Parks</h2>
+        <h2 className="text-xl font-heading font-semibold mb-4 text-gray-700">
+          🏞️ Top 5 Most Liked Parks
+        </h2>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={topLikedParks}>
             <CartesianGrid strokeDasharray="3 3" />
@@ -68,7 +72,7 @@ const AdminDashboard = () => {
 
 const Card = ({ title, value }) => (
   <div className="bg-white p-6 rounded-2xl shadow text-center">
-    <p className="text-gray-500 text-sm">{title}</p>
+    <p className="text-gray-500 text-sm font-medium">{title}</p>
     <h2 className="text-2xl font-bold text-green-600 mt-2">{value}</h2>
   </div>
 );

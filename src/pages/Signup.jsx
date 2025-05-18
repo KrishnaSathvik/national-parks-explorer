@@ -2,17 +2,19 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { FaGoogle } from "react-icons/fa";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup } = useAuth();
+  const { signup, loginWithGoogle } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
+  // ✨ Email/Password Signup
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -50,10 +52,36 @@ const Signup = () => {
     }
   };
 
+  // 🔐 Google OAuth Signup
+  const handleGoogleSignup = async () => {
+    try {
+      const userCredential = await loginWithGoogle();
+      const user = userCredential.user;
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          displayName: user.displayName,
+          role: "user",
+          favoriteParks: [],
+          favoriteEvents: [],
+        });
+      }
+
+      showToast("✅ Signed up with Google!", "success");
+      navigate("/account");
+    } catch (err) {
+      console.error("Google Signup Error:", err);
+      showToast("❌ Google signup failed", "error");
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">
-        <h2 className="text-3xl font-heading font-bold mb-6 text-center text-pink-600">
+        <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           📝 Create Your Account
         </h2>
 
@@ -69,7 +97,7 @@ const Signup = () => {
               type="email"
               placeholder="Email"
               autoFocus
-              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
               onChange={(e) => {
                 setEmail(e.target.value);
                 setError("");
@@ -84,7 +112,7 @@ const Signup = () => {
               id="password"
               type="password"
               placeholder="Password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-pink-400"
+              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
               onChange={(e) => {
                 setPassword(e.target.value);
                 setError("");
@@ -95,15 +123,29 @@ const Signup = () => {
 
           <button
             type="submit"
-            className="w-full bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 rounded-full shadow-md transition"
+            className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-full shadow-md transition"
           >
             Sign Up
           </button>
         </form>
 
+        <div className="relative my-6">
+          <hr className="border-t border-gray-200" />
+          <span className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white px-3 text-sm text-gray-400">
+            or
+          </span>
+        </div>
+
+        <button
+          onClick={handleGoogleSignup}
+          className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 font-medium py-3 rounded-full shadow text-sm transition flex items-center justify-center gap-2"
+        >
+          <FaGoogle className="text-lg" /> Continue with Google
+        </button>
+
         <p className="text-sm text-center mt-6 text-gray-600">
           Already have an account?{" "}
-          <Link to="/login" className="text-pink-500 font-medium underline">
+          <Link to="/login" className="text-pink-500 font-medium underline hover:text-pink-600">
             Log in
           </Link>
         </p>

@@ -152,7 +152,7 @@ const UserAccount = () => {
       </div>
 
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-md max-w-7xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-extrabold mb-6 text-pink-600">
+        <h1 className="text-3xl sm:text-4xl font-heading font-extrabold mb-6 text-pink-600">
           👤 My Account
         </h1>
 
@@ -181,9 +181,9 @@ const UserAccount = () => {
                   await updateDoc(userRef, { displayName: userDoc.displayName });
                   showToast("✅ Display name updated!", "success");
                 }}
-                className="bg-pink-500 text-white px-4 py-2 rounded text-sm hover:bg-pink-600"
+                className="bg-pink-600 hover:bg-pink-700 text-white font-medium px-5 py-2 rounded-full text-sm shadow transition"
               >
-                Save
+                ✅ Save Name
               </button>
             </div>
           </div>
@@ -191,7 +191,7 @@ const UserAccount = () => {
 
         {/* 💖 Favorite Parks */}
         <div className="mt-10">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">💖 Favorite Parks</h2>
+          <h2 className="text-xl sm:text-2xl font-heading font-semibold mb-4 text-gray-700">💖 Favorite Parks</h2>
           {parksLoading ? (
             <SkeletonLoader type="card" count={3} />
           ) : favoriteParks.length === 0 ? (
@@ -218,7 +218,7 @@ const UserAccount = () => {
                     >
                       ❤️
                     </button>
-                    <h2 className="text-lg font-semibold text-pink-600 truncate">
+                    <h2 className="text-lg font-semibold text-pink-600 leading-snug break-words">
                       {park.name}
                     </h2>
                     <p className="text-sm text-gray-500">📍 {park.state}</p>
@@ -249,16 +249,16 @@ const UserAccount = () => {
 
         {/* 📅 Favorite Events */}
         <div className="mt-10">
-          <h2 className="text-xl font-semibold mb-4 text-gray-700">📅 Favorite Events</h2>
+          <h2 className="text-xl sm:text-2xl font-heading font-semibold mb-4 text-gray-700">📅 Favorite Events</h2>
           {eventsLoading ? (
             <SkeletonLoader type="box" count={2} />
           ) : parsedEvents.length === 0 ? (
             <p className="text-gray-500">📭 You haven’t saved any events yet.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 gap-y-8">
               {parsedEvents.map((event, idx) => (
                 <FadeInWrapper key={event.id} delay={idx * 0.05}>
-                  <div className="bg-white rounded-xl p-5 border shadow hover:shadow-lg transition relative">
+                  <div className="bg-white rounded-xl p-5 sm:p-6 border shadow hover:shadow-lg transition relative">
                     <button
                       onClick={() => handleRemoveEvent(event.id)}
                       className="absolute top-3 right-3 text-sm text-red-500 hover:underline"
