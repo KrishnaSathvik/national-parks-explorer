@@ -166,11 +166,6 @@ const Login = () => {
             Sign up
           </Link>
         </p>
-        <div className="pt-6 text-center">
-          <Link to="/" className="inline-block px-5 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-full text-sm transition">
-            🌲 Explore National Parks
-          </Link>
-        </div>
       </div>
     </div>
   );
