@@ -12,7 +12,7 @@ const Login = () => {
   const { login, loginWithGoogle } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-
+  const { currentUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -99,10 +99,23 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 font-sans">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+
+        {/* 🌄 Logo and Welcome Message */}
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src="/logo.png"
+            alt="National Parks Explorer"
+            className="w-20 h-20 mb-3"
+          />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-700 text-center">
+            Welcome to <span className="text-pink-600">National Parks Explorer</span>
+          </h1>
+        </div>
+
+        {/* 🔐 Original Login Heading */}
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           🔐 Log In to Your Account
         </h2>
-
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -15,7 +15,10 @@ const Signup = () => {
   const { signup, loginWithGoogle } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [error, setError] = useState("");
+
+
 
   // ✨ Email/Password Signup
   const handleSubmit = async (e) => {
@@ -102,10 +105,23 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">
+
+        {/* 🖼️ Logo + Welcome Message */}
+        <div className="flex flex-col items-center mb-6">
+          <img
+            src="/logo.png"
+            alt="National Parks Explorer"
+            className="w-20 h-20 mb-3"
+          />
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-700 text-center">
+            Welcome to <span className="text-pink-600">National Parks Explorer</span>
+          </h1>
+        </div>
+
+        {/* 📝 Form Heading */}
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           📝 Create Your Account
         </h2>
-
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
         )}
