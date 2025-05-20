@@ -5,6 +5,7 @@ import { onMessage } from 'firebase/messaging';
 import InstallButton from './components/InstallButton';
 import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
+import PrivateRoute from "./components/PrivateRoute";
 import { db } from "./firebase";
 import {
   collection,
@@ -150,26 +151,57 @@ function App() {
         <div className="main-scroll">
           <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
             <Routes>
-              <Route
-                path="/"
-                element={
-                  <Home
-                    parks={parks}
-                    favorites={favorites}
-                    toggleFavorite={toggleFavorite}
-                  />
-                }
-              />
+              {/* ✅ Public Routes */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/park/:id" element={<ParkDetails />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/calendar" element={<CalendarView />} />
               <Route path="/about" element={<About />} />
-              <Route path="/account" element={<UserAccount />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+
+              {/* ✅ Protected Routes */}
+              <Route
+                path="/"
+                element={
+                  <PrivateRoute>
+                    <Home parks={parks} favorites={favorites} toggleFavorite={toggleFavorite} />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/park/:id"
+                element={
+                  <PrivateRoute>
+                    <ParkDetails />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/map"
+                element={
+                  <PrivateRoute>
+                    <MapPage />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/calendar"
+                element={
+                  <PrivateRoute>
+                    <CalendarView />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/account"
+                element={
+                  <PrivateRoute>
+                    <UserAccount />
+                  </PrivateRoute>
+                }
+              />
+
+              {/* ✅ Admin Protected */}
               <Route
                 path="/admin"
                 element={
@@ -206,16 +238,8 @@ function App() {
           </Suspense>
         </div>
       </Layout>
-      {/* 📲 Install + 🔔 Notifications Buttons */}
-            <div className="flex justify-center gap-4 p-4 bg-white border-t shadow-sm z-50">
+      {/* 📲 Install */}
               <InstallButton />
-              <button
-                onClick={requestNotificationPermission}
-                className="bg-blue-600 text-white px-4 py-2 rounded"
-              >
-                🔔 Enable Notifications
-              </button>
-            </div>
       <ScrollToTopButton />
     </div>
   );

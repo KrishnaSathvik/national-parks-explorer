@@ -5,6 +5,7 @@
   import FadeInWrapper from "../components/FadeInWrapper";
   import { useNavigate, useSearchParams, Link } from "react-router-dom";
   import { useAuth } from "../context/AuthContext";
+  import ParkCardFlip from "../components/ParkCardFlip";
   import { useToast } from "../context/ToastContext";
   import SkeletonLoader from "../components/SkeletonLoader";
   import {
@@ -242,53 +243,37 @@
           ) : (
             currentParks.map((park, idx) => (
               <FadeInWrapper key={park.id} delay={idx * 0.1}>
-                <div
-                  className="relative bg-white w-full max-w-[320px] mx-auto rounded-2xl px-4 py-6 shadow-md hover:shadow-lg transition cursor-pointer flex flex-col justify-between min-h-[160px]"
-                  onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)}
-                >
+                <div className="relative">
+                  {/* ❤️ Favorite button in corner */}
                   {currentUser && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleFavorite(park.id);
                       }}
-                      className="absolute top-3 right-3 text-xl"
+                      className={`absolute top-2 right-2 z-20 text-xl transition transform duration-200 ${
+                        favorites.includes(park.id) ? "scale-110 text-red-500" : "scale-100 text-gray-400"
+                      } hover:scale-125`}
                       title={favorites.includes(park.id) ? "Remove from favorites" : "Add to favorites"}
                     >
                       {favorites.includes(park.id) ? "❤️" : "🤍"}
                     </button>
                   )}
-                  <div className="text-center">
-                    <h2
-                      className="text-base sm:text-lg font-semibold text-pink-600 leading-tight truncate"
-                      title={park.name}
-                    >
-                      {park.name}
-                    </h2>
-                    <p className="text-sm text-gray-700 mb-1">📍 {park.state}</p>
-                    <p className="text-sm text-gray-700">
-                      📆 Best Season: {" "}
-                      <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-                          park.bestSeason === "Spring"
-                            ? "bg-green-100 text-green-800"
-                            : park.bestSeason === "Summer"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : park.bestSeason === "Fall"
-                            ? "bg-orange-100 text-orange-800"
-                            : "bg-blue-100 text-blue-800"
-                        }`}
-                      >
-                        {park.bestSeason}
-                      </span>
-                    </p>
-                  </div>
+
+                  <ParkCardFlip 
+                    id={park.id}
+                    name={park.name}
+                    state={park.state}
+                    bestSeason={park.bestSeason}
+                    entryFee={park.entryFee}
+                    hours={park.hours}
+                    highlight={park.highlight}
+                  />
                 </div>
               </FadeInWrapper>
             ))
           )}
         </div>
-
         {/* 📄 Pagination */}
         <div className="flex justify-center mt-8 space-x-2">
           {Array.from({ length: totalPages }, (_, i) => (

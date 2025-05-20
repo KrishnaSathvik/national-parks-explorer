@@ -5,6 +5,9 @@ import { useToast } from "../context/ToastContext";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { FaGoogle } from "react-icons/fa";
+import { useEffect } from "react";
+import { requestNotificationPermission } from "../firebase";
+
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -78,6 +81,24 @@ const Signup = () => {
     }
   };
 
+  // 🔔 Prompt user to enable push notifications after sign-up
+  useEffect(() => {
+    if (currentUser && Notification.permission !== "granted") {
+      setTimeout(() => {
+        showToast(
+          <span
+            onClick={requestNotificationPermission}
+            className="cursor-pointer hover:underline"
+          >
+            🔔 Tap here to enable push notifications for park updates!
+          </span>,
+          "info"
+        );
+      }, 1000);
+    }
+  }, [currentUser]);
+
+  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">

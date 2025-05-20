@@ -1,0 +1,5015 @@
+[
+  {
+    "id": "1",
+    "name": "Acadia National Park",
+    "state": "Maine",
+    "coordinates": "44.35, -68.21",
+    "parkCode": "acad",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Mild weather with blooming wildflowers and ideal hiking conditions.",
+      "summer": "June\u2013August: Peak season with warm weather, perfect for all outdoor activities.",
+      "fall": "September\u2013October: Cooler temperatures and beautiful fall foliage.",
+      "winter": "November\u2013March: Snow-covered trails and fewer crowds; check accessibility."
+    },
+    "placesToVisit": [
+      {
+        "name": "Cadillac Mountain",
+        "description": "The highest point on the U.S. East Coast, offering panoramic sunrise views."
+      },
+      {
+        "name": "Jordan Pond",
+        "description": "A serene glacial pond surrounded by trails and the iconic Jordan Pond House."
+      },
+      {
+        "name": "Sand Beach",
+        "description": "A picturesque beach nestled between granite mountains and the Atlantic Ocean."
+      },
+      {
+        "name": "Thunder Hole",
+        "description": "A natural rock inlet where waves crash with a thunderous sound."
+      },
+      {
+        "name": "Beehive Trail",
+        "description": "A challenging hike featuring iron rungs and rewarding coastal vistas."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Jordan Pond House",
+        "description": "Famous for its popovers and tea, offering views of Jordan Pond."
+      },
+      {
+        "name": "Abel's Lobster",
+        "description": "A waterfront spot known for boiled lobster and lobster bisque."
+      },
+      {
+        "name": "Havana",
+        "description": "An upscale restaurant in Bar Harbor serving Latin American-inspired dishes."
+      },
+      {
+        "name": "Galyn's",
+        "description": "A Bar Harbor staple offering seafood and steaks with harbor views."
+      },
+      {
+        "name": "Beal's Lobster Pier",
+        "description": "A historic pier serving fresh lobster and seafood in Southwest Harbor."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Bar Harbor Inn and Spa",
+        "description": "A historic waterfront hotel offering luxury accommodations and spa services."
+      },
+      {
+        "name": "Atlantic Oceanside Hotel & Conference Center",
+        "description": "A family-friendly hotel with ocean views and direct access to the shore."
+      },
+      {
+        "name": "Blackwoods Campground",
+        "description": "A popular NPS campground located within the park, close to major attractions."
+      },
+      {
+        "name": "Seawall Campground",
+        "description": "A quieter campground on the western side of Mount Desert Island."
+      },
+      {
+        "name": "Under Canvas Acadia",
+        "description": "A glamping site offering luxury tents on a waterfront property near the park."
+      }
+    ],
+    "thumbnailUrl": "https://firebasestorage.googleapis.com/v0/b/national-parks-explorer-7bc55.firebasestorage.app/o/acad.jpg?alt=media&token=7b3a0b2f-5f11-4837-bc19-c3c16bb982b7"
+  },
+  {
+    "id": "2",
+    "name": "Arches National Park",
+    "state": "Utah",
+    "coordinates": "38.68, -109.57",
+    "parkCode": "arch",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Mild temperatures and blooming desert flora.",
+      "summer": "June\u2013August: Very hot; early morning or evening visits recommended.",
+      "fall": "September\u2013October: Pleasant weather and fewer crowds.",
+      "winter": "November\u2013February: Cold temperatures; snow may occur."
+    },
+    "placesToVisit": [
+      {
+        "name": "Delicate Arch",
+        "description": "Iconic freestanding arch; a must-see landmark."
+      },
+      {
+        "name": "Devils Garden",
+        "description": "Features a variety of arches and spires along hiking trails."
+      },
+      {
+        "name": "Fiery Furnace",
+        "description": "A labyrinth of narrow sandstone canyons; guided tours available."
+      },
+      {
+        "name": "The Windows Section",
+        "description": "Home to some of the largest arches in the park, including North and South Windows."
+      },
+      {
+        "name": "Balanced Rock",
+        "description": "A massive boulder precariously balanced on a narrow pedestal."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Moab Diner",
+        "description": "Classic American diner known for hearty breakfasts and burgers."
+      },
+      {
+        "name": "Arches Thai",
+        "description": "Offers authentic Thai cuisine in a cozy setting."
+      },
+      {
+        "name": "The Broken Oar",
+        "description": "Rustic eatery serving steaks, seafood, and pasta."
+      },
+      {
+        "name": "Quesadilla Mobilla",
+        "description": "Popular food truck offering gourmet quesadillas."
+      },
+      {
+        "name": "Desert Bistro",
+        "description": "Fine dining with a Southwestern flair; reservations recommended."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Red Cliffs Lodge",
+        "description": "Riverside lodge offering suites and cabins with stunning views."
+      },
+      {
+        "name": "Fairfield Inn & Suites Moab",
+        "description": "Modern hotel with amenities like pools and free breakfast."
+      },
+      {
+        "name": "Moab Springs Ranch",
+        "description": "Offers bungalows and townhouses with private porches."
+      },
+      {
+        "name": "Under Canvas Moab",
+        "description": "Glamping site with luxury tents near the park."
+      },
+      {
+        "name": "Devils Garden Campground",
+        "description": "The only campground within the park; reservations recommended."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Delicate_Arch_-_Arches_National_Park.jpg"
+  },
+  {
+    "id": "3",
+    "name": "Badlands National Park",
+    "state": "South Dakota",
+    "coordinates": "43.75, -102.5",
+    "parkCode": "badl",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Mild temperatures and blooming wildflowers.",
+      "summer": "July\u2013August: Hot and dry; early morning visits advised.",
+      "fall": "September\u2013October: Cooler weather and fewer visitors.",
+      "winter": "November\u2013March: Cold and snowy; some areas may be inaccessible."
+    },
+    "placesToVisit": [
+      {
+        "name": "Badlands Loop Road",
+        "description": "Scenic drive offering panoramic views of the park's unique formations."
+      },
+      {
+        "name": "Notch Trail",
+        "description": "Popular hike featuring a log ladder and cliff-edge views."
+      },
+      {
+        "name": "Fossil Exhibit Trail",
+        "description": "Boardwalk trail showcasing fossil replicas and exhibits."
+      },
+      {
+        "name": "Yellow Mounds Overlook",
+        "description": "Offers views of colorful mounds formed by ancient seas."
+      },
+      {
+        "name": "Ben Reifel Visitor Center",
+        "description": "Provides exhibits, park information, and ranger programs."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Cedar Pass Lodge Restaurant",
+        "description": "Serves local dishes including Sioux Indian Tacos."
+      },
+      {
+        "name": "Wall Drug Caf\u00e9",
+        "description": "Famous for its donuts and homestyle meals."
+      },
+      {
+        "name": "Badlands Saloon & Grille",
+        "description": "Offers burgers, steaks, and a full bar."
+      },
+      {
+        "name": "Cowboy Corner",
+        "description": "Diner-style eatery known for hearty breakfasts."
+      },
+      {
+        "name": "Tally's Silver Spoon",
+        "description": "Upscale dining in nearby Rapid City with diverse menu options."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Cedar Pass Lodge",
+        "description": "Only in-park lodging with cabins and an RV campground."
+      },
+      {
+        "name": "Badlands Interior Motel and Campground",
+        "description": "Offers motel rooms, RV sites, and tent camping."
+      },
+      {
+        "name": "Badlands Frontier Cabins",
+        "description": "Log cabins with modern amenities near the park entrance."
+      },
+      {
+        "name": "Circle View Guest Ranch",
+        "description": "Working cattle ranch offering B&B accommodations."
+      },
+      {
+        "name": "Sleepy Hollow Campground",
+        "description": "Family-friendly campground with full hookups and amenities."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Badlands_National_Park%2C_South_Dakota%2C_USA.jpg"
+  },
+  {
+    "id": "4",
+    "name": "Big Bend National Park",
+    "state": "Texas",
+    "coordinates": "29.25, -103.25",
+    "parkCode": "bibe",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "March\u2013April: Wildflowers in bloom and pleasant temperatures.",
+      "summer": "May\u2013August: Extremely hot; limited outdoor activities recommended.",
+      "fall": "September\u2013October: Cooler temperatures and fewer crowds.",
+      "winter": "November\u2013February: Mild days and cold nights; ideal for hiking."
+    },
+    "placesToVisit": [
+      {
+        "name": "Santa Elena Canyon",
+        "description": "Dramatic canyon carved by the Rio Grande; accessible via trail or river."
+      },
+      {
+        "name": "Lost Mine Trail",
+        "description": "Popular hike offering panoramic views of the Chisos Mountains."
+      },
+      {
+        "name": "Hot Springs Historic District",
+        "description": "Features a natural hot spring along the river and historic buildings."
+      },
+      {
+        "name": "Boquillas Canyon",
+        "description": "Scenic area with towering cliffs and river access."
+      },
+      {
+        "name": "Ross Maxwell Scenic Drive",
+        "description": "Offers access to several geological and historical sites."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Chisos Mountains Lodge Restaurant",
+        "description": "Only full-service dining within the park; offers American cuisine."
+      },
+      {
+        "name": "Starlight Theatre Restaurant & Saloon",
+        "description": "Historic venue in Terlingua serving Southwestern dishes and live music."
+      },
+      {
+        "name": "La Kiva Restaurant and Bar",
+        "description": "Unique underground bar offering steaks and local fare."
+      },
+      {
+        "name": "DB's Rustic Iron BBQ",
+        "description": "Casual spot known for smoked meats and classic sides."
+      },
+      {
+        "name": "Long Draw Pizza",
+        "description": "Pizzeria offering a variety of pies and local beers."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Chisos Mountains Lodge",
+        "description": "Only in-park lodging; offers rooms and cottages."
+      },
+      {
+        "name": "Big Bend Resort & Adventures",
+        "description": "Provides motel rooms, RV sites, and camping near the park entrance."
+      },
+      {
+        "name": "Terlingua Ranch Lodge",
+        "description": "Offers cabins and camping with access to hiking trails."
+      },
+      {
+        "name": "Lajitas Golf Resort",
+        "description": "Upscale resort featuring golf course, spa, and dining options."
+      },
+      {
+        "name": "Rio Grande Village Campground",
+        "description": "NPS campground with RV hookups and tent sites."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Big_Bend_National_Park_Panorama.jpg"
+  },
+  {
+    "id": "5",
+    "name": "Biscayne National Park",
+    "state": "Florida",
+    "coordinates": "25.65, -80.08",
+    "parkCode": "bisc",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "Pleasant weather with blooming flora; ideal for water activities and wildlife viewing.",
+      "summer": "Hot and humid; increased chance of thunderstorms and mosquitoes.",
+      "fall": "Still warm with potential for hurricanes; fewer crowds.",
+      "winter": "Mild temperatures and lower humidity; best time for snorkeling and boating."
+    },
+    "placesToVisit": [
+      {
+        "name": "Boca Chita Key",
+        "description": "Popular island featuring a historic lighthouse, picnic areas, and scenic views."
+      },
+      {
+        "name": "Elliott Key",
+        "description": "The park's largest island, offering hiking trails, camping, and opportunities to explore mangrove forests."
+      },
+      {
+        "name": "Jones Lagoon",
+        "description": "A serene area ideal for kayaking and paddleboarding through clear, shallow waters."
+      },
+      {
+        "name": "Maritime Heritage Trail",
+        "description": "An underwater trail showcasing shipwrecks and coral reefs, perfect for snorkeling and diving enthusiasts."
+      },
+      {
+        "name": "Dante Fascell Visitor Center",
+        "description": "The main visitor center providing exhibits, park information, and access to guided tours."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "La Playa Grill",
+        "description": "Casual waterfront dining offering fresh seafood and local dishes."
+      },
+      {
+        "name": "Shiver's BBQ",
+        "description": "Family-owned restaurant known for its authentic Southern-style barbecue."
+      },
+      {
+        "name": "Black Point Ocean Grill",
+        "description": "Seafood restaurant with marina views, serving a variety of grilled specialties."
+      },
+      {
+        "name": "The Rusty Pelican",
+        "description": "Upscale dining experience featuring contemporary American cuisine and panoramic bay views."
+      },
+      {
+        "name": "Lighthouse Caf\u00e9",
+        "description": "Charming caf\u00e9 offering breakfast and lunch options near the park."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Elliott Key Campground",
+        "description": "Primitive camping on the largest island in the park; accessible only by boat."
+      },
+      {
+        "name": "Boca Chita Key Campground",
+        "description": "Scenic island campground featuring a historic lighthouse; boat access required."
+      },
+      {
+        "name": "Courtyard by Marriott Miami Homestead",
+        "description": "Modern hotel offering comfortable accommodations and amenities near the park entrance."
+      },
+      {
+        "name": "Hampton Inn & Suites Homestead",
+        "description": "Conveniently located hotel providing complimentary breakfast and easy access to the park."
+      },
+      {
+        "name": "Quality Inn Florida City",
+        "description": "Budget-friendly option with essential amenities, situated close to Biscayne National Park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Biscayne_NP_snorkeling.jpg"
+  },
+  {
+    "id": "6",
+    "name": "Black Canyon of the Gunnison National Park",
+    "state": "Colorado",
+    "coordinates": "38.57, -107.72",
+    "parkCode": "blca",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Warming temperatures; some trails may still be icy.",
+      "summer": "June\u2013August: Ideal for hiking and stargazing; all facilities open.",
+      "fall": "September\u2013October: Cooler temperatures and vibrant foliage.",
+      "winter": "November\u2013March: Limited access due to snow; some roads closed."
+    },
+    "placesToVisit": [
+      {
+        "name": "South Rim Drive",
+        "description": "Scenic drive with multiple overlooks offering dramatic canyon views."
+      },
+      {
+        "name": "North Rim Drive",
+        "description": "Less-traveled route with unique perspectives of the canyon."
+      },
+      {
+        "name": "Warner Point Trail",
+        "description": "Moderate hike culminating in panoramic vistas of the canyon and surrounding areas."
+      },
+      {
+        "name": "Painted Wall View",
+        "description": "Viewpoint of the tallest cliff in Colorado, showcasing striking geological patterns."
+      },
+      {
+        "name": "Gunnison Point",
+        "description": "Popular overlook near the visitor center with expansive canyon views."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Stone House",
+        "description": "Upscale American cuisine in Montrose with a rustic ambiance."
+      },
+      {
+        "name": "Camp Robber",
+        "description": "Eclectic menu featuring Southwestern and international dishes."
+      },
+      {
+        "name": "Horsefly Brewing Company",
+        "description": "Local brewery offering craft beers and pub fare."
+      },
+      {
+        "name": "Backstreet Bagel Company",
+        "description": "Casual spot for breakfast and lunch with homemade bagels and sandwiches."
+      },
+      {
+        "name": "Pahgre's",
+        "description": "Family-friendly restaurant known for pizzas and pasta dishes."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "South Rim Campground",
+        "description": "NPS campground with sites suitable for tents and RVs; reservations recommended."
+      },
+      {
+        "name": "North Rim Campground",
+        "description": "Primitive campground offering solitude and basic amenities."
+      },
+      {
+        "name": "East Portal Campground",
+        "description": "Located at the canyon's base; accessible via steep road; tents only."
+      },
+      {
+        "name": "Hampton Inn Montrose",
+        "description": "Comfortable lodging with modern amenities close to the park."
+      },
+      {
+        "name": "Black Canyon Motel",
+        "description": "Budget-friendly option with easy access to park entrances."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Black_Canyon_of_the_Gunnison_National_Park.jpg"
+  },
+  {
+    "id": "7",
+    "name": "Bryce Canyon National Park",
+    "state": "Utah",
+    "coordinates": "37.57, -112.18",
+    "parkCode": "brca",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Mild temperatures and blooming wildflowers.",
+      "summer": "June\u2013August: Warm days; popular for hiking among hoodoos.",
+      "fall": "September\u2013October: Crisp air and vibrant foliage; fewer crowds.",
+      "winter": "November\u2013March: Snow-covered landscapes ideal for cross-country skiing and snowshoeing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Bryce Amphitheater",
+        "description": "Iconic area featuring a vast collection of hoodoos and spires."
+      },
+      {
+        "name": "Navajo Loop Trail",
+        "description": "Popular hiking trail descending into the canyon among towering formations."
+      },
+      {
+        "name": "Sunrise Point",
+        "description": "Ideal spot to witness the sun illuminating the hoodoos at dawn."
+      },
+      {
+        "name": "Thor's Hammer",
+        "description": "Distinctive rock formation resembling a hammer perched atop a narrow column."
+      },
+      {
+        "name": "Bryce Point",
+        "description": "Offers panoramic views of the amphitheater and surrounding areas."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Bryce Canyon Lodge Restaurant",
+        "description": "Historic dining room serving classic American dishes within the park."
+      },
+      {
+        "name": "Ebenezer's Barn and Grill",
+        "description": "Western-themed dinner show with hearty meals and live entertainment."
+      },
+      {
+        "name": "Bryce Canyon Pines Restaurant",
+        "description": "Family-run eatery known for homemade pies and comfort food."
+      },
+      {
+        "name": "Stone Hearth Grille",
+        "description": "Upscale dining offering steaks and seafood with scenic views."
+      },
+      {
+        "name": "Foster's Family Steakhouse",
+        "description": "Casual restaurant serving steaks, burgers, and salads."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "The Lodge at Bryce Canyon",
+        "description": "Only lodging within the park; offers cabins and motel-style rooms."
+      },
+      {
+        "name": "Bryce Canyon Inn",
+        "description": "Comfortable cabins located in Tropic, a short drive from the park."
+      },
+      {
+        "name": "Best Western Plus Bryce Canyon Grand Hotel",
+        "description": "Modern hotel with amenities including pool and complimentary breakfast."
+      },
+      {
+        "name": "North Campground",
+        "description": "Year-round NPS campground close to the visitor center."
+      },
+      {
+        "name": "Sunset Campground",
+        "description": "Seasonal campground offering shaded sites near the canyon rim."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Bryce_Canyon_National_Park.jpg"
+  },
+  {
+    "id": "8",
+    "name": "Canyonlands National Park",
+    "state": "Utah",
+    "coordinates": "38.2, -109.93",
+    "parkCode": "cany",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Pleasant temperatures ideal for hiking and photography.",
+      "summer": "June\u2013August: Hot days; limited shade; early morning activities recommended.",
+      "fall": "September\u2013October: Cooler weather and fewer visitors.",
+      "winter": "November\u2013March: Cold temperatures; some roads may be impassable."
+    },
+    "placesToVisit": [
+      {
+        "name": "Mesa Arch",
+        "description": "Famous arch offering stunning sunrise views over the canyon."
+      },
+      {
+        "name": "Island in the Sky",
+        "description": "Easily accessible district with panoramic overlooks."
+      },
+      {
+        "name": "The Needles",
+        "description": "Area featuring colorful spires and challenging hiking trails."
+      },
+      {
+        "name": "Grand View Point",
+        "description": "Scenic overlook providing expansive views of the park's canyons."
+      },
+      {
+        "name": "Green River Overlook",
+        "description": "Viewpoint showcasing the confluence of the Green and Colorado Rivers."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Moab Brewery",
+        "description": "Local brewery offering craft beers and a diverse menu."
+      },
+      {
+        "name": "The Broken Oar",
+        "description": "Rustic restaurant serving steaks, seafood, and pasta."
+      },
+      {
+        "name": "Desert Bistro",
+        "description": "Fine dining with Southwestern-inspired cuisine."
+      },
+      {
+        "name": "Eklecticafe",
+        "description": "Quirky cafe known for hearty breakfasts and vegetarian options."
+      },
+      {
+        "name": "Love Muffin Cafe",
+        "description": "Popular spot for breakfast burritos and sandwiches."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Willow Flat Campground",
+        "description": "Primitive campground in the Island in the Sky district; first-come, first-served."
+      },
+      {
+        "name": "The Needles Campground",
+        "description": "NPS campground offering sites near trailheads; reservations recommended."
+      },
+      {
+        "name": "Red Cliffs Lodge",
+        "description": "Resort featuring riverside cabins and a winery."
+      },
+      {
+        "name": "Moab Springs Ranch",
+        "description": "Lodging with bungalows and townhouses set in a serene environment."
+      },
+      {
+        "name": "Aarchway Inn",
+        "description": "Family-friendly hotel with amenities including pool and playground."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Canyonlands_National_Park_-_Mesa_Arch.jpg"
+  },
+  {
+    "id": "9",
+    "name": "Capitol Reef National Park",
+    "state": "Utah",
+    "coordinates": "38.2, -111.17",
+    "parkCode": "care",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Wildflowers bloom; moderate temperatures.",
+      "summer": "June\u2013August: Hot days; afternoon thunderstorms possible.",
+      "fall": "September\u2013October: Crisp air and colorful foliage.",
+      "winter": "November\u2013March: Cold temperatures; some roads may be icy."
+    },
+    "placesToVisit": [
+      {
+        "name": "Fruita Historic District",
+        "description": "Area featuring historic orchards, schoolhouse, and Gifford Homestead."
+      },
+      {
+        "name": "Capitol Gorge",
+        "description": "Scenic drive and hike showcasing pioneer inscriptions and rock formations."
+      },
+      {
+        "name": "Hickman Bridge Trail",
+        "description": "Moderate hike leading to a natural sandstone arch."
+      },
+      {
+        "name": "Cathedral Valley",
+        "description": "Remote area known for monolithic rock formations and scenic views."
+      },
+      {
+        "name": "Goosenecks Overlook",
+        "description": "Short trail with sweeping views of deep canyons and cliffs."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Gifford House",
+        "description": "Historic house-turned-bakery known for fresh pies and local jams."
+      },
+      {
+        "name": "Capitol Burger",
+        "description": "Food truck in Torrey offering burgers and local eats."
+      },
+      {
+        "name": "The Rim Rock Restaurant",
+        "description": "Casual dining with views, serving steak and American fare."
+      },
+      {
+        "name": "Slackers Burger Joint",
+        "description": "Retro-style diner known for burgers, fries, and milkshakes."
+      },
+      {
+        "name": "Hunt & Gather Restaurant",
+        "description": "Upscale dining spot with locally sourced seasonal ingredients."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Capitol Reef Resort",
+        "description": "Offers hotel rooms, luxury tents, and Conestoga wagons near the park."
+      },
+      {
+        "name": "Fruita Campground",
+        "description": "NPS campground in an orchard setting with scenic surroundings."
+      },
+      {
+        "name": "Austin\u2019s Chuckwagon Motel",
+        "description": "Rustic lodging in Torrey with convenience store and bakery."
+      },
+      {
+        "name": "Red Sands Hotel",
+        "description": "Modern hotel with spa and on-site restaurant."
+      },
+      {
+        "name": "Sunglow Campground",
+        "description": "Forest Service campground in nearby Bicknell Canyon."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Capitol_Reef_National_Park_-_Scenic_Drive.jpg"
+  },
+  {
+    "id": "10",
+    "name": "Carlsbad Caverns National Park",
+    "state": "New Mexico",
+    "coordinates": "32.17, -104.44",
+    "parkCode": "cave",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Ideal weather for hiking and exploring the caves.",
+      "summer": "June\u2013August: Hot outside but cool inside the caverns; popular bat flight season.",
+      "fall": "September\u2013October: Fewer crowds and great wildlife viewing.",
+      "winter": "November\u2013February: Off-season with quiet trails and cool weather."
+    },
+    "placesToVisit": [
+      {
+        "name": "Big Room",
+        "description": "The largest chamber in the caverns with dramatic stalactites and stalagmites."
+      },
+      {
+        "name": "Natural Entrance Trail",
+        "description": "Steep trail descending into the caverns offering immersive experience."
+      },
+      {
+        "name": "Bat Flight Amphitheater",
+        "description": "Watch thousands of bats emerge at dusk from the cave entrance (seasonal)."
+      },
+      {
+        "name": "King\u2019s Palace",
+        "description": "Guided tour area with beautiful and delicate cave formations."
+      },
+      {
+        "name": "Rattlesnake Springs",
+        "description": "Day-use area and oasis known for birdwatching and picnicking."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Cactus Cafe",
+        "description": "Classic diner near the park serving hearty American meals."
+      },
+      {
+        "name": "Blue House Bakery & Cafe",
+        "description": "Locally loved spot for coffee, breakfast, and fresh-baked goods."
+      },
+      {
+        "name": "Yellow Brix Restaurant",
+        "description": "Upscale casual dining offering New American cuisine and wine."
+      },
+      {
+        "name": "Lucy\u2019s Mexicali Restaurant",
+        "description": "Tex-Mex cuisine with colorful ambiance in Carlsbad."
+      },
+      {
+        "name": "Danny\u2019s Place",
+        "description": "BBQ joint known for brisket, ribs, and a casual vibe."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "White\u2019s City Cavern Inn",
+        "description": "Closest hotel to the park entrance with basic amenities."
+      },
+      {
+        "name": "La Quinta Inn & Suites by Wyndham Carlsbad",
+        "description": "Modern hotel with pool and complimentary breakfast."
+      },
+      {
+        "name": "The Trinity Hotel",
+        "description": "Historic boutique hotel in downtown Carlsbad."
+      },
+      {
+        "name": "Carlsbad KOA",
+        "description": "Campground with RV sites, cabins, and tent spots near the park."
+      },
+      {
+        "name": "Brantley Lake State Park Campground",
+        "description": "Scenic lakeside camping with boating and picnic areas."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Carlsbad_Caverns_Entrance.jpg"
+  },
+  {
+    "id": "11",
+    "name": "Channel Islands National Park",
+    "state": "California",
+    "coordinates": "34.01, -119.42",
+    "parkCode": "chis",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Wildflowers bloom; ideal for hiking and wildlife viewing.",
+      "summer": "June\u2013August: Warm weather; popular for kayaking and snorkeling.",
+      "fall": "September\u2013November: Best ocean conditions for water activities; fewer crowds.",
+      "winter": "December\u2013February: Cooler temperatures; limited ferry services."
+    },
+    "placesToVisit": [
+      {
+        "name": "Santa Cruz Island",
+        "description": "Largest island with diverse hiking trails, sea caves, and camping opportunities."
+      },
+      {
+        "name": "Anacapa Island",
+        "description": "Known for its iconic lighthouse and panoramic ocean views."
+      },
+      {
+        "name": "Scorpion Anchorage",
+        "description": "Popular landing site on Santa Cruz Island with access to trails and snorkeling spots."
+      },
+      {
+        "name": "Painted Cave",
+        "description": "One of the world's largest sea caves, accessible by kayak or boat tour."
+      },
+      {
+        "name": "Inspiration Point",
+        "description": "Scenic overlook on Anacapa Island offering breathtaking vistas."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Andria's Seafood Restaurant & Market",
+        "description": "Fresh seafood dishes located at Ventura Harbor."
+      },
+      {
+        "name": "Brophy Bros. Clam Bar & Restaurant",
+        "description": "Popular spot in Santa Barbara for clam chowder and harbor views."
+      },
+      {
+        "name": "The Greek Mediterranean Steak & Seafood",
+        "description": "Mediterranean cuisine with waterfront dining in Ventura."
+      },
+      {
+        "name": "Cafe Nouveau",
+        "description": "Charming cafe in Ventura known for its brunch and coffee."
+      },
+      {
+        "name": "Spencer Makenzie's Fish Company",
+        "description": "Casual eatery offering tacos and seafood favorites in Ventura."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Scorpion Ranch Campground",
+        "description": "Primitive camping on Santa Cruz Island; reservations required."
+      },
+      {
+        "name": "East Anacapa Island Campground",
+        "description": "Small campground with ocean views; accessible by boat."
+      },
+      {
+        "name": "Crowne Plaza Ventura Beach",
+        "description": "Beachfront hotel offering comfortable accommodations in Ventura."
+      },
+      {
+        "name": "Best Western Plus Inn of Ventura",
+        "description": "Conveniently located hotel near downtown Ventura."
+      },
+      {
+        "name": "Ventura Beach Marriott",
+        "description": "Modern hotel with amenities close to the harbor."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Channel_Islands_National_Park.jpg"
+  },
+  {
+    "id": "12",
+    "name": "Congaree National Park",
+    "state": "South Carolina",
+    "coordinates": "33.79, -80.78",
+    "parkCode": "cong",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Pleasant temperatures and blooming flora; ideal for hiking and paddling.",
+      "summer": "June\u2013August: Hot and humid; increased mosquito activity.",
+      "fall": "September\u2013November: Cooler weather and vibrant fall colors.",
+      "winter": "December\u2013February: Mild temperatures; fewer insects."
+    },
+    "placesToVisit": [
+      {
+        "name": "Boardwalk Loop Trail",
+        "description": "Elevated walkway through old-growth hardwood forest and swamp."
+      },
+      {
+        "name": "Weston Lake Loop Trail",
+        "description": "Trail offering views of cypress-tupelo swamps and wildlife."
+      },
+      {
+        "name": "Kingsnake Trail",
+        "description": "Backcountry trail ideal for birdwatching and solitude."
+      },
+      {
+        "name": "Cedar Creek Canoe Trail",
+        "description": "Paddling route through the heart of the park's wilderness."
+      },
+      {
+        "name": "Harry Hampton Visitor Center",
+        "description": "Main hub for park information, exhibits, and maps."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Doc's Barbeque & Southern Buffet",
+        "description": "Southern-style buffet featuring classic BBQ dishes in Columbia."
+      },
+      {
+        "name": "The War Mouth",
+        "description": "Rustic eatery offering Southern cuisine and craft beers."
+      },
+      {
+        "name": "Motor Supply Co. Bistro",
+        "description": "Upscale restaurant with a farm-to-table menu in Columbia."
+      },
+      {
+        "name": "Terra",
+        "description": "Fine dining with a focus on locally sourced ingredients."
+      },
+      {
+        "name": "Cafe Strudel",
+        "description": "Popular spot for breakfast and brunch in West Columbia."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Longleaf Campground",
+        "description": "Primitive campground within the park; reservations recommended."
+      },
+      {
+        "name": "Bluff Campground",
+        "description": "Backcountry camping area accessible by hiking or paddling."
+      },
+      {
+        "name": "Hampton Inn & Suites Columbia/Southeast-Ft. Jackson",
+        "description": "Comfortable hotel located near the park entrance."
+      },
+      {
+        "name": "Courtyard by Marriott Columbia Downtown at USC",
+        "description": "Modern accommodations in downtown Columbia."
+      },
+      {
+        "name": "Holiday Inn Express & Suites Columbia-Fort Jackson",
+        "description": "Convenient hotel with amenities close to the park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Congaree_National_Park.jpg"
+  },
+  {
+    "id": "13",
+    "name": "Crater Lake National Park",
+    "state": "Oregon",
+    "coordinates": "42.94, -122.1",
+    "parkCode": "crla",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snow begins to melt; limited access to some areas.",
+      "summer": "July\u2013September: Warm weather; all park facilities and roads open.",
+      "fall": "October: Cooler temperatures; fewer visitors.",
+      "winter": "November\u2013April: Heavy snowfall; limited access; ideal for snowshoeing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Rim Drive",
+        "description": "Scenic 33-mile loop offering panoramic views of Crater Lake."
+      },
+      {
+        "name": "Wizard Island",
+        "description": "Volcanic cinder cone accessible by boat tours during summer."
+      },
+      {
+        "name": "Cleetwood Cove Trail",
+        "description": "Steep trail leading to the lake's shore; only legal access point for swimming."
+      },
+      {
+        "name": "Crater Lake Lodge",
+        "description": "Historic lodge with stunning lake views and dining options."
+      },
+      {
+        "name": "Vidae Falls",
+        "description": "Picturesque waterfall easily accessible from Rim Drive."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Crater Lake Lodge Dining Room",
+        "description": "Elegant dining with lake views; reservations recommended."
+      },
+      {
+        "name": "Annie Creek Restaurant",
+        "description": "Casual eatery located at Mazama Village."
+      },
+      {
+        "name": "Beckie's Cafe",
+        "description": "Historic cafe in Union Creek known for homemade pies."
+      },
+      {
+        "name": "Diamond Lake Resort Restaurant",
+        "description": "Family-friendly dining near Diamond Lake."
+      },
+      {
+        "name": "Mazama Village Camper Store",
+        "description": "Convenience store offering snacks and camping supplies."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Crater Lake Lodge",
+        "description": "Historic lodge offering rooms with lake views."
+      },
+      {
+        "name": "Mazama Campground",
+        "description": "Main campground with tent and RV sites; reservations advised."
+      },
+      {
+        "name": "Union Creek Resort",
+        "description": "Rustic cabins and lodge near the park entrance."
+      },
+      {
+        "name": "Diamond Lake Resort",
+        "description": "Lakeside accommodations with various recreational activities."
+      },
+      {
+        "name": "Prospect Historic Hotel",
+        "description": "Charming B&B located in the nearby town of Prospect."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f8/Crater_Lake_from_Rim_Drive.jpg"
+  },
+  {
+    "id": "14",
+    "name": "Cuyahoga Valley National Park",
+    "state": "Ohio",
+    "coordinates": "41.24, -81.55",
+    "parkCode": "cuva",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Lush greenery and blooming wildflowers.",
+      "summer": "June\u2013August: Great for biking and hiking; popular season.",
+      "fall": "September\u2013October: Stunning fall foliage along trails and rivers.",
+      "winter": "November\u2013March: Snow-covered trails; good for cross-country skiing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Brandywine Falls",
+        "description": "A stunning 65-foot waterfall, easily accessible by boardwalk."
+      },
+      {
+        "name": "Virginia Kendall Ledges",
+        "description": "Unique rock formations and scenic overlook trails."
+      },
+      {
+        "name": "Towpath Trail",
+        "description": "Multi-use trail that follows the historic Ohio & Erie Canal."
+      },
+      {
+        "name": "Cuyahoga Valley Scenic Railroad",
+        "description": "Historic train ride offering scenic views through the park."
+      },
+      {
+        "name": "Beaver Marsh",
+        "description": "Boardwalk trail perfect for birdwatching and wildlife viewing."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Winking Lizard Tavern",
+        "description": "Laid-back eatery with wings, burgers, and craft beers."
+      },
+      {
+        "name": "Sarah's Vineyard",
+        "description": "Rustic winery offering wood-fired pizzas and local wines."
+      },
+      {
+        "name": "Blue Door Caf\u00e9 & Bakery",
+        "description": "Stylish brunch spot serving fresh and seasonal dishes."
+      },
+      {
+        "name": "The Tasting Room at Gervasi",
+        "description": "Upscale restaurant with vineyard views and Italian fare."
+      },
+      {
+        "name": "Fisher\u2019s Caf\u00e9 & Pub",
+        "description": "Cozy diner serving American comfort food near the park."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Inn at Brandywine Falls",
+        "description": "Historic B&B with scenic views and proximity to waterfalls."
+      },
+      {
+        "name": "Stanford House",
+        "description": "Rustic lodging operated by the Conservancy within the park."
+      },
+      {
+        "name": "Silver Fern Bed & Breakfast",
+        "description": "Charming inn with homemade breakfasts in Peninsula, OH."
+      },
+      {
+        "name": "Everett Covered Bridge Campground",
+        "description": "Primitive campsite near trails and the Cuyahoga River."
+      },
+      {
+        "name": "Hilton Akron/Fairlawn",
+        "description": "Modern hotel with dining and amenities just outside the park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Brandywine_Falls_in_Cuyahoga_Valley_National_Park.jpg"
+  },
+  {
+    "id": "15",
+    "name": "Denali National Park",
+    "state": "Alaska",
+    "coordinates": "63.33, -150.50",
+    "parkCode": "dena",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May: Limited access; snow melts and wildlife becomes active.",
+      "summer": "June\u2013August: Peak season with 24-hour daylight and full park access.",
+      "fall": "September: Short season with fall colors and potential aurora sightings.",
+      "winter": "October\u2013April: Harsh conditions; limited services; ideal for solitude and snow activities."
+    },
+    "placesToVisit": [
+      {
+        "name": "Denali (Mount McKinley)",
+        "description": "The tallest peak in North America, visible from various points in the park."
+      },
+      {
+        "name": "Wonder Lake",
+        "description": "Reflective lake offering picturesque views of Denali on clear days."
+      },
+      {
+        "name": "Savage River Loop Trail",
+        "description": "Moderate hike through a scenic river valley with wildlife viewing opportunities."
+      },
+      {
+        "name": "Eielson Visitor Center",
+        "description": "Exhibits and panoramic views of Denali; shuttle access required."
+      },
+      {
+        "name": "Polychrome Pass",
+        "description": "Colorful hills and dramatic vistas along the Denali Park Road."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "229 Parks Restaurant and Tavern",
+        "description": "Farm-to-table dining with seasonal Alaskan ingredients."
+      },
+      {
+        "name": "Moose-AKa's",
+        "description": "Eastern European fusion cuisine with a cozy ambiance."
+      },
+      {
+        "name": "The Overlook",
+        "description": "Upscale bistro with views of the Alaska Range."
+      },
+      {
+        "name": "Denali Park Salmon Bake",
+        "description": "Rustic eatery serving seafood, burgers, and craft beer."
+      },
+      {
+        "name": "Prospectors Pizzeria & Alehouse",
+        "description": "Popular stop for pizza and local brews."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Denali Bluffs Hotel",
+        "description": "Hillside hotel offering views, lodge-style rooms, and a restaurant."
+      },
+      {
+        "name": "Camp Denali",
+        "description": "Rustic but comfortable cabins deep in the park with guided activities."
+      },
+      {
+        "name": "Riley Creek Campground",
+        "description": "Year-round campground near the entrance with basic facilities."
+      },
+      {
+        "name": "Denali Cabins",
+        "description": "Cozy cabins with hot tubs and shuttle service to the park."
+      },
+      {
+        "name": "McKinley Chalet Resort",
+        "description": "Spacious lodge with modern amenities and park shuttle access."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Denali_Mt_McKinley.jpg"
+  },
+  {
+    "id": "16",
+    "name": "Dry Tortugas National Park",
+    "state": "Florida",
+    "coordinates": "24.63, -82.87",
+    "parkCode": "drto",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Clear waters, mild weather, and calm seas.",
+      "summer": "June\u2013August: Hot and humid with higher chance of storms.",
+      "fall": "September\u2013November: Storm risk continues, fewer visitors.",
+      "winter": "December\u2013February: Best time for snorkeling and comfortable climate."
+    },
+    "placesToVisit": [
+      {
+        "name": "Fort Jefferson",
+        "description": "Massive coastal fortress surrounded by turquoise waters."
+      },
+      {
+        "name": "Garden Key",
+        "description": "Main island with beaches, snorkeling, and camping."
+      },
+      {
+        "name": "Loggerhead Key",
+        "description": "Remote island with lighthouse and coral reefs."
+      },
+      {
+        "name": "Moat Wall",
+        "description": "Snorkeling spot around the historic fort's perimeter."
+      },
+      {
+        "name": "Bush Key",
+        "description": "Bird nesting area accessible seasonally."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "No restaurants on-site",
+        "description": "Visitors must bring their own food and water."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Garden Key Campground",
+        "description": "Primitive camping near Fort Jefferson; no facilities."
+      },
+      {
+        "name": "Lodging in Key West",
+        "description": "Nearest accommodations located in Key West."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Fort_Jefferson_Dry_Tortugas.jpg"
+  },
+  {
+    "id": "17",
+    "name": "Everglades National Park",
+    "state": "Florida",
+    "coordinates": "25.32, -80.93",
+    "parkCode": "ever",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Transition from dry to wet season; increasing humidity and mosquito activity.",
+      "summer": "June\u2013September: Hot, humid, and rainy; fewer visitors but challenging conditions.",
+      "fall": "October\u2013November: Gradual decrease in rainfall; wildlife becomes more active.",
+      "winter": "December\u2013February: Dry season with mild temperatures and abundant wildlife viewing opportunities."
+    },
+    "placesToVisit": [
+      {
+        "name": "Anhinga Trail",
+        "description": "Boardwalk trail offering close views of alligators, birds, and other wildlife."
+      },
+      {
+        "name": "Shark Valley",
+        "description": "15-mile loop trail with an observation tower providing panoramic views of the Everglades."
+      },
+      {
+        "name": "Flamingo Visitor Center",
+        "description": "Gateway to backcountry camping, kayaking, and boat tours."
+      },
+      {
+        "name": "Pa-hay-okee Overlook",
+        "description": "Short boardwalk leading to a viewing platform over the 'River of Grass.'"
+      },
+      {
+        "name": "Gumbo Limbo Trail",
+        "description": "Shaded trail through a hardwood hammock ecosystem."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Robert Is Here Fruit Stand",
+        "description": "Famous for fresh tropical fruits, smoothies, and milkshakes."
+      },
+      {
+        "name": "The Pit Bar-B-Q",
+        "description": "Casual spot offering smoked meats and classic sides."
+      },
+      {
+        "name": "Everglades Gator Grill",
+        "description": "Local eatery serving gator bites, burgers, and seafood."
+      },
+      {
+        "name": "Mango Cafe",
+        "description": "Family-owned restaurant with a mix of Cuban and American dishes."
+      },
+      {
+        "name": "La Quebradita Mexican Grill",
+        "description": "Authentic Mexican cuisine with outdoor seating."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Flamingo Lodge & Marina",
+        "description": "Offers eco-tents, houseboats, and traditional rooms near the park's southern tip."
+      },
+      {
+        "name": "Long Pine Key Campground",
+        "description": "NPS campground with tent and RV sites; open seasonally."
+      },
+      {
+        "name": "Everglades International Hostel",
+        "description": "Budget-friendly accommodations in nearby Florida City."
+      },
+      {
+        "name": "Travelodge by Wyndham Florida City",
+        "description": "Comfortable hotel with amenities and easy park access."
+      },
+      {
+        "name": "Best Western Gateway to the Keys",
+        "description": "Modern hotel offering complimentary breakfast and pool."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Everglades_Sawgrass.jpg"
+  },
+  {
+    "id": "18",
+    "name": "Gates of the Arctic National Park",
+    "state": "Alaska",
+    "coordinates": "67.78, -153.30",
+    "parkCode": "gaar",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snow begins to melt; access still limited and unpredictable.",
+      "summer": "July\u2013August: Best time for backpacking and scenic flights; 24-hour daylight.",
+      "fall": "September: Short season with brilliant tundra colors and increasing snow.",
+      "winter": "October\u2013April: Extremely harsh; primarily accessible to expert adventurers only."
+    },
+    "placesToVisit": [
+      {
+        "name": "Arrigetch Peaks",
+        "description": "Granite spires popular with climbers and backpackers in the Brooks Range."
+      },
+      {
+        "name": "Alatna River",
+        "description": "Designated Wild and Scenic River ideal for float trips through remote terrain."
+      },
+      {
+        "name": "Noatak Wilderness",
+        "description": "Pristine wilderness with vast tundra and mountain vistas."
+      },
+      {
+        "name": "Aniakchak River",
+        "description": "Remote river corridor teeming with wildlife and scenic views."
+      },
+      {
+        "name": "Gates of the Arctic Pass",
+        "description": "Natural pass named for the two tall peaks framing the northern gateway."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Sam & Lee\u2019s Restaurant (Fairbanks)",
+        "description": "Popular spot for Chinese and Korean food in Fairbanks."
+      },
+      {
+        "name": "The Crepery (Fairbanks)",
+        "description": "Cozy caf\u00e9 known for sweet and savory crepes near the airport."
+      },
+      {
+        "name": "Pike\u2019s Landing (Fairbanks)",
+        "description": "Waterfront dining with Alaskan seafood and grill options."
+      },
+      {
+        "name": "Pump House Restaurant (Fairbanks)",
+        "description": "Fine dining with historic Alaskan charm and views of the Chena River."
+      },
+      {
+        "name": "Big Daddy\u2019s BBQ (Fairbanks)",
+        "description": "Southern-style barbecue with generous portions and casual vibe."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Sophie Station Suites (Fairbanks)",
+        "description": "Comfortable all-suite hotel popular with travelers flying to the Arctic."
+      },
+      {
+        "name": "SpringHill Suites by Marriott Fairbanks",
+        "description": "Downtown hotel offering modern amenities and river views."
+      },
+      {
+        "name": "Chena River State Recreation Site",
+        "description": "Campground with scenic views and basic facilities near Fairbanks."
+      },
+      {
+        "name": "Brooks Lodge Fly-In Base (Bettles)",
+        "description": "Gateway lodge providing floatplane access and guided tours."
+      },
+      {
+        "name": "Bettles Lodge",
+        "description": "Rustic lodge offering access to remote Arctic wilderness."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Gates_of_the_Arctic_National_Park.jpg"
+  },
+  {
+    "id": "19",
+    "name": "Glacier Bay National Park",
+    "state": "Alaska",
+    "coordinates": "58.50, -137.00",
+    "parkCode": "glba",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Blooming wildflowers and fewer crowds.",
+      "summer": "July\u2013August: Peak cruise season; best wildlife and glacier viewing.",
+      "fall": "September: Cooler temps and fewer visitors; late wildlife activity.",
+      "winter": "October\u2013April: Cold and limited access; only for experienced adventurers."
+    },
+    "placesToVisit": [
+      {
+        "name": "Johns Hopkins Glacier",
+        "description": "One of the park\u2019s most active tidewater glaciers; best seen by boat or cruise."
+      },
+      {
+        "name": "Bartlett Cove",
+        "description": "Visitor center area offering kayaking, hiking, and ranger programs."
+      },
+      {
+        "name": "Margerie Glacier",
+        "description": "Spectacular glacier known for frequent calving events."
+      },
+      {
+        "name": "Reid Glacier Trail",
+        "description": "Scenic hike leading to the base of Reid Glacier."
+      },
+      {
+        "name": "Tlingit Trail",
+        "description": "Short interpretive trail highlighting native culture and natural beauty."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Gustavus Inn",
+        "description": "Charming inn offering locally sourced meals in a homey setting."
+      },
+      {
+        "name": "Glacier Bay Country Inn Dining",
+        "description": "Upscale dining featuring Alaskan seafood and produce."
+      },
+      {
+        "name": "Fireweed Gallery Cafe",
+        "description": "Art gallery caf\u00e9 with snacks and light meals in Gustavus."
+      },
+      {
+        "name": "Crab Station at Icy Strait Point",
+        "description": "Popular cruise port stop offering fresh crab and seafood plates."
+      },
+      {
+        "name": "The Landing Zone Bar & Grill",
+        "description": "Casual eatery with burgers and beers in Gustavus."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Glacier Bay Lodge",
+        "description": "The only lodge inside the park; provides access to guided boat tours."
+      },
+      {
+        "name": "Gustavus Inn",
+        "description": "Family-run inn with rustic rooms and meals included."
+      },
+      {
+        "name": "Glacier Bay Country Inn",
+        "description": "Luxury lodge with fly-fishing and wildlife excursions."
+      },
+      {
+        "name": "Bartlett Cove Campground",
+        "description": "Free walk-in campground with bear-resistant lockers and composting toilets."
+      },
+      {
+        "name": "Annie Mae Lodge",
+        "description": "Quiet riverside lodge with cozy accommodations near the park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/47/Glacier_Bay_Johns_Hopkins_Inlet.jpg"
+  },
+  {
+    "id": "20",
+    "name": "Glacier National Park",
+    "state": "Montana",
+    "coordinates": "48.70, -113.81",
+    "parkCode": "glac",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Waterfalls at peak flow; some roads/trails may still be snow-covered.",
+      "summer": "July\u2013August: Best weather and full road access.",
+      "fall": "September\u2013October: Fewer visitors and colorful foliage.",
+      "winter": "November\u2013April: Limited access; suitable for cross-country skiing and solitude."
+    },
+    "placesToVisit": [
+      {
+        "name": "Going-to-the-Sun Road",
+        "description": "Scenic drive crossing the Continental Divide with breathtaking views."
+      },
+      {
+        "name": "Lake McDonald",
+        "description": "Largest lake in the park with crystal-clear water and kayak rentals."
+      },
+      {
+        "name": "Grinnell Glacier Trail",
+        "description": "Challenging hike offering up-close glacier views and alpine scenery."
+      },
+      {
+        "name": "Logan Pass",
+        "description": "Popular stop with visitor center and access to Hidden Lake Overlook trail."
+      },
+      {
+        "name": "Many Glacier Area",
+        "description": "Wildlife-rich region with multiple hiking trails and lakes."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Belton Chalet Dining Room",
+        "description": "Historic lodge offering upscale American cuisine."
+      },
+      {
+        "name": "Two Dog Flats Grill",
+        "description": "Casual dining in St. Mary offering burgers and regional dishes."
+      },
+      {
+        "name": "Swiftcurrent Motor Inn & Cabins Restaurant",
+        "description": "Quick bites and breakfast options near the trails."
+      },
+      {
+        "name": "Lake McDonald Lodge Restaurant",
+        "description": "Rustic lodge dining with lakeside views."
+      },
+      {
+        "name": "Ptarmigan Dining Room",
+        "description": "Seasonal restaurant in Many Glacier Hotel with great views."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Many Glacier Hotel",
+        "description": "Historic hotel offering alpine-style rooms and lake views."
+      },
+      {
+        "name": "Lake McDonald Lodge",
+        "description": "Lodge accommodations with rustic charm on the lakeshore."
+      },
+      {
+        "name": "Apgar Campground",
+        "description": "One of the largest campgrounds in the park, near West Glacier entrance."
+      },
+      {
+        "name": "St. Mary Campground",
+        "description": "Eastern campground with RV and tent sites near scenic viewpoints."
+      },
+      {
+        "name": "Glacier Park Lodge",
+        "description": "Beautifully crafted wooden lodge near the park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/41/Grinnell_Lake_from_Grinnell_Glacier_Trail.jpg"
+  },
+  {
+    "id": "21",
+    "name": "Grand Canyon National Park",
+    "state": "Arizona",
+    "coordinates": "36.06, -112.14",
+    "parkCode": "grca",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Mild temperatures and wildflowers; fewer crowds.",
+      "summer": "June\u2013August: Hot and crowded, especially at the South Rim.",
+      "fall": "September\u2013November: Cooler temps and fewer visitors.",
+      "winter": "December\u2013February: Snow at the rim, but fewer crowds and unique views."
+    },
+    "placesToVisit": [
+      {
+        "name": "South Rim",
+        "description": "Most popular area with visitor centers, viewpoints, and shuttle access."
+      },
+      {
+        "name": "North Rim",
+        "description": "Quieter and cooler; open seasonally from mid-May to mid-October."
+      },
+      {
+        "name": "Bright Angel Trail",
+        "description": "Iconic hike descending into the canyon with rest stops and views."
+      },
+      {
+        "name": "Desert View Watchtower",
+        "description": "Historic structure with 360-degree views near the East Entrance."
+      },
+      {
+        "name": "Havasupai Falls",
+        "description": "Stunning turquoise waterfalls requiring permits and advance planning."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "El Tovar Dining Room",
+        "description": "Historic lodge dining with canyon views and fine American cuisine."
+      },
+      {
+        "name": "Arizona Room",
+        "description": "Southwestern-style dishes with steaks and canyon-side seating."
+      },
+      {
+        "name": "Bright Angel Restaurant",
+        "description": "Casual family-friendly meals near the Bright Angel trailhead."
+      },
+      {
+        "name": "Canyon Village Market Deli",
+        "description": "Grab-and-go sandwiches and snacks inside the park."
+      },
+      {
+        "name": "We Cook Pizza and Pasta",
+        "description": "Popular eatery in Tusayan with generous portions."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "El Tovar Hotel",
+        "description": "Luxury lodge on the South Rim with historic architecture and dining."
+      },
+      {
+        "name": "Yavapai Lodge",
+        "description": "Modern rooms and amenities near Market Plaza on the South Rim."
+      },
+      {
+        "name": "Phantom Ranch",
+        "description": "Rustic cabins at the bottom of the canyon; accessible by hiking or mule."
+      },
+      {
+        "name": "Mather Campground",
+        "description": "Well-equipped campground near Grand Canyon Village (South Rim)."
+      },
+      {
+        "name": "North Rim Campground",
+        "description": "Seasonal campground with views and cooler climate."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Grand_Canyon_view_from_Pima_Point_2010.jpg"
+  },
+  {
+    "id": "22",
+    "name": "Grand Teton National Park",
+    "state": "Wyoming",
+    "coordinates": "43.73, -110.80",
+    "parkCode": "grte",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Wildlife emerges; some facilities reopen.",
+      "summer": "June\u2013August: Best weather, hiking, and boating opportunities.",
+      "fall": "September\u2013October: Stunning fall colors and active wildlife.",
+      "winter": "November\u2013March: Cross-country skiing and snowshoeing with few crowds."
+    },
+    "placesToVisit": [
+      {
+        "name": "Jenny Lake",
+        "description": "Popular area with boat rides, hikes, and scenic overlooks."
+      },
+      {
+        "name": "Schwabacher Landing",
+        "description": "Photogenic spot for sunrise and wildlife watching."
+      },
+      {
+        "name": "Snake River Overlook",
+        "description": "Made famous by Ansel Adams; panoramic mountain views."
+      },
+      {
+        "name": "Taggart Lake Trail",
+        "description": "Easy to moderate hike through forests and open meadows."
+      },
+      {
+        "name": "Signal Mountain",
+        "description": "Summit drive or hike offering sweeping views of the valley and Teton Range."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Dornan\u2019s Pizza & Pasta Company",
+        "description": "Casual spot with pizza and beer overlooking the Tetons."
+      },
+      {
+        "name": "The Mural Room",
+        "description": "Fine dining with panoramic views inside Jackson Lake Lodge."
+      },
+      {
+        "name": "Trapper Grill",
+        "description": "Classic American fare with a mountain lodge atmosphere."
+      },
+      {
+        "name": "Cafe Genevieve",
+        "description": "Southern comfort food in a cozy log cabin (Jackson)."
+      },
+      {
+        "name": "Persephone Bakery",
+        "description": "Chic caf\u00e9 with brunch and artisanal pastries (Jackson)."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Jackson Lake Lodge",
+        "description": "Upscale lodge with mountain views, dining, and guided tours."
+      },
+      {
+        "name": "Jenny Lake Lodge",
+        "description": "Luxury cabins and fine dining in a serene location."
+      },
+      {
+        "name": "Colter Bay Village",
+        "description": "Rustic cabins, tent cabins, and an RV park near Jackson Lake."
+      },
+      {
+        "name": "Gros Ventre Campground",
+        "description": "Spacious sites with wildlife and mountain views."
+      },
+      {
+        "name": "Signal Mountain Campground",
+        "description": "Popular waterfront campground with direct views of the Tetons."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Grand_Teton_in_Spring.jpg"
+  },
+  {
+    "id": "23",
+    "name": "Great Basin National Park",
+    "state": "Nevada",
+    "coordinates": "38.98, -114.30",
+    "parkCode": "grba",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Wildflowers bloom and weather begins to warm.",
+      "summer": "July\u2013August: High-elevation hiking and cave tours are ideal.",
+      "fall": "September\u2013October: Fewer crowds and colorful aspen groves.",
+      "winter": "November\u2013March: Cold with snowshoeing and stargazing opportunities."
+    },
+    "placesToVisit": [
+      {
+        "name": "Lehman Caves",
+        "description": "Decorated limestone cave with guided tours available."
+      },
+      {
+        "name": "Wheeler Peak Scenic Drive",
+        "description": "Mountain road with overlooks, bristlecone pine groves, and alpine lakes."
+      },
+      {
+        "name": "Bristlecone Pine Trail",
+        "description": "Leads to some of the oldest living trees on Earth."
+      },
+      {
+        "name": "Wheeler Peak",
+        "description": "Highest summit in the park with strenuous hiking and stunning views."
+      },
+      {
+        "name": "Baker Creek Trail",
+        "description": "Scenic trail through forested canyon with summer wildflowers."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Lehman Caves Caf\u00e9",
+        "description": "Seasonal eatery near the visitor center serving sandwiches and drinks."
+      },
+      {
+        "name": "Kerouac\u2019s Restaurant",
+        "description": "Stylish bistro in Baker offering upscale American cuisine."
+      },
+      {
+        "name": "Magic Bean Coffee Cart",
+        "description": "Coffee and snacks with friendly service near the park entrance."
+      },
+      {
+        "name": "Lectrolux Caf\u00e9",
+        "description": "Vintage diner-style caf\u00e9 in Baker with local favorites."
+      },
+      {
+        "name": "Silver Jack Inn",
+        "description": "Rustic motel and restaurant serving hearty meals."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Lower Lehman Creek Campground",
+        "description": "Shaded sites near the creek and close to cave tours."
+      },
+      {
+        "name": "Baker Creek Campground",
+        "description": "Quiet, forested campground with easy access to trails."
+      },
+      {
+        "name": "Whispering Elms Motel & RV Park",
+        "description": "Basic accommodations with campsites in Baker."
+      },
+      {
+        "name": "Silver Jack Inn & Lectrolux Caf\u00e9",
+        "description": "Combo inn and eatery in a quirky local setup."
+      },
+      {
+        "name": "Stella Lake Trail Dispersed Camping",
+        "description": "Backcountry camping with dark skies and solitude."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Wheeler_Peak_and_Great_Basin_NP.jpg"
+  },
+  {
+    "id": "24",
+    "name": "Great Sand Dunes National Park",
+    "state": "Colorado",
+    "coordinates": "37.73, -105.51",
+    "parkCode": "grsa",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Medano Creek begins flowing; great for family fun.",
+      "summer": "June\u2013August: Hot sand in midday; hike early or late.",
+      "fall": "September\u2013October: Pleasant temps and fewer visitors.",
+      "winter": "November\u2013March: Snow-dusted dunes and quiet surroundings."
+    },
+    "placesToVisit": [
+      {
+        "name": "High Dune on First Ridge",
+        "description": "Popular hiking spot for sweeping views of the dune field."
+      },
+      {
+        "name": "Medano Creek",
+        "description": "Seasonal stream at the base of the dunes, great for splashing and relaxing."
+      },
+      {
+        "name": "Zapata Falls",
+        "description": "Short hike to a hidden waterfall near the park entrance."
+      },
+      {
+        "name": "Star Dune",
+        "description": "One of the tallest dunes in North America; a long but rewarding hike."
+      },
+      {
+        "name": "Mosca Pass Trail",
+        "description": "Scenic forested trail with wildflowers and mountain views."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Great Sand Dunes Oasis Restaurant",
+        "description": "Casual dining near the entrance with burgers and ice cream."
+      },
+      {
+        "name": "Calvillo\u2019s Mexican Restaurant",
+        "description": "Popular Mexican food in nearby Alamosa."
+      },
+      {
+        "name": "San Luis Valley Brewing Company",
+        "description": "Craft beers and hearty meals in Alamosa\u2019s downtown."
+      },
+      {
+        "name": "The Rubi Slipper",
+        "description": "Charming caf\u00e9 with homemade pastries and breakfast options."
+      },
+      {
+        "name": "Purple Pig Pizzeria & Pub",
+        "description": "Family-friendly pizza and wings place with local character."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Pi\u00f1on Flats Campground",
+        "description": "NPS campground within walking distance to the dunes."
+      },
+      {
+        "name": "Great Sand Dunes Lodge",
+        "description": "Motel-style lodge offering views of the dunes."
+      },
+      {
+        "name": "Sunset Inn Alamosa",
+        "description": "Budget-friendly hotel with basic amenities in Alamosa."
+      },
+      {
+        "name": "Fairfield Inn & Suites Alamosa",
+        "description": "Modern hotel chain with pool and free breakfast."
+      },
+      {
+        "name": "Zapata Ranch",
+        "description": "Rustic working ranch offering horseback riding and lodging."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Great_Sand_Dunes_National_Park.jpg"
+  },
+  {
+    "id": "25",
+    "name": "Great Smoky Mountains National Park",
+    "state": "Tennessee, North Carolina",
+    "coordinates": "35.68, -83.53",
+    "parkCode": "grsm",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Wildflowers in full bloom.",
+      "summer": "June\u2013August: Warm weather and great hiking.",
+      "fall": "September\u2013October: Peak for fall foliage and photography.",
+      "winter": "November\u2013March: Quiet trails and occasional snow views."
+    },
+    "placesToVisit": [
+      {
+        "name": "Clingmans Dome",
+        "description": "Highest point in the park with a 360-degree observation tower."
+      },
+      {
+        "name": "Cades Cove",
+        "description": "Scenic valley loop with wildlife viewing and historic buildings."
+      },
+      {
+        "name": "Roaring Fork Motor Nature Trail",
+        "description": "One-way loop road with forest views and waterfalls."
+      },
+      {
+        "name": "Alum Cave Trail",
+        "description": "Popular hike leading to bluffs and panoramic views."
+      },
+      {
+        "name": "Newfound Gap",
+        "description": "Scenic overlook on the TN/NC border along US 441."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Peddler Steakhouse",
+        "description": "Classic Gatlinburg steakhouse with mountain ambiance."
+      },
+      {
+        "name": "Crockett\u2019s Breakfast Camp",
+        "description": "Popular breakfast spot with giant cinnamon rolls and skillets."
+      },
+      {
+        "name": "Wild Plum Tea Room",
+        "description": "Charming lunch cafe with vegetarian options in Gatlinburg."
+      },
+      {
+        "name": "Applewood Farmhouse Restaurant",
+        "description": "Southern comfort food in Sevierville with apple fritters."
+      },
+      {
+        "name": "Pancake Pantry",
+        "description": "Historic pancake house in downtown Gatlinburg."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "LeConte Lodge",
+        "description": "Accessible only by hike; rustic mountain-top lodging."
+      },
+      {
+        "name": "Elkmont Campground",
+        "description": "Largest campground in the park, near hiking and rivers."
+      },
+      {
+        "name": "Cades Cove Campground",
+        "description": "Scenic campground with easy wildlife access."
+      },
+      {
+        "name": "Gatlinburg Inn",
+        "description": "Historic inn in downtown Gatlinburg with modern upgrades."
+      },
+      {
+        "name": "Margaritaville Island Hotel",
+        "description": "Themed luxury hotel in nearby Pigeon Forge."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Great_Smoky_Mountains_National_Park.jpg"
+  },
+  {
+    "id": "26",
+    "name": "Haleakal\u0101 National Park",
+    "state": "Hawai\u02bbi",
+    "coordinates": "20.72, -156.17",
+    "parkCode": "hale",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Pleasant temperatures and blooming native plants.",
+      "summer": "June\u2013August: Warmer weather; popular for sunrise viewing.",
+      "fall": "September\u2013November: Fewer crowds and clear skies.",
+      "winter": "December\u2013February: Cooler temperatures; occasional rain."
+    },
+    "placesToVisit": [
+      {
+        "name": "Summit Area",
+        "description": "Offers panoramic views of the volcanic crater and sunrise vistas."
+      },
+      {
+        "name": "K\u012bpahulu District",
+        "description": "Lush coastal area with waterfalls and hiking trails."
+      },
+      {
+        "name": "Sliding Sands Trail",
+        "description": "Trail descending into the crater, showcasing unique volcanic landscapes."
+      },
+      {
+        "name": "Hosmer Grove",
+        "description": "Forest area with diverse plant species and birdwatching opportunities."
+      },
+      {
+        "name": "Pipiwai Trail",
+        "description": "Scenic trail leading to Waimoku Falls through bamboo forests."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Kula Lodge Restaurant",
+        "description": "Offers local cuisine with views of Maui's central valley."
+      },
+      {
+        "name": "Hana Farms Roadside Stand",
+        "description": "Serves fresh baked goods and local produce."
+      },
+      {
+        "name": "T. Komoda Store & Bakery",
+        "description": "Historic bakery known for cream puffs and stick donuts."
+      },
+      {
+        "name": "Cafe Mambo",
+        "description": "Casual spot offering a mix of local and international dishes."
+      },
+      {
+        "name": "Hali'imaile General Store",
+        "description": "Upscale dining with Hawaiian regional cuisine."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Kula Lodge",
+        "description": "Rustic accommodations with panoramic views."
+      },
+      {
+        "name": "Hana Maui Resort",
+        "description": "Luxury resort near the K\u012bpahulu District."
+      },
+      {
+        "name": "Hosmer Grove Campground",
+        "description": "First-come, first-served campground near the summit."
+      },
+      {
+        "name": "K\u012bpahulu Campground",
+        "description": "Coastal campground near waterfalls and trails."
+      },
+      {
+        "name": "Waianapanapa State Park Cabins",
+        "description": "Cabins near black sand beaches along the Hana Highway."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Haleakala_Crater.jpg"
+  },
+  {
+    "id": "27",
+    "name": "Hawai\u02bbi Volcanoes National Park",
+    "state": "Hawai\u02bbi",
+    "coordinates": "19.38, -155.20",
+    "parkCode": "havo",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Mild temperatures and active lava flows.",
+      "summer": "June\u2013August: Warmer weather; higher visitor numbers.",
+      "fall": "September\u2013November: Fewer crowds and clear skies.",
+      "winter": "December\u2013February: Cooler temperatures; best for hiking."
+    },
+    "placesToVisit": [
+      {
+        "name": "K\u012blauea Visitor Center",
+        "description": "Provides information on volcanic activity and park history."
+      },
+      {
+        "name": "Crater Rim Drive",
+        "description": "Scenic drive offering views of volcanic craters and steam vents."
+      },
+      {
+        "name": "Thurston Lava Tube",
+        "description": "Walk through a naturally formed lava tunnel."
+      },
+      {
+        "name": "Chain of Craters Road",
+        "description": "Road descending to the coast with lava fields and sea arches."
+      },
+      {
+        "name": "Mauna Loa Summit Trail",
+        "description": "Challenging hike to the summit of one of the world's largest volcanoes."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Volcano House Restaurant",
+        "description": "Dining with views of the K\u012blauea Caldera."
+      },
+      {
+        "name": "Ohelo Cafe",
+        "description": "Offers wood-fired pizzas and local dishes."
+      },
+      {
+        "name": "Thai Thai Bistro & Bar",
+        "description": "Thai cuisine with a Hawaiian twist."
+      },
+      {
+        "name": "Eagles Lighthouse Cafe",
+        "description": "Casual spot for sandwiches and salads."
+      },
+      {
+        "name": "Tuk-Tuk Thai Food Truck",
+        "description": "Mobile eatery serving authentic Thai dishes."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Volcano House Hotel",
+        "description": "Historic hotel within the park boundaries."
+      },
+      {
+        "name": "K\u012blauea Military Camp",
+        "description": "Lodging primarily for military personnel and families."
+      },
+      {
+        "name": "Namakanipaio Campground",
+        "description": "Wooded campground with tent and cabin options."
+      },
+      {
+        "name": "Volcano Rainforest Retreat",
+        "description": "Bed and breakfast nestled in the rainforest."
+      },
+      {
+        "name": "Lava Lodge at Volcano Village",
+        "description": "Cozy cabins near the park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Halemaumau_Crater_eruption_2021.jpg"
+  },
+  {
+    "id": "28",
+    "name": "Hot Springs National Park",
+    "state": "Arkansas",
+    "coordinates": "34.51, -93.05",
+    "parkCode": "hosp",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Blooming flowers and pleasant temperatures.",
+      "summer": "June\u2013August: Hot and humid; peak tourist season.",
+      "fall": "September\u2013November: Cooler weather and colorful foliage.",
+      "winter": "December\u2013February: Mild winters; fewer visitors."
+    },
+    "placesToVisit": [
+      {
+        "name": "Bathhouse Row",
+        "description": "Historic bathhouses offering spa services and tours."
+      },
+      {
+        "name": "Hot Springs Mountain Tower",
+        "description": "Observation tower with panoramic views of the Ouachita Mountains."
+      },
+      {
+        "name": "Grand Promenade",
+        "description": "Brick walkway behind Bathhouse Row for leisurely strolls."
+      },
+      {
+        "name": "Gulpha Gorge Trail",
+        "description": "Trail leading through forests and streams."
+      },
+      {
+        "name": "Fordyce Bathhouse Museum",
+        "description": "Restored bathhouse showcasing the history of the area."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Pancake Shop",
+        "description": "Classic breakfast spot known for pancakes and omelets."
+      },
+      {
+        "name": "Rolando's Restaurante",
+        "description": "Latin American cuisine with a unique atmosphere."
+      },
+      {
+        "name": "Superior Bathhouse Brewery",
+        "description": "Brewery located in a former bathhouse."
+      },
+      {
+        "name": "Deluca's Pizzeria",
+        "description": "Artisan pizzas with fresh ingredients."
+      },
+      {
+        "name": "Ohio Club",
+        "description": "Historic bar and grill with live music."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Arlington Resort Hotel & Spa",
+        "description": "Historic hotel with spa services."
+      },
+      {
+        "name": "Gulpha Gorge Campground",
+        "description": "NPS campground with modern amenities."
+      },
+      {
+        "name": "The Waters Hot Springs",
+        "description": "Boutique hotel near Bathhouse Row."
+      },
+      {
+        "name": "Lookout Point Lakeside Inn",
+        "description": "Luxury bed and breakfast on Lake Hamilton."
+      },
+      {
+        "name": "KOA Hot Springs",
+        "description": "Family-friendly campground with cabins and RV sites."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Hot_Springs_National_Park_Bathhouse_Row.jpg"
+  },
+  {
+    "id": "29",
+    "name": "Indiana Dunes National Park",
+    "state": "Indiana",
+    "coordinates": "41.65, -87.06",
+    "parkCode": "indu",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Wildflowers bloom and pleasant hiking conditions.",
+      "summer": "June\u2013August: Warm temperatures ideal for beach activities.",
+      "fall": "September\u2013October: Cooler temperatures and colorful foliage.",
+      "winter": "November\u2013March: Snow-covered trails and serene landscapes."
+    },
+    "placesToVisit": [
+      {
+        "name": "West Beach",
+        "description": "Popular spot for swimming and picnicking with scenic views."
+      },
+      {
+        "name": "Mount Baldy",
+        "description": "Large sand dune offering panoramic views of Lake Michigan."
+      },
+      {
+        "name": "Paul H. Douglas Trail",
+        "description": "Trail through diverse habitats including wetlands and forests."
+      },
+      {
+        "name": "Portage Lakefront and Riverwalk",
+        "description": "Area featuring a pavilion, fishing pier, and walking trails."
+      },
+      {
+        "name": "Cowles Bog Trail",
+        "description": "Challenging hike through wetlands and dunes to the beach."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Octave Grill",
+        "description": "Local favorite offering creative burgers and craft beers in Chesterton."
+      },
+      {
+        "name": "The Rolling Stonebaker",
+        "description": "Wood-fired pizza truck and dine-in spot known for fresh, local ingredients."
+      },
+      {
+        "name": "Lucrezia Caf\u00e9",
+        "description": "Italian dining in a charming setting with outdoor patio."
+      },
+      {
+        "name": "Third Coast Spice Caf\u00e9",
+        "description": "Healthy breakfast and lunch options with vegetarian choices."
+      },
+      {
+        "name": "Blocks Ice Cream",
+        "description": "Classic ice cream parlor popular with park visitors."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "DunesWalk Inn",
+        "description": "Boutique inn in a historic mansion close to the park."
+      },
+      {
+        "name": "Spring House Inn",
+        "description": "Quiet, woodsy lodge with indoor pool and balconies."
+      },
+      {
+        "name": "Indiana Dunes State Park Campground",
+        "description": "Electric hookups and close access to dunes and beach."
+      },
+      {
+        "name": "Comfort Inn & Suites Porter",
+        "description": "Standard hotel with free breakfast and pool near the park."
+      },
+      {
+        "name": "Waterbird Lakeside Inn",
+        "description": "Affordable lakeside inn with balconies and nature views."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/Indiana_Dunes_National_Park.jpg"
+  },
+  {
+    "id": "30",
+    "name": "Isle Royale National Park",
+    "state": "Michigan",
+    "coordinates": "47.99, -88.91",
+    "parkCode": "isro",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Season begins with cooler temps and fewer visitors.",
+      "summer": "July\u2013August: Peak season with warm weather and accessible trails.",
+      "fall": "September: Quieter trails, fall colors, and crisp air.",
+      "winter": "October\u2013April: Park is closed to visitors due to ice and harsh weather."
+    },
+    "placesToVisit": [
+      {
+        "name": "Rock Harbor",
+        "description": "Main entry point with trails, lodging, and ranger station."
+      },
+      {
+        "name": "Windigo",
+        "description": "Remote area on the island\u2019s west side with visitor center and camping."
+      },
+      {
+        "name": "Scoville Point Loop",
+        "description": "Popular day hike with rocky shorelines and dense forests."
+      },
+      {
+        "name": "Greenstone Ridge Trail",
+        "description": "Backpacking trail that spans the length of the island."
+      },
+      {
+        "name": "Lookout Louise",
+        "description": "Short hike with one of the best panoramic views of the island."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Greenstone Grill (Rock Harbor)",
+        "description": "Seasonal dining offering burgers, snacks, and simple meals."
+      },
+      {
+        "name": "Windigo Store & Grill",
+        "description": "Basic provisions, snacks, and a small menu in the Windigo area."
+      },
+      {
+        "name": "Keweenaw Mountain Lodge (Copper Harbor)",
+        "description": "Rustic lodge restaurant near the ferry terminal on the mainland."
+      },
+      {
+        "name": "Harbor Haus Restaurant",
+        "description": "Waterfront dining with German and seafood specialties in Copper Harbor."
+      },
+      {
+        "name": "Jamsen\u2019s Fish Market & Bakery",
+        "description": "Fresh bakery items and smoked fish near the ferry dock in Grand Marais."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Rock Harbor Lodge",
+        "description": "Lodge accommodations and cabins at the island\u2019s main dock area."
+      },
+      {
+        "name": "Windigo Camper Cabins",
+        "description": "Rustic cabins near the Windigo dock; must be reserved early."
+      },
+      {
+        "name": "Three Mile Campground",
+        "description": "Popular backcountry campground close to Rock Harbor."
+      },
+      {
+        "name": "Daisy Farm Campground",
+        "description": "Spacious site halfway along Greenstone Ridge Trail."
+      },
+      {
+        "name": "Washington Creek Campground",
+        "description": "Peaceful site at Windigo with moose and wolf sightings."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Isle_Royale_National_Park.jpg"
+  },
+  {
+    "id": "31",
+    "name": "Kenai Fjords National Park",
+    "state": "Alaska",
+    "coordinates": "59.92, -149.65",
+    "parkCode": "kefj",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May: Snow begins to melt; limited access.",
+      "summer": "June\u2013August: Peak season with accessible trails and wildlife viewing.",
+      "fall": "September: Cooler temperatures; fewer crowds.",
+      "winter": "October\u2013April: Harsh weather; limited accessibility."
+    },
+    "placesToVisit": [
+      {
+        "name": "Exit Glacier",
+        "description": "Accessible glacier with hiking trails and ranger-led programs."
+      },
+      {
+        "name": "Harding Icefield Trail",
+        "description": "Challenging hike offering panoramic views of the icefield."
+      },
+      {
+        "name": "Aialik Bay",
+        "description": "Popular area for kayaking and glacier viewing."
+      },
+      {
+        "name": "Bear Glacier",
+        "description": "Largest glacier in the park; accessible by boat or kayak."
+      },
+      {
+        "name": "Holgate Glacier",
+        "description": "Active tidewater glacier known for calving events."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Cookery",
+        "description": "Seafood-focused menu with local ingredients in Seward."
+      },
+      {
+        "name": "Chinooks",
+        "description": "Waterfront dining offering fresh seafood and steaks."
+      },
+      {
+        "name": "Thorn\u2019s Showcase Lounge",
+        "description": "Known for its 'bucket of butt' halibut dish."
+      },
+      {
+        "name": "Zudy\u2019s Caf\u00e9",
+        "description": "Casual spot with sandwiches, soups, and baked goods."
+      },
+      {
+        "name": "Resurrect Art Coffee House",
+        "description": "Coffee shop and art gallery in a historic church."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Exit Glacier Campground",
+        "description": "Walk-in, tent-only campground near Exit Glacier."
+      },
+      {
+        "name": "Seward Windsong Lodge",
+        "description": "Lodge offering comfortable rooms near the park entrance."
+      },
+      {
+        "name": "Harbor 360 Hotel",
+        "description": "Waterfront hotel with views of the harbor and mountains."
+      },
+      {
+        "name": "Kenai Fjords Wilderness Lodge",
+        "description": "Remote lodge on Fox Island accessible by boat."
+      },
+      {
+        "name": "Bear Creek Cabins",
+        "description": "Rustic cabins nestled in the woods near Seward."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Kenai_Fjords_National_Park.jpg"
+  },
+  {
+    "id": "32",
+    "name": "Kings Canyon National Park",
+    "state": "California",
+    "coordinates": "36.80, -118.55",
+    "parkCode": "kica",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Snowmelt fills rivers; wildflowers bloom.",
+      "summer": "July\u2013August: Warm temperatures; full access to park areas.",
+      "fall": "September\u2013October: Cooler temperatures; fall colors.",
+      "winter": "November\u2013March: Snow closes many park roads and facilities."
+    },
+    "placesToVisit": [
+      {
+        "name": "General Grant Tree",
+        "description": "Second-largest tree in the world; designated as the Nation's Christmas Tree."
+      },
+      {
+        "name": "Zumwalt Meadow",
+        "description": "Scenic meadow with a loop trail offering views of the Kings River and granite cliffs."
+      },
+      {
+        "name": "Roaring River Falls",
+        "description": "Short walk to a powerful waterfall cascading through a granite chute."
+      },
+      {
+        "name": "Cedar Grove",
+        "description": "Area offering campgrounds, trails, and access to the Kings River."
+      },
+      {
+        "name": "Mist Falls Trail",
+        "description": "Popular hike leading to one of the largest waterfalls in the park."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Grant Grove Restaurant",
+        "description": "Casual dining offering American cuisine near the park entrance."
+      },
+      {
+        "name": "Cedar Grove Snack Bar",
+        "description": "Seasonal spot with quick bites and picnic supplies."
+      },
+      {
+        "name": "Montecito Sequoia Lodge Dining Room",
+        "description": "Buffet-style meals with views of the surrounding forest."
+      },
+      {
+        "name": "The Peaks Restaurant",
+        "description": "Located in Wuksachi Lodge; offers upscale dining with regional flavors."
+      },
+      {
+        "name": "Hume Lake Snack Shop",
+        "description": "Casual eatery near Hume Lake offering burgers and ice cream."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "John Muir Lodge",
+        "description": "Rustic lodge located in Grant Grove Village."
+      },
+      {
+        "name": "Cedar Grove Lodge",
+        "description": "Seasonal lodge situated along the Kings River."
+      },
+      {
+        "name": "Azalea Campground",
+        "description": "Campground near Grant Grove with access to giant sequoias."
+      },
+      {
+        "name": "Sheep Creek Campground",
+        "description": "Located in Cedar Grove; offers shaded sites near the river."
+      },
+      {
+        "name": "Sunset Campground",
+        "description": "Large campground close to Grant Grove Village."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Kings_Canyon_from_Glacier_Point.jpg"
+  },
+  {
+    "id": "33",
+    "name": "Kobuk Valley National Park",
+    "state": "Alaska",
+    "coordinates": "67.55, -159.28",
+    "parkCode": "kova",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Melting snow; rivers begin to flow.",
+      "summer": "July\u2013August: Warmest temperatures; best time for hiking and river trips.",
+      "fall": "September: Cooler temperatures; fall colors.",
+      "winter": "October\u2013April: Extremely cold; limited daylight and accessibility."
+    },
+    "placesToVisit": [
+      {
+        "name": "Great Kobuk Sand Dunes",
+        "description": "Largest active sand dunes in the Arctic; unique landscape for hiking."
+      },
+      {
+        "name": "Kobuk River",
+        "description": "Major river offering opportunities for boating and wildlife viewing."
+      },
+      {
+        "name": "Onion Portage",
+        "description": "Archaeological site with evidence of 9,000 years of human activity."
+      },
+      {
+        "name": "Walker Lake",
+        "description": "Scenic lake surrounded by mountains; accessible by floatplane."
+      },
+      {
+        "name": "Baird Mountains",
+        "description": "Mountain range offering challenging hikes and stunning vistas."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Null",
+        "description": "No dining facilities within the park; visitors must bring all provisions."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Null",
+        "description": "No developed lodging or campgrounds; backcountry camping only."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b5/Kobuk_Sand_Dunes.jpg"
+  },
+  {
+    "id": "34",
+    "name": "Lake Clark National Park & Preserve",
+    "state": "Alaska",
+    "coordinates": "60.97, -153.42",
+    "parkCode": "lacl",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snowmelt and blooming wildflowers.",
+      "summer": "July\u2013August: Warmest weather; best time for wildlife viewing and hiking.",
+      "fall": "September: Cooler temperatures; fall colors.",
+      "winter": "October\u2013April: Harsh weather; limited accessibility."
+    },
+    "placesToVisit": [
+      {
+        "name": "Port Alsworth",
+        "description": "Main access point to the park; visitor center and lodging available."
+      },
+      {
+        "name": "Turquoise Lake",
+        "description": "Stunning glacial lake surrounded by mountains; accessible by floatplane."
+      },
+      {
+        "name": "Tanalian Falls",
+        "description": "Popular hiking destination with a 30-foot waterfall."
+      },
+      {
+        "name": "Twin Lakes",
+        "description": "Remote area known for solitude and the historic Dick Proenneke cabin."
+      },
+      {
+        "name": "Chilikadrotna River",
+        "description": "Wild river offering challenging rafting and fishing opportunities."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Farm Lodge Dining Room",
+        "description": "Offers meals for guests staying at the lodge in Port Alsworth."
+      },
+      {
+        "name": "Silver Salmon Creek Lodge",
+        "description": "Provides meals for guests; known for bear viewing opportunities."
+      },
+      {
+        "name": "Redoubt Mountain Lodge",
+        "description": "All-inclusive lodge with meals and guided activities."
+      },
+      {
+        "name": "Alaska Homestead Lodge",
+        "description": "Rustic lodge offering home-cooked meals and wildlife viewing."
+      },
+      {
+        "name": "Wilderness Lodge",
+        "description": "Remote lodge with dining options for guests."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "The Farm Lodge",
+        "description": "Lodge in Port Alsworth offering accommodations and guided trips."
+      },
+      {
+        "name": "Silver Salmon Creek Lodge",
+        "description": "Lodge providing bear viewing and fishing excursions."
+      },
+      {
+        "name": "Redoubt Mountain Lodge",
+        "description": "Scenic lodge offering full-service packages near Crescent Lake."
+      },
+      {
+        "name": "Alaska Homestead Lodge",
+        "description": "Rustic, family-run lodge with guided activities."
+      },
+      {
+        "name": "Wilderness Lodge",
+        "description": "Lodge located on the shores of Lake Clark, ideal for fishing and wildlife viewing."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Lake_Clark_National_Park.jpg"
+  },
+  {
+    "id": "35",
+    "name": "Lassen Volcanic National Park",
+    "state": "California",
+    "coordinates": "40.49, -121.51",
+    "parkCode": "lavo",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Limited access due to lingering snow; scenic snow-capped views.",
+      "summer": "July\u2013September: Best weather for hiking and exploring volcanic features.",
+      "fall": "October: Crisp air and vibrant foliage before seasonal closures.",
+      "winter": "November\u2013April: Snowy conditions ideal for snowshoeing and skiing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Bumpass Hell",
+        "description": "Largest hydrothermal area in the park with boardwalk trails and boiling springs."
+      },
+      {
+        "name": "Lassen Peak Trail",
+        "description": "Steep hike to the summit of a volcano with panoramic views."
+      },
+      {
+        "name": "Manzanita Lake",
+        "description": "Popular spot for kayaking, fishing, and photography."
+      },
+      {
+        "name": "Devastated Area",
+        "description": "Trail showcasing volcanic destruction from Lassen\u2019s 1915 eruption."
+      },
+      {
+        "name": "Kings Creek Falls",
+        "description": "Scenic waterfall accessible via a moderately strenuous trail."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Highlands Ranch Resort",
+        "description": "Upscale lodge with a full-service restaurant near the park entrance."
+      },
+      {
+        "name": "JJ\u2019s Caf\u00e9",
+        "description": "Casual American dining in Old Station with hearty breakfasts."
+      },
+      {
+        "name": "Lassen Caf\u00e9 & Gift",
+        "description": "Convenient meals and snacks at the Loomis Museum area."
+      },
+      {
+        "name": "Mineral Lodge Caf\u00e9",
+        "description": "Simple American meals close to the Southwest Entrance."
+      },
+      {
+        "name": "Chester Pizza Factory",
+        "description": "Family-friendly pizzeria in nearby Chester, CA."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Drakesbad Guest Ranch",
+        "description": "Historic lodge with rustic charm and natural hot springs."
+      },
+      {
+        "name": "Manzanita Lake Campground",
+        "description": "Largest campground in the park; near a scenic lake."
+      },
+      {
+        "name": "Summit Lake Campground",
+        "description": "Mid-elevation campground great for stargazing."
+      },
+      {
+        "name": "Highlands Ranch Resort",
+        "description": "Modern, cozy cabins and rooms with dining and views."
+      },
+      {
+        "name": "Mill Creek Resort",
+        "description": "Cabin rentals and RV sites located near the park\u2019s southern entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1e/Lassen_Peak_in_Lassen_Volcanic_National_Park.jpg"
+  },
+  {
+    "id": "41",
+    "name": "Mount Rainier National Park",
+    "state": "Washington",
+    "coordinates": "46.85, -121.75",
+    "parkCode": "mora",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snow begins to melt; wildflowers start to bloom.",
+      "summer": "July\u2013August: Peak season with full trail access and vibrant meadows.",
+      "fall": "September\u2013October: Cooler temperatures; fall colors.",
+      "winter": "November\u2013April: Snow-covered landscape ideal for snowshoeing and skiing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Paradise",
+        "description": "Famous for its wildflower meadows and views of Mount Rainier."
+      },
+      {
+        "name": "Sunrise",
+        "description": "Highest point accessible by vehicle; offers panoramic vistas."
+      },
+      {
+        "name": "Grove of the Patriarchs",
+        "description": "Trail through ancient old-growth forest with massive trees."
+      },
+      {
+        "name": "Nisqually Vista Trail",
+        "description": "Easy hike with views of the Nisqually Glacier."
+      },
+      {
+        "name": "Reflection Lakes",
+        "description": "Scenic spot for photography with mirror-like lake reflections."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "National Park Inn Dining Room",
+        "description": "Casual dining with views of Mount Rainier."
+      },
+      {
+        "name": "Copper Creek Inn",
+        "description": "Known for homemade pies and hearty meals."
+      },
+      {
+        "name": "Wildberry Restaurant",
+        "description": "Offers Himalayan cuisine and American classics."
+      },
+      {
+        "name": "Summit House Restaurant",
+        "description": "Washington's highest elevation restaurant with alpine views."
+      },
+      {
+        "name": "Basecamp Bar & Grill",
+        "description": "Casual spot with burgers and local beers."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "National Park Inn",
+        "description": "Historic lodge open year-round in Longmire."
+      },
+      {
+        "name": "Paradise Inn",
+        "description": "Iconic lodge with rustic charm at Paradise."
+      },
+      {
+        "name": "Cougar Rock Campground",
+        "description": "Popular campground near Paradise area."
+      },
+      {
+        "name": "White River Campground",
+        "description": "Located near Sunrise; offers forested sites."
+      },
+      {
+        "name": "Mounthaven Resort",
+        "description": "Cabins and RV sites close to the park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Mount_Rainier_from_Reflection_Lakes.jpg"
+  },
+  {
+    "id": "42",
+    "name": "North Cascades National Park",
+    "state": "Washington",
+    "coordinates": "48.77, -121.30",
+    "parkCode": "noca",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snowmelt opens lower elevation trails.",
+      "summer": "July\u2013September: Best time for hiking and backpacking.",
+      "fall": "October: Fall colors and fewer crowds.",
+      "winter": "November\u2013April: Heavy snowfall limits access."
+    },
+    "placesToVisit": [
+      {
+        "name": "Diablo Lake Overlook",
+        "description": "Stunning turquoise lake view from Highway 20."
+      },
+      {
+        "name": "Cascade Pass Trail",
+        "description": "Popular hike with alpine scenery and wildlife sightings."
+      },
+      {
+        "name": "Ross Lake",
+        "description": "Large reservoir offering boating and fishing."
+      },
+      {
+        "name": "Maple Pass Loop",
+        "description": "Scenic loop trail with panoramic mountain views."
+      },
+      {
+        "name": "Ladder Creek Falls",
+        "description": "Illuminated waterfall near the town of Newhalem."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Mondo Restaurant",
+        "description": "Asian fusion cuisine in Marblemount."
+      },
+      {
+        "name": "Cascadian Home Farm",
+        "description": "Seasonal stand with ice cream and fresh produce."
+      },
+      {
+        "name": "Good Food",
+        "description": "Cafe offering sandwiches and baked goods."
+      },
+      {
+        "name": "5b's Bakery",
+        "description": "Bakery known for pastries and coffee."
+      },
+      {
+        "name": "Buffalo Run Restaurant",
+        "description": "Serves wild game and classic American dishes."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "North Cascades Lodge at Stehekin",
+        "description": "Remote lodge accessible by boat or hike."
+      },
+      {
+        "name": "Ross Lake Resort",
+        "description": "Floating cabins on Ross Lake."
+      },
+      {
+        "name": "Newhalem Campground",
+        "description": "Forest campground near visitor center."
+      },
+      {
+        "name": "Colonial Creek Campground",
+        "description": "Lakeside sites with access to trails."
+      },
+      {
+        "name": "Marblemount Homestead",
+        "description": "Cabins and RV sites near park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d4/North_Cascades_National_Park_Diablo_Lake.jpg"
+  },
+  {
+    "id": "43",
+    "name": "Olympic National Park",
+    "state": "Washington",
+    "coordinates": "47.80, -123.70",
+    "parkCode": "olym",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Waterfalls at peak flow; wildflowers bloom.",
+      "summer": "July\u2013August: Best weather for hiking and beach visits.",
+      "fall": "September\u2013October: Fall colors and salmon runs.",
+      "winter": "November\u2013March: Snow in mountains; rain in lowlands."
+    },
+    "placesToVisit": [
+      {
+        "name": "Hurricane Ridge",
+        "description": "Mountain area with panoramic views and trails."
+      },
+      {
+        "name": "Hoh Rain Forest",
+        "description": "Lush temperate rainforest with moss-covered trees."
+      },
+      {
+        "name": "Rialto Beach",
+        "description": "Coastal area with sea stacks and tide pools."
+      },
+      {
+        "name": "Lake Crescent",
+        "description": "Deep glacial lake with clear blue waters."
+      },
+      {
+        "name": "Sol Duc Falls",
+        "description": "Scenic waterfall accessible via short hike."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Lake Crescent Lodge Dining Room",
+        "description": "Historic lodge offering Northwest cuisine."
+      },
+      {
+        "name": "Next Door Gastropub",
+        "description": "Popular spot in Port Angeles with craft beers."
+      },
+      {
+        "name": "Bella Italia",
+        "description": "Italian restaurant known for seafood dishes."
+      },
+      {
+        "name": "Forks Coffee Shop",
+        "description": "Classic diner serving hearty breakfasts."
+      },
+      {
+        "name": "Kalaloch Lodge Restaurant",
+        "description": "Oceanfront dining with seasonal menus."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Lake Crescent Lodge",
+        "description": "Historic lodge with lakeside cabins."
+      },
+      {
+        "name": "Kalaloch Lodge",
+        "description": "Rustic cabins overlooking the Pacific Ocean."
+      },
+      {
+        "name": "Sol Duc Hot Springs Resort",
+        "description": "Cabins with access to hot springs pools."
+      },
+      {
+        "name": "Hoh Campground",
+        "description": "Rainforest camping near the Hoh River."
+      },
+      {
+        "name": "Heart O' the Hills Campground",
+        "description": "Forest campground near Hurricane Ridge."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Olympic_National_Park_Hoh_Rainforest.jpg"
+  },
+  {
+    "id": "44",
+    "name": "Petrified Forest National Park",
+    "state": "Arizona",
+    "coordinates": "35.07, -109.78",
+    "parkCode": "pefo",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Mild temperatures and wildflowers.",
+      "summer": "June\u2013August: Very hot; best visited early morning or late afternoon.",
+      "fall": "September\u2013October: Comfortable weather and fewer visitors.",
+      "winter": "November\u2013February: Cold, but scenic with snow-dusted landscapes."
+    },
+    "placesToVisit": [
+      {
+        "name": "Blue Mesa",
+        "description": "Colorful badlands with a paved loop trail through petrified wood."
+      },
+      {
+        "name": "Painted Desert",
+        "description": "Vast desert landscape with vibrant, layered rock formations."
+      },
+      {
+        "name": "Crystal Forest",
+        "description": "Concentration of petrified logs along an easy trail."
+      },
+      {
+        "name": "Puerco Pueblo",
+        "description": "Ruins of an ancient pueblo with petroglyphs."
+      },
+      {
+        "name": "Agate Bridge",
+        "description": "Natural bridge formed by a petrified log spanning a wash."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Mesa Italiana Restaurant",
+        "description": "Popular Italian-American restaurant in Holbrook."
+      },
+      {
+        "name": "Butterfield Stage Co Steak House",
+        "description": "Steakhouse with rustic western d\u00e9cor in Holbrook."
+      },
+      {
+        "name": "Tom and Suzie\u2019s Diner",
+        "description": "Classic diner offering burgers, breakfasts, and pies."
+      },
+      {
+        "name": "Romo\u2019s Restaurant",
+        "description": "Mexican eatery known for generous portions and friendly service."
+      },
+      {
+        "name": "Subway (Holbrook)",
+        "description": "Quick sandwich option along the interstate."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Wigwam Motel",
+        "description": "Historic Route 66 motel with teepee-style rooms."
+      },
+      {
+        "name": "Brad\u2019s Desert Inn",
+        "description": "Affordable and charming inn in downtown Holbrook."
+      },
+      {
+        "name": "La Quinta Inn & Suites Holbrook",
+        "description": "Modern hotel with free breakfast and pool."
+      },
+      {
+        "name": "Sun Valley RV Resort",
+        "description": "Campground with full hookups near the park entrance."
+      },
+      {
+        "name": "OK RV Park",
+        "description": "Spacious RV sites and tent camping in Holbrook."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Petrified_Forest_wood.jpg"
+  },
+  {
+    "id": "45",
+    "name": "Pinnacles National Park",
+    "state": "California",
+    "coordinates": "36.48, -121.18",
+    "parkCode": "pinn",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Best time for wildflowers and moderate hiking weather.",
+      "summer": "June\u2013August: Hot temperatures; limited hiking recommended.",
+      "fall": "September\u2013October: Cooler with fewer crowds.",
+      "winter": "November\u2013February: Cold mornings; good for quiet visits and condor viewing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Bear Gulch Cave Trail",
+        "description": "Hike through talus caves with seasonal bat closures."
+      },
+      {
+        "name": "High Peaks Trail",
+        "description": "Scenic and challenging trail with steep rock stairways."
+      },
+      {
+        "name": "Condor Gulch Trail",
+        "description": "Great views and chances to see California condors."
+      },
+      {
+        "name": "Balconies Cliffs Trail",
+        "description": "Loop trail with dramatic rock formations and caves."
+      },
+      {
+        "name": "Chalone Peak",
+        "description": "Strenuous hike to the highest point in the park."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Running Rooster",
+        "description": "Popular chicken and burger spot in Hollister."
+      },
+      {
+        "name": "The Grove Restaurant",
+        "description": "American fare in Soledad near the park\u2019s west entrance."
+      },
+      {
+        "name": "La Fuente Restaurant",
+        "description": "Casual Mexican food in Hollister."
+      },
+      {
+        "name": "Eden Caf\u00e9",
+        "description": "Coffee, breakfast, and brunch near park gateway."
+      },
+      {
+        "name": "Windmill Market Deli",
+        "description": "Sandwiches and snacks ideal for to-go meals."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Pinnacles Campground",
+        "description": "The only campground inside the park, offering tent and RV sites."
+      },
+      {
+        "name": "Inn at the Pinnacles",
+        "description": "Luxury B&B near the park\u2019s west entrance."
+      },
+      {
+        "name": "Best Western Plus Salinas Valley Inn",
+        "description": "Hotel option with modern comforts in nearby Soledad."
+      },
+      {
+        "name": "Hacienda de Leal",
+        "description": "Upscale boutique hotel in San Juan Bautista."
+      },
+      {
+        "name": "San Benito RV & Camping Resort",
+        "description": "Family-friendly campground with amenities."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e4/Pinnacles_National_Park.jpg"
+  },
+  {
+    "id": "46",
+    "name": "Redwood National and State Parks",
+    "state": "California",
+    "coordinates": "41.30, -124.00",
+    "parkCode": "redw",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Lush greenery and blooming rhododendrons.",
+      "summer": "July\u2013August: Warmer temperatures and drier trails.",
+      "fall": "September\u2013October: Fewer crowds and golden foliage.",
+      "winter": "November\u2013March: Rainy season with fewer visitors."
+    },
+    "placesToVisit": [
+      {
+        "name": "Tall Trees Grove",
+        "description": "Home to some of the world's tallest trees; requires a permit to visit."
+      },
+      {
+        "name": "Fern Canyon",
+        "description": "A lush canyon with walls covered in ferns; featured in films like Jurassic Park."
+      },
+      {
+        "name": "Lady Bird Johnson Grove",
+        "description": "An easy loop trail through old-growth redwoods."
+      },
+      {
+        "name": "Prairie Creek Redwoods State Park",
+        "description": "Offers scenic drives and trails through dense redwood forests."
+      },
+      {
+        "name": "Gold Bluffs Beach",
+        "description": "Coastal area with camping and access to Fern Canyon."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Eureka Inn Palm Lounge",
+        "description": "Historic hotel with a classic American restaurant."
+      },
+      {
+        "name": "Samoa Cookhouse",
+        "description": "Last surviving lumber camp-style cookhouse in the West."
+      },
+      {
+        "name": "Trinidad Bay Eatery",
+        "description": "Seafood-focused menu with ocean views."
+      },
+      {
+        "name": "The Historic Requa Inn",
+        "description": "Offers dinner with local ingredients and river views."
+      },
+      {
+        "name": "Wildflower Caf\u00e9",
+        "description": "Cozy spot for breakfast and lunch in Arcata."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Elk Prairie Campground",
+        "description": "Located in Prairie Creek Redwoods State Park; frequent elk sightings."
+      },
+      {
+        "name": "Gold Bluffs Beach Campground",
+        "description": "Beachside camping with access to Fern Canyon."
+      },
+      {
+        "name": "Requa Inn",
+        "description": "Historic inn overlooking the Klamath River."
+      },
+      {
+        "name": "Holiday Inn Express Klamath",
+        "description": "Modern accommodations near the park."
+      },
+      {
+        "name": "Redwood Hostel",
+        "description": "Budget-friendly lodging option in the heart of the redwoods."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fb/Redwood_National_and_State_Parks_trail.jpg"
+  },
+  {
+    "id": "47",
+    "name": "Rocky Mountain National Park",
+    "state": "Colorado",
+    "coordinates": "40.35, -105.68",
+    "parkCode": "romo",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Snowmelt and blooming wildflowers.",
+      "summer": "July\u2013August: Warm temperatures and full trail access.",
+      "fall": "September\u2013October: Vibrant foliage and elk rutting season.",
+      "winter": "November\u2013March: Snow-covered landscapes ideal for snowshoeing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Trail Ridge Road",
+        "description": "Scenic drive reaching over 12,000 feet with panoramic views."
+      },
+      {
+        "name": "Bear Lake",
+        "description": "Popular spot with a loop trail and access to other hikes."
+      },
+      {
+        "name": "Alberta Falls",
+        "description": "Short hike to a picturesque waterfall."
+      },
+      {
+        "name": "Longs Peak",
+        "description": "Challenging 14er for experienced hikers."
+      },
+      {
+        "name": "Moraine Park",
+        "description": "Meadow area known for wildlife viewing, especially elk."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Bird & Jim",
+        "description": "Modern mountain dining with locally sourced ingredients."
+      },
+      {
+        "name": "The Rock Inn Mountain Tavern",
+        "description": "Rustic tavern offering hearty meals and live music."
+      },
+      {
+        "name": "Smokin' Dave's BBQ",
+        "description": "Popular spot for barbecue and comfort food."
+      },
+      {
+        "name": "Dunraven Inn",
+        "description": "Italian-American cuisine with a cozy atmosphere."
+      },
+      {
+        "name": "Kind Coffee",
+        "description": "Local coffee shop with organic brews and pastries."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "The Stanley Hotel",
+        "description": "Historic hotel known for its architecture and inspiration for 'The Shining.'"
+      },
+      {
+        "name": "Aspenglen Campground",
+        "description": "Located near the Fall River entrance; reservations required."
+      },
+      {
+        "name": "Glacier Basin Campground",
+        "description": "Family-friendly campground with shuttle access to trailheads."
+      },
+      {
+        "name": "YMCA of the Rockies",
+        "description": "Lodging and activities suitable for families and groups."
+      },
+      {
+        "name": "Estes Park KOA",
+        "description": "Campground with amenities close to town and the park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Rocky_Mountain_National_Park_Bear_Lake.jpg"
+  },
+  {
+    "id": "48",
+    "name": "Saguaro National Park",
+    "state": "Arizona",
+    "coordinates": "32.25, -110.50",
+    "parkCode": "sagu",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Cactus blooms and pleasant temperatures.",
+      "summer": "June\u2013August: Extremely hot; limited outdoor activities.",
+      "fall": "September\u2013November: Cooler temperatures and fewer crowds.",
+      "winter": "December\u2013February: Mild weather ideal for hiking."
+    },
+    "placesToVisit": [
+      {
+        "name": "Cactus Forest Drive",
+        "description": "Scenic loop with pullouts and trail access in the east district."
+      },
+      {
+        "name": "Signal Hill Petroglyphs",
+        "description": "Short hike to ancient rock carvings."
+      },
+      {
+        "name": "Valley View Overlook Trail",
+        "description": "Easy trail with panoramic desert views."
+      },
+      {
+        "name": "Rincon Mountain District",
+        "description": "Offers backcountry hiking and diverse flora."
+      },
+      {
+        "name": "Desert Discovery Trail",
+        "description": "Accessible trail with interpretive signs about desert ecology."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "El Charro Caf\u00e9",
+        "description": "Historic Mexican restaurant in Tucson."
+      },
+      {
+        "name": "Beyond Bread",
+        "description": "Bakery and caf\u00e9 known for sandwiches and pastries."
+      },
+      {
+        "name": "The Coronet",
+        "description": "European-style bistro with seasonal menus."
+      },
+      {
+        "name": "Seis Kitchen",
+        "description": "Modern Mexican eatery with a focus on regional dishes."
+      },
+      {
+        "name": "Cup Caf\u00e9",
+        "description": "Eclectic menu located in the historic Hotel Congress."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "JW Marriott Tucson Starr Pass Resort",
+        "description": "Luxury resort with desert views and golf course."
+      },
+      {
+        "name": "Saguaro National Park Backcountry Camping",
+        "description": "Permit-required camping in designated wilderness areas."
+      },
+      {
+        "name": "Catalina State Park Campground",
+        "description": "Campground with amenities north of Tucson."
+      },
+      {
+        "name": "Hotel McCoy",
+        "description": "Retro-style hotel with local art and wine bar."
+      },
+      {
+        "name": "Tucson/Lazydays KOA",
+        "description": "RV resort with pools and full hookups."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Saguaro_National_Park.jpg"
+  },
+  {
+    "id": "49",
+    "name": "Sequoia National Park",
+    "state": "California",
+    "coordinates": "36.4864, -118.5658",
+    "parkCode": "seki",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Wildflowers bloom in lower elevations; higher elevations may still have snow.",
+      "summer": "June\u2013August: Warm weather and full access to park areas.",
+      "fall": "September\u2013October: Cooler temperatures and fewer crowds.",
+      "winter": "November\u2013March: Snow covers higher elevations; some areas may be inaccessible."
+    },
+    "placesToVisit": [
+      {
+        "name": "General Sherman Tree",
+        "description": "The largest tree on Earth by volume, located in the Giant Forest."
+      },
+      {
+        "name": "Moro Rock",
+        "description": "A granite dome offering panoramic views after a steep stair climb."
+      },
+      {
+        "name": "Crystal Cave",
+        "description": "A marble cave with guided tours showcasing stalactites and stalagmites."
+      },
+      {
+        "name": "Tunnel Log",
+        "description": "A fallen sequoia tree with a tunnel cut through it, allowing cars to drive through."
+      },
+      {
+        "name": "Crescent Meadow",
+        "description": "A picturesque meadow surrounded by giant sequoias, ideal for hiking and picnicking."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Peaks Restaurant",
+        "description": "Located in Wuksachi Lodge, offering mountain views and a diverse menu."
+      },
+      {
+        "name": "Lodgepole Market & Grill",
+        "description": "Casual dining with sandwiches, snacks, and groceries."
+      },
+      {
+        "name": "Grant Grove Restaurant",
+        "description": "Seasonal restaurant serving American cuisine near the Grant Grove area."
+      },
+      {
+        "name": "Sierra Subs and Salads",
+        "description": "Popular spot in Three Rivers for fresh sandwiches and salads."
+      },
+      {
+        "name": "Gateway Restaurant & Lodge",
+        "description": "Dining with scenic river views, offering steaks and seafood."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Wuksachi Lodge",
+        "description": "Year-round lodge with modern amenities located within the park."
+      },
+      {
+        "name": "Lodgepole Campground",
+        "description": "Large campground near the Giant Forest, open seasonally."
+      },
+      {
+        "name": "Dorst Creek Campground",
+        "description": "Family-friendly campground with shuttle access to major attractions."
+      },
+      {
+        "name": "Montecito Sequoia Lodge",
+        "description": "All-inclusive lodge offering meals and activities, located between Sequoia and Kings Canyon."
+      },
+      {
+        "name": "Stony Creek Lodge",
+        "description": "Rustic lodge with a restaurant, situated between the two parks."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/06/General_Sherman_Tree.jpg"
+  },
+  {
+    "id": "50",
+    "name": "Shenandoah National Park",
+    "state": "Virginia",
+    "coordinates": "38.53, -78.35",
+    "parkCode": "shen",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Wildflowers and waterfalls at their peak.",
+      "summer": "July\u2013August: Warm with lush greenery, popular hiking season.",
+      "fall": "September\u2013November: Stunning foliage and crisp air.",
+      "winter": "December\u2013March: Quiet and snowy with limited access."
+    },
+    "placesToVisit": [
+      {
+        "name": "Skyline Drive",
+        "description": "Scenic 105-mile road offering incredible mountain views."
+      },
+      {
+        "name": "Old Rag Mountain",
+        "description": "Challenging hike with rock scrambles and sweeping vistas."
+      },
+      {
+        "name": "Dark Hollow Falls",
+        "description": "Short hike to a picturesque waterfall."
+      },
+      {
+        "name": "Big Meadows",
+        "description": "Great spot for wildlife viewing and picnics."
+      },
+      {
+        "name": "Stony Man Trail",
+        "description": "Easy hike with panoramic views of Shenandoah Valley."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Big Meadows Lodge Dining Room",
+        "description": "Rustic setting offering local fare and views."
+      },
+      {
+        "name": "Skyland Restaurant",
+        "description": "Seasonal dishes with mountain vistas."
+      },
+      {
+        "name": "Pollock Dining Room",
+        "description": "Casual meals inside Skyland Lodge."
+      },
+      {
+        "name": "Hawksbill Diner",
+        "description": "Small-town diner with hearty breakfast options."
+      },
+      {
+        "name": "Gathering Grounds Caf\u00e9",
+        "description": "Coffee and light meals in Luray."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Big Meadows Lodge",
+        "description": "Charming lodge along Skyline Drive with hiking access."
+      },
+      {
+        "name": "Skyland Resort",
+        "description": "Largest lodge in the park, ideal for exploring the central district."
+      },
+      {
+        "name": "Lewis Mountain Cabins",
+        "description": "Historic cabins with a rustic feel."
+      },
+      {
+        "name": "Mathews Arm Campground",
+        "description": "Northernmost campground with family-friendly amenities."
+      },
+      {
+        "name": "Loft Mountain Campground",
+        "description": "Spacious sites and excellent sunset views."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Shenandoah_National_Park_in_the_fall.jpg"
+  },
+  {
+    "id": "51",
+    "name": "Theodore Roosevelt National Park",
+    "state": "North Dakota",
+    "coordinates": "46.97, -103.45",
+    "parkCode": "thro",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Mild temps and blooming wildflowers.",
+      "summer": "June\u2013August: Warm with wildlife activity, but hot midday.",
+      "fall": "September\u2013October: Cooler and colorful foliage.",
+      "winter": "November\u2013March: Cold and snowy; scenic with solitude."
+    },
+    "placesToVisit": [
+      {
+        "name": "Painted Canyon",
+        "description": "Overlook with stunning views of the badlands."
+      },
+      {
+        "name": "South Unit Scenic Drive",
+        "description": "Loop with overlooks, prairie dogs, and bison sightings."
+      },
+      {
+        "name": "Medora",
+        "description": "Gateway town with dining, shopping, and history."
+      },
+      {
+        "name": "Elkhorn Ranch Site",
+        "description": "Remote site where Roosevelt\u2019s ranch once stood."
+      },
+      {
+        "name": "Wind Canyon Trail",
+        "description": "Easy hike to canyon and river vistas."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Little Missouri Saloon",
+        "description": "Rustic eatery serving burgers and steaks in Medora."
+      },
+      {
+        "name": "Boots Bar & Grill",
+        "description": "Casual bar with hearty American food."
+      },
+      {
+        "name": "The Farmhouse Caf\u00e9",
+        "description": "Cozy spot with coffee and homemade meals."
+      },
+      {
+        "name": "Badlands Pizza & Saloon",
+        "description": "Laid-back pizza joint in Medora."
+      },
+      {
+        "name": "Cowboy Caf\u00e9",
+        "description": "Quick breakfast and lunch spot near park entrance."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Rough Riders Hotel",
+        "description": "Historic and elegant hotel in Medora."
+      },
+      {
+        "name": "Amble Inn",
+        "description": "Budget-friendly stay in town."
+      },
+      {
+        "name": "Cottonwood Campground",
+        "description": "Main park campground in the South Unit."
+      },
+      {
+        "name": "Juniper Campground",
+        "description": "Northern Unit site for quiet stays."
+      },
+      {
+        "name": "Red Trail Campground",
+        "description": "RV park with full hookups near Medora."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Theodore_Roosevelt_National_Park.jpg"
+  },
+  {
+    "id": "52",
+    "name": "Virgin Islands National Park",
+    "state": "U.S. Virgin Islands",
+    "coordinates": "18.34, -64.73",
+    "parkCode": "viis",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Less crowded, calm seas.",
+      "summer": "July\u2013September: Hot and humid; chance of storms.",
+      "fall": "October\u2013November: Hurricane season wanes.",
+      "winter": "December\u2013March: Peak season with perfect weather."
+    },
+    "placesToVisit": [
+      {
+        "name": "Trunk Bay",
+        "description": "One of the most beautiful beaches in the world with an underwater snorkeling trail."
+      },
+      {
+        "name": "Cinnamon Bay",
+        "description": "Beach and ruins with water sports rentals."
+      },
+      {
+        "name": "Reef Bay Trail",
+        "description": "Hike through rainforest to petroglyphs and waterfalls."
+      },
+      {
+        "name": "Annaberg Plantation",
+        "description": "Historic sugar mill ruins with cultural exhibits."
+      },
+      {
+        "name": "Honeymoon Beach",
+        "description": "Quiet cove accessible by hike or water taxi."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Longboard",
+        "description": "Island-style eats and cocktails in Cruz Bay."
+      },
+      {
+        "name": "High Tide Bar & Seafood Grill",
+        "description": "Beachfront dining with seafood and American fare."
+      },
+      {
+        "name": "Morgan\u2019s Mango",
+        "description": "Upscale Caribbean-Latin cuisine."
+      },
+      {
+        "name": "Joe\u2019s Rum Hut",
+        "description": "Relaxed spot with drinks and comfort food."
+      },
+      {
+        "name": "North Shore Deli",
+        "description": "Great for beach picnic sandwiches and smoothies."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Cruz Bay Boutique Hotel",
+        "description": "Chic, central hotel with easy access to ferry and shops."
+      },
+      {
+        "name": "Estate Lindholm",
+        "description": "Romantic hilltop B&B overlooking the bay."
+      },
+      {
+        "name": "Cinnamon Bay Campground",
+        "description": "Beachside camping and eco-tents."
+      },
+      {
+        "name": "Gallows Point Resort",
+        "description": "Luxury condos on the waterfront."
+      },
+      {
+        "name": "The Westin St. John Resort Villas",
+        "description": "Upscale family resort with full amenities."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Virgin_Islands_National_Park_St_John.jpg"
+  },
+  {
+    "id": "53",
+    "name": "Voyageurs National Park",
+    "state": "Minnesota",
+    "coordinates": "48.48, -92.88",
+    "parkCode": "voya",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Ice-out and blooming wildflowers.",
+      "summer": "July\u2013August: Warm weather ideal for boating and fishing.",
+      "fall": "September\u2013October: Fall colors and fewer bugs.",
+      "winter": "November\u2013April: Snowmobiling and ice fishing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Kabetogama Lake",
+        "description": "Large lake perfect for boating, fishing, and wildlife viewing."
+      },
+      {
+        "name": "Ash River Visitor Center",
+        "description": "Interpretive center with park info and exhibits."
+      },
+      {
+        "name": "Ellsworth Rock Gardens",
+        "description": "Historic site with hand-built stone sculptures."
+      },
+      {
+        "name": "Rainy Lake",
+        "description": "Scenic area for houseboats and island hopping."
+      },
+      {
+        "name": "Anderson Bay",
+        "description": "Backcountry area for paddling and camping."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Log Cabin",
+        "description": "Comfort food with lake views in International Falls."
+      },
+      {
+        "name": "Loony\u2019s Brew",
+        "description": "Brewpub with creative bar food in Ranier."
+      },
+      {
+        "name": "Sha Sha Resort Bar",
+        "description": "Lakefront bar and grill accessible by boat."
+      },
+      {
+        "name": "Voyagaire Lodge & Restaurant",
+        "description": "Hearty meals with houseboat services."
+      },
+      {
+        "name": "Rocky Ledge",
+        "description": "Casual dining and pizza in Kabetogama."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Voyagaire Lodge",
+        "description": "Full-service lodge with boat rentals and dining."
+      },
+      {
+        "name": "Northern Lights Resort",
+        "description": "Cabins and RV sites on Lake Kabetogama."
+      },
+      {
+        "name": "Island View Lodge",
+        "description": "Rustic accommodations with access to Rainy Lake."
+      },
+      {
+        "name": "Houseboat Rentals",
+        "description": "Unique stay on the water, very popular in summer."
+      },
+      {
+        "name": "Kabetogama State Forest Campgrounds",
+        "description": "Basic sites near the park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Voyageurs_National_Park_boating.jpg"
+  },
+  {
+    "id": "54",
+    "name": "White Sands National Park",
+    "state": "New Mexico",
+    "coordinates": "32.78, -106.17",
+    "parkCode": "whsa",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Mild temps, blooming yuccas.",
+      "summer": "June\u2013August: Hot with early morning or sunset visits advised.",
+      "fall": "September\u2013November: Ideal weather with fewer crowds.",
+      "winter": "December\u2013February: Cold nights but great for photography."
+    },
+    "placesToVisit": [
+      {
+        "name": "Dunes Drive",
+        "description": "8-mile scenic road into the heart of the white gypsum dunes."
+      },
+      {
+        "name": "Interdune Boardwalk",
+        "description": "Easy walk with views and educational signs."
+      },
+      {
+        "name": "Alkali Flat Trail",
+        "description": "Strenuous 5-mile loop through the largest dunes."
+      },
+      {
+        "name": "Playa Trail",
+        "description": "Short trail showcasing ephemeral desert lakes."
+      },
+      {
+        "name": "Sunset Stroll",
+        "description": "Ranger-guided walk during golden hour."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Si Senor Restaurant",
+        "description": "Classic New Mexican food in Alamogordo."
+      },
+      {
+        "name": "Hi-D-Ho Drive In",
+        "description": "Famous for green chile cheeseburgers."
+      },
+      {
+        "name": "The 19th Hole Grill",
+        "description": "Relaxed dining with golf course views."
+      },
+      {
+        "name": "Rizo\u2019s Restaurant",
+        "description": "Mexican and American menu with family-friendly atmosphere."
+      },
+      {
+        "name": "Waffle & Pancake Shoppe",
+        "description": "Popular breakfast and brunch joint."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Fairfield Inn & Suites Alamogordo",
+        "description": "Modern hotel with free breakfast."
+      },
+      {
+        "name": "White Sands Motel",
+        "description": "Charming, locally-owned with desert views."
+      },
+      {
+        "name": "Hampton Inn Alamogordo",
+        "description": "Trusted chain hotel with amenities."
+      },
+      {
+        "name": "Oliver Lee State Park Campground",
+        "description": "Nearby state park with desert hiking and camping."
+      },
+      {
+        "name": "KOA Alamogordo",
+        "description": "RV sites and tent camping near the park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c8/White_Sands_National_Park_dunes.jpg"
+  },
+  {
+    "id": "55",
+    "name": "Wind Cave National Park",
+    "state": "South Dakota",
+    "coordinates": "43.57, -103.48",
+    "parkCode": "wica",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013May: Green prairies and active wildlife.",
+      "summer": "June\u2013August: Warm weather and full access to cave tours.",
+      "fall": "September\u2013October: Crisp weather and fall colors.",
+      "winter": "November\u2013March: Quiet season with limited facilities."
+    },
+    "placesToVisit": [
+      {
+        "name": "Wind Cave",
+        "description": "One of the world\u2019s longest caves, famous for boxwork formations."
+      },
+      {
+        "name": "Rankin Ridge Trail",
+        "description": "Short hike with panoramic views and a fire lookout."
+      },
+      {
+        "name": "Elk Mountain Campground",
+        "description": "Peaceful camping and stargazing site."
+      },
+      {
+        "name": "Prairie Dog Town",
+        "description": "Watch prairie dogs in their natural habitat."
+      },
+      {
+        "name": "Cold Brook Canyon Trail",
+        "description": "Trail with great chances to see bison and elk."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Buffalo Dreamer",
+        "description": "Contemporary Native American cuisine in Hot Springs."
+      },
+      {
+        "name": "Woolly's Grill and Cellar",
+        "description": "Steaks and local brews in Hot Springs."
+      },
+      {
+        "name": "Big Time Pizza",
+        "description": "Hearty pizzas and casual dining."
+      },
+      {
+        "name": "Coffee Cup Fuel Stop",
+        "description": "Quick eats and snacks along the highway."
+      },
+      {
+        "name": "Mornin' Sunshine Caf\u00e9",
+        "description": "Breakfast and bakery favorites."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Elk Mountain Campground",
+        "description": "Quiet in-park camping with wildlife around."
+      },
+      {
+        "name": "Red Rock River Resort",
+        "description": "Historic hotel with spa in Hot Springs."
+      },
+      {
+        "name": "Stay USA Hotel and Suites",
+        "description": "Budget-friendly hotel with indoor pool."
+      },
+      {
+        "name": "Hills Inn",
+        "description": "Affordable, clean motel near park attractions."
+      },
+      {
+        "name": "KOA Hot Springs",
+        "description": "Full-service RV and tent campground."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Wind_Cave_Entrance.jpg"
+  },
+  {
+    "id": "56",
+    "name": "Wrangell\u2013St. Elias National Park",
+    "state": "Alaska",
+    "coordinates": "61.71, -142.99",
+    "parkCode": "wrst",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Snowmelt begins; limited access.",
+      "summer": "July\u2013August: Best time for exploring glaciers, rivers, and historic mines.",
+      "fall": "September: Crisp air and early snow at higher elevations.",
+      "winter": "October\u2013April: Extremely cold; difficult travel and closures."
+    },
+    "placesToVisit": [
+      {
+        "name": "Kennecott Mines",
+        "description": "Historic copper mining town preserved within the park."
+      },
+      {
+        "name": "Root Glacier",
+        "description": "Easily accessible glacier for guided hikes."
+      },
+      {
+        "name": "McCarthy",
+        "description": "Rustic town offering access to hiking, rafting, and scenic flights."
+      },
+      {
+        "name": "Nabesna Road",
+        "description": "Remote scenic drive with wildlife and trails."
+      },
+      {
+        "name": "Skookum Volcano Trail",
+        "description": "Trail through an ancient volcanic landscape."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Potato",
+        "description": "Popular eatery in McCarthy serving burritos and baked goods."
+      },
+      {
+        "name": "Meatza Wagon",
+        "description": "Food truck near Kennecott offering pizza and wraps."
+      },
+      {
+        "name": "Roadside Potatohead",
+        "description": "Laid-back spot with hearty portions in McCarthy."
+      },
+      {
+        "name": "McCarthy Lodge Bistro",
+        "description": "Rustic fine dining experience with Alaskan fare."
+      },
+      {
+        "name": "Golden Saloon",
+        "description": "Lively bar and grill with evening events."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Kennecott Glacier Lodge",
+        "description": "Scenic lodge near the historic mill town."
+      },
+      {
+        "name": "Ma Johnson\u2019s Hotel",
+        "description": "Eclectic boutique hotel in McCarthy."
+      },
+      {
+        "name": "Wrangell Mountain Air B&B",
+        "description": "Comfortable lodging with mountain views."
+      },
+      {
+        "name": "Base Camp Kennicott",
+        "description": "Affordable cabins and camping."
+      },
+      {
+        "name": "Glacier View Campground",
+        "description": "Basic sites near the park entrance."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Wrangell_St_Elias_Mountains.jpg"
+  },
+  {
+    "id": "57",
+    "name": "Yellowstone National Park",
+    "state": "Wyoming, Montana, Idaho",
+    "coordinates": "44.6, -110.5",
+    "parkCode": "yell",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Wildlife viewing, waterfalls at peak flow.",
+      "summer": "July\u2013August: Full access and ranger programs.",
+      "fall": "September\u2013October: Fewer crowds and autumn colors.",
+      "winter": "November\u2013March: Snow-covered landscapes and winter activities."
+    },
+    "placesToVisit": [
+      {
+        "name": "Old Faithful",
+        "description": "Iconic geyser that erupts regularly."
+      },
+      {
+        "name": "Grand Prismatic Spring",
+        "description": "Colorful hot spring seen best from overlook."
+      },
+      {
+        "name": "Lamar Valley",
+        "description": "Prime spot for wildlife watching."
+      },
+      {
+        "name": "Yellowstone Lake",
+        "description": "Largest high-elevation lake in North America."
+      },
+      {
+        "name": "Grand Canyon of the Yellowstone",
+        "description": "Waterfalls and colorful canyon walls."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Old Faithful Inn Dining Room",
+        "description": "Rustic dining near the geyser."
+      },
+      {
+        "name": "Lake Hotel Dining Room",
+        "description": "Historic hotel dining with scenic views."
+      },
+      {
+        "name": "Canyon Lodge Eatery",
+        "description": "Casual meals near the canyon area."
+      },
+      {
+        "name": "Roosevelt Lodge Dining Room",
+        "description": "Western-style cuisine near Lamar Valley."
+      },
+      {
+        "name": "Mammoth Hot Springs Dining Room",
+        "description": "Comfort food in a historic setting."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Old Faithful Inn",
+        "description": "Famous log structure near the geyser."
+      },
+      {
+        "name": "Lake Yellowstone Hotel",
+        "description": "Yellow-painted colonial revival hotel."
+      },
+      {
+        "name": "Grant Village Campground",
+        "description": "Large campground near West Thumb Geyser Basin."
+      },
+      {
+        "name": "Mammoth Campground",
+        "description": "Open year-round near Mammoth Hot Springs."
+      },
+      {
+        "name": "Canyon Lodge",
+        "description": "Modern rooms and cabins in central Yellowstone."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Grand_Prismatic_Spring_and_Excelsior_Geyser.jpg"
+  },
+  {
+    "id": "58",
+    "name": "Yosemite National Park",
+    "state": "California",
+    "coordinates": "37.8651, -119.5383",
+    "parkCode": "yose",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Best waterfalls and fewer crowds.",
+      "summer": "July\u2013August: Warm weather, busy season.",
+      "fall": "September\u2013October: Colorful foliage and cooler hikes.",
+      "winter": "November\u2013March: Snow in the valley, skiing at Badger Pass."
+    },
+    "placesToVisit": [
+      {
+        "name": "Yosemite Valley",
+        "description": "Iconic views of El Capitan and Half Dome."
+      },
+      {
+        "name": "Glacier Point",
+        "description": "Overlook with sweeping views of Yosemite Valley."
+      },
+      {
+        "name": "Mariposa Grove",
+        "description": "Home to hundreds of ancient giant sequoias."
+      },
+      {
+        "name": "Tunnel View",
+        "description": "Famous viewpoint at park entrance."
+      },
+      {
+        "name": "Vernal Fall",
+        "description": "Hike up the Mist Trail for stunning views."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Degnan\u2019s Kitchen",
+        "description": "Quick-service deli in Yosemite Village."
+      },
+      {
+        "name": "The Mountain Room",
+        "description": "Sit-down dining with views of Yosemite Falls."
+      },
+      {
+        "name": "Base Camp Eatery",
+        "description": "Variety of international cuisines."
+      },
+      {
+        "name": "Curry Village Pavilion",
+        "description": "Buffet-style meals near tent cabins."
+      },
+      {
+        "name": "Ahwahnee Dining Room",
+        "description": "Fine dining in a historic lodge."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Ahwahnee Hotel",
+        "description": "Luxury lodging inside the valley."
+      },
+      {
+        "name": "Yosemite Valley Lodge",
+        "description": "Family-friendly and close to Yosemite Falls."
+      },
+      {
+        "name": "Curry Village",
+        "description": "Canvas tent cabins and cabins with baths."
+      },
+      {
+        "name": "North Pines Campground",
+        "description": "Popular campground with river access."
+      },
+      {
+        "name": "Wawona Hotel",
+        "description": "Victorian-era charm near Mariposa Grove."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Yosemite_Valley_from_Tunnel_View.jpg"
+  },
+  {
+    "id": "59",
+    "name": "Zion National Park",
+    "state": "Utah",
+    "coordinates": "37.30, -113.05",
+    "parkCode": "zion",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Blooming wildflowers and ideal hiking weather.",
+      "summer": "June\u2013August: Hot days; early morning hikes recommended.",
+      "fall": "September\u2013October: Perfect temperatures and fall foliage.",
+      "winter": "November\u2013February: Quiet season with potential snow."
+    },
+    "placesToVisit": [
+      {
+        "name": "Angels Landing",
+        "description": "Thrilling hike with chains and incredible views."
+      },
+      {
+        "name": "The Narrows",
+        "description": "Hike through the Virgin River in a slot canyon."
+      },
+      {
+        "name": "Zion Canyon Scenic Drive",
+        "description": "Shuttle-access route through the park\u2019s highlights."
+      },
+      {
+        "name": "Emerald Pools",
+        "description": "Trails leading to waterfalls and scenic pools."
+      },
+      {
+        "name": "Kolob Canyons",
+        "description": "Less crowded area with stunning red cliffs."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Zion Canyon Brew Pub",
+        "description": "Burgers and brews at the park\u2019s edge."
+      },
+      {
+        "name": "Spotted Dog Caf\u00e9",
+        "description": "Upscale bistro in Springdale."
+      },
+      {
+        "name": "Oscar\u2019s Caf\u00e9",
+        "description": "Hearty breakfasts and burritos."
+      },
+      {
+        "name": "Cafe Soleil",
+        "description": "Organic coffee and sandwiches near park entrance."
+      },
+      {
+        "name": "Bit & Spur Restaurant & Saloon",
+        "description": "Southwestern cuisine and cocktails."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Zion Lodge",
+        "description": "Only lodging within the park, with cabins and hotel rooms."
+      },
+      {
+        "name": "Watchman Campground",
+        "description": "Popular NPS campground with scenic views."
+      },
+      {
+        "name": "South Campground",
+        "description": "Tent and RV sites near park shuttle stop."
+      },
+      {
+        "name": "Cliffrose Springdale",
+        "description": "Upscale resort steps from the park."
+      },
+      {
+        "name": "Cable Mountain Lodge",
+        "description": "Lodge with mountain views and easy access to Zion."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e8/Zion_Canyon.jpg"
+  },
+  {
+    "id": "60",
+    "name": "National Park of American Samoa",
+    "state": "American Samoa",
+    "coordinates": "-14.25, -170.68",
+    "parkCode": "npsa",
+    "bestSeason": "Dry Season",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Start of the dry season; good weather.",
+      "summer": "July\u2013September: Best weather for hiking and snorkeling.",
+      "fall": "October\u2013November: Warmer, start of wet season.",
+      "winter": "December\u2013March: Rainy season with storms."
+    },
+    "placesToVisit": [
+      {
+        "name": "Pago Pago Harbor",
+        "description": "Scenic harbor near park headquarters."
+      },
+      {
+        "name": "Ofu Beach",
+        "description": "Remote, white-sand beach with coral reefs."
+      },
+      {
+        "name": "Mount Alava Trail",
+        "description": "Hike through tropical rainforest with ocean views."
+      },
+      {
+        "name": "Vatia Village",
+        "description": "Traditional Samoan village near key trails."
+      },
+      {
+        "name": "Pola Island",
+        "description": "Iconic sea stack and seabird nesting site."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Sadie\u2019s by the Sea",
+        "description": "Waterfront restaurant with local seafood."
+      },
+      {
+        "name": "McDonald\u2019s American Samoa",
+        "description": "Familiar fast food option."
+      },
+      {
+        "name": "Tisa\u2019s Barefoot Bar",
+        "description": "Rustic beach bar with Samoan dishes."
+      },
+      {
+        "name": "Kenny\u2019s Restaurant",
+        "description": "Local favorite for comfort food."
+      },
+      {
+        "name": "Double Z\u2019s BBQ",
+        "description": "Barbecue spot with island-style meats."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Sadie\u2019s by the Sea",
+        "description": "Beachfront hotel with island views."
+      },
+      {
+        "name": "Tradewinds Hotel",
+        "description": "Modern hotel near airport."
+      },
+      {
+        "name": "Reid\u2019s Hotel",
+        "description": "Affordable local accommodation."
+      },
+      {
+        "name": "Tisa\u2019s Barefoot Eco-Lodge",
+        "description": "Rustic beach lodging near Pola Island."
+      },
+      {
+        "name": "Vaoto Lodge",
+        "description": "Only lodge on Ofu Island, near reef sanctuary."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cf/National_Park_of_American_Samoa_Tutuila.jpg"
+  },
+  {
+    "id": "61",
+    "name": "New River Gorge National Park",
+    "state": "West Virginia",
+    "coordinates": "38.07, -81.08",
+    "parkCode": "neri",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Best for whitewater rafting and wildflowers.",
+      "summer": "July\u2013August: Warm and great for hiking and climbing.",
+      "fall": "September\u2013October: Peak leaf colors and pleasant temps.",
+      "winter": "November\u2013March: Quiet season for scenic drives and frosty trails."
+    },
+    "placesToVisit": [
+      {
+        "name": "New River Gorge Bridge",
+        "description": "Iconic steel arch bridge offering incredible views."
+      },
+      {
+        "name": "Endless Wall Trail",
+        "description": "Clifftop hike with stunning gorge overlooks."
+      },
+      {
+        "name": "Grandview",
+        "description": "Dramatic overlook and picnic area."
+      },
+      {
+        "name": "Thurmond Historic District",
+        "description": "Preserved railroad town."
+      },
+      {
+        "name": "Long Point Trail",
+        "description": "Moderate trail with views of the bridge."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Cathedral Caf\u00e9",
+        "description": "Coffeehouse in a repurposed church."
+      },
+      {
+        "name": "Pies & Pints",
+        "description": "Craft pizza and local beers."
+      },
+      {
+        "name": "Secret Sandwich Society",
+        "description": "Creative sandwiches and patio dining."
+      },
+      {
+        "name": "Arrowhead Bike Farm",
+        "description": "Taproom and campground with light bites."
+      },
+      {
+        "name": "The Station",
+        "description": "Upscale American fare in Fayetteville."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Adventures on the Gorge",
+        "description": "Resort with cabins and outdoor activities."
+      },
+      {
+        "name": "Quality Inn New River Gorge",
+        "description": "Comfortable rooms near the park."
+      },
+      {
+        "name": "ACE Adventure Resort",
+        "description": "Full-service lodging with ziplining and rafting."
+      },
+      {
+        "name": "River Expeditions",
+        "description": "Camping, cabins, and whitewater trips."
+      },
+      {
+        "name": "New River Gorge Campground",
+        "description": "NPS-managed primitive campsites."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/New_River_Gorge_Bridge_in_Autumn.jpg"
+  },
+  {
+    "id": "62",
+    "name": "Gateway Arch National Park",
+    "state": "Missouri",
+    "coordinates": "38.6247, -90.1848",
+    "parkCode": "jeff",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Pleasant temperatures and blooming flowers.",
+      "summer": "June\u2013August: Popular time with events and warm weather.",
+      "fall": "September\u2013October: Mild weather and fewer crowds.",
+      "winter": "November\u2013February: Cold, but fewer visitors."
+    },
+    "placesToVisit": [
+      {
+        "name": "Gateway Arch",
+        "description": "Iconic 630-foot monument symbolizing westward expansion."
+      },
+      {
+        "name": "Museum at the Gateway Arch",
+        "description": "Exhibits on American history and exploration."
+      },
+      {
+        "name": "Old Courthouse",
+        "description": "Historic building where the Dred Scott case was heard."
+      },
+      {
+        "name": "Riverfront Trail",
+        "description": "Walking path along the Mississippi River."
+      },
+      {
+        "name": "Tram Ride to the Top",
+        "description": "Unique experience inside the arch with sweeping views."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Sugarfire Smoke House",
+        "description": "Popular BBQ joint with creative sides."
+      },
+      {
+        "name": "Ballpark Village",
+        "description": "Dining and entertainment near Busch Stadium."
+      },
+      {
+        "name": "Pappy\u2019s Smokehouse",
+        "description": "Famous for ribs and Southern hospitality."
+      },
+      {
+        "name": "Salt + Smoke",
+        "description": "Modern BBQ with bourbon and sides."
+      },
+      {
+        "name": "Lombardo\u2019s Trattoria",
+        "description": "Italian classics near Union Station."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Hyatt Regency St. Louis at The Arch",
+        "description": "Upscale hotel with views of the Gateway Arch."
+      },
+      {
+        "name": "Drury Plaza Hotel St. Louis",
+        "description": "Comfortable stay with free breakfast and cocktails."
+      },
+      {
+        "name": "Hilton St. Louis at the Ballpark",
+        "description": "Modern hotel close to downtown attractions."
+      },
+      {
+        "name": "Four Seasons Hotel St. Louis",
+        "description": "Luxury option with rooftop pool and spa."
+      },
+      {
+        "name": "St. Louis RV Park",
+        "description": "Urban camping close to downtown."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Gateway_Arch_St_Louis.jpg"
+  },
+  {
+    "id": "63",
+    "name": "Katmai National Park",
+    "state": "Alaska",
+    "coordinates": "58.5, -155.0",
+    "parkCode": "katm",
+    "bestSeason": "Summer",
+    "bestTimeToVisit": {
+      "spring": "May\u2013June: Bears begin emerging and flowers bloom.",
+      "summer": "July\u2013August: Best time for bear viewing at Brooks Falls.",
+      "fall": "September: Quieter with fall foliage and wildlife sightings.",
+      "winter": "October\u2013April: Cold, remote, and limited access."
+    },
+    "placesToVisit": [
+      {
+        "name": "Brooks Falls",
+        "description": "Famous for brown bears catching salmon."
+      },
+      {
+        "name": "Valley of Ten Thousand Smokes",
+        "description": "Volcanic valley formed by 1912 eruption."
+      },
+      {
+        "name": "Naknek Lake",
+        "description": "Popular spot for fishing and boating."
+      },
+      {
+        "name": "Dumpling Mountain",
+        "description": "Scenic hike with views over lakes and tundra."
+      },
+      {
+        "name": "Brooks Camp",
+        "description": "Center for bear viewing and access to trails."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Brooks Lodge Dining",
+        "description": "Buffet-style meals near bear viewing platforms."
+      },
+      {
+        "name": "Bring Your Own Provisions",
+        "description": "Limited food services; plan ahead."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Brooks Lodge",
+        "description": "Rustic lodge near bear viewing."
+      },
+      {
+        "name": "Katmai Wilderness Lodge",
+        "description": "All-inclusive lodge with guided tours."
+      },
+      {
+        "name": "King Salmon Lodge",
+        "description": "Gateway town lodging with excursions."
+      },
+      {
+        "name": "Brooks Camp Campground",
+        "description": "NPS-managed campground near falls."
+      },
+      {
+        "name": "Bear Trail Cabins",
+        "description": "Simple cabins near King Salmon."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b6/Brown_bear_at_Brooks_Falls_in_Katmai_National_Park.jpg"
+  },
+  {
+    "id": "64",
+    "name": "Joshua Tree National Park",
+    "state": "California",
+    "coordinates": "33.8734, -115.9010",
+    "parkCode": "jotr",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Blooming wildflowers and pleasant temps.",
+      "summer": "June\u2013August: Very hot, limited hiking midday.",
+      "fall": "September\u2013October: Cooler evenings and scenic views.",
+      "winter": "November\u2013February: Cold nights but great stargazing."
+    },
+    "placesToVisit": [
+      {
+        "name": "Hidden Valley",
+        "description": "Rock formations and short interpretive trail."
+      },
+      {
+        "name": "Keys View",
+        "description": "Overlook of Coachella Valley."
+      },
+      {
+        "name": "Cholla Cactus Garden",
+        "description": "Dense cactus patch glowing at sunrise."
+      },
+      {
+        "name": "Barker Dam",
+        "description": "Historic dam and easy loop trail."
+      },
+      {
+        "name": "Skull Rock",
+        "description": "Popular roadside stop and nature trail."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Crossroads Caf\u00e9",
+        "description": "Casual American breakfast and lunch."
+      },
+      {
+        "name": "Joshua Tree Coffee Company",
+        "description": "Specialty coffee roasters."
+      },
+      {
+        "name": "Pappy & Harriet\u2019s",
+        "description": "Live music and BBQ in nearby Pioneertown."
+      },
+      {
+        "name": "Royal Siam Cuisine Thai Restaurant",
+        "description": "Thai food in Twentynine Palms."
+      },
+      {
+        "name": "Pie for the People",
+        "description": "New York-style pizza near park entrance."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Joshua Tree Inn",
+        "description": "Quaint motel with musical history."
+      },
+      {
+        "name": "AutoCamp Joshua Tree",
+        "description": "Luxury airstream lodging."
+      },
+      {
+        "name": "Hidden Valley Campground",
+        "description": "First-come campground near climbing spots."
+      },
+      {
+        "name": "Black Rock Campground",
+        "description": "RV and tent sites with views."
+      },
+      {
+        "name": "Pioneertown Motel",
+        "description": "Western-style hotel near park."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Joshua_Tree_National_Park.jpg"
+  },
+  {
+    "id": "65",
+    "name": "Mesa Verde National Park",
+    "state": "Colorado",
+    "coordinates": "37.2309, -108.4618",
+    "parkCode": "meve",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "April\u2013June: Mild weather and wildflowers.",
+      "summer": "July\u2013August: Warm with ranger-led tours available.",
+      "fall": "September\u2013October: Best time with fewer crowds.",
+      "winter": "November\u2013March: Limited access and colder temps."
+    },
+    "placesToVisit": [
+      {
+        "name": "Cliff Palace",
+        "description": "Largest cliff dwelling in North America."
+      },
+      {
+        "name": "Balcony House",
+        "description": "Challenging guided tour with ladders and tunnels."
+      },
+      {
+        "name": "Spruce Tree House",
+        "description": "Well-preserved dwelling near museum."
+      },
+      {
+        "name": "Mesa Top Loop",
+        "description": "Auto tour with archaeological sites and overlooks."
+      },
+      {
+        "name": "Far View Sites",
+        "description": "Trail to ancient village ruins."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Metate Room Restaurant",
+        "description": "Fine dining inside park with views."
+      },
+      {
+        "name": "Far View Terrace Caf\u00e9",
+        "description": "Quick bites and coffee."
+      },
+      {
+        "name": "Pepperhead Restaurant",
+        "description": "Mexican fusion in Cortez."
+      },
+      {
+        "name": "The Farm Bistro",
+        "description": "Farm-to-table in downtown Cortez."
+      },
+      {
+        "name": "Absolute Bakery",
+        "description": "Homemade baked goods and brunch in Mancos."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Far View Lodge",
+        "description": "In-park hotel with stunning vistas."
+      },
+      {
+        "name": "Morefield Campground",
+        "description": "NPS campground with store and laundry."
+      },
+      {
+        "name": "Baymont by Wyndham Cortez",
+        "description": "Affordable hotel with pool."
+      },
+      {
+        "name": "Canyon of the Ancients Guest Ranch",
+        "description": "Charming retreat with history."
+      },
+      {
+        "name": "Echo Basin Resort",
+        "description": "Cabins and RV sites in the mountains."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Mesa_Verde_Cliff_Palace.jpg"
+  },
+  {
+    "id": "66",
+    "name": "Mammoth Cave National Park",
+    "state": "Kentucky",
+    "coordinates": "37.1869, -86.1017",
+    "parkCode": "maca",
+    "bestSeason": "Spring",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Cave tours begin expanding with mild weather.",
+      "summer": "June\u2013August: Peak tourism and ranger programs.",
+      "fall": "September\u2013October: Colorful foliage and cooler temps.",
+      "winter": "November\u2013February: Quieter season for touring caves."
+    },
+    "placesToVisit": [
+      {
+        "name": "Historic Entrance",
+        "description": "Main access point for cave tours."
+      },
+      {
+        "name": "Frozen Niagara",
+        "description": "One of the most decorative cave areas."
+      },
+      {
+        "name": "Green River Bluffs",
+        "description": "Hiking trail with river views."
+      },
+      {
+        "name": "Echo River Spring Trail",
+        "description": "Accessible boardwalk trail to river."
+      },
+      {
+        "name": "Dixon Cave",
+        "description": "Former cave entrance with bat habitat."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Green River Grill",
+        "description": "In-park restaurant near visitor center."
+      },
+      {
+        "name": "Mammoth Railway Caf\u00e9",
+        "description": "Casual local spot in Cave City."
+      },
+      {
+        "name": "Bucky Bee\u2019s BBQ",
+        "description": "Barbecue favorites in Horse Cave."
+      },
+      {
+        "name": "Watermill Restaurant",
+        "description": "Buffet and country cooking."
+      },
+      {
+        "name": "El Mazatlan",
+        "description": "Mexican food close to the park."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "The Lodge at Mammoth Cave",
+        "description": "Park-run lodge next to cave entrance."
+      },
+      {
+        "name": "Mammoth Cave Campground",
+        "description": "Tent and RV sites under trees."
+      },
+      {
+        "name": "Yogi Bear\u2019s Jellystone Park",
+        "description": "Family fun campground near park."
+      },
+      {
+        "name": "Sleep Inn & Suites Cave City",
+        "description": "Modern hotel with breakfast."
+      },
+      {
+        "name": "Grand Victorian Inn",
+        "description": "Historic inn with themed rooms."
+      }
+    ],
+    "thumbnailUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Mammoth_Cave_Entrance.jpg"
+  },
+  {
+    "id": "67",
+    "name": "Guadalupe Mountains National Park",
+    "state": "Texas",
+    "coordinates": "31.92, -104.87",
+    "parkCode": "gumo",
+    "bestSeason": "Fall",
+    "bestTimeToVisit": {
+      "spring": "March\u2013May: Blooming desert wildflowers.",
+      "summer": "June\u2013August: Hot and dry; early hikes recommended.",
+      "fall": "September\u2013November: Best hiking conditions and fall colors.",
+      "winter": "December\u2013February: Snow possible; cooler weather hikes."
+    },
+    "placesToVisit": [
+      {
+        "name": "Guadalupe Peak",
+        "description": "Highest point in Texas with a rewarding summit view."
+      },
+      {
+        "name": "McKittrick Canyon",
+        "description": "Famous for colorful fall foliage."
+      },
+      {
+        "name": "Devil\u2019s Hall",
+        "description": "Unique rock formations and canyon views."
+      },
+      {
+        "name": "Frijole Ranch",
+        "description": "Historic ranch and visitor center."
+      },
+      {
+        "name": "Salt Basin Dunes",
+        "description": "White sand dunes on the west side of the park."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "Bring Your Own Food",
+        "description": "No restaurants inside or immediately near the park."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "Pine Springs Campground",
+        "description": "Basic camping near trailheads."
+      },
+      {
+        "name": "Dog Canyon Campground",
+        "description": "Remote, scenic spot on the north end."
+      },
+      {
+        "name": "White\u2019s City Cavern Inn",
+        "description": "Closest hotel to park; rustic rooms."
+      },
+      {
+        "name": "Carlsbad Hotels",
+        "description": "40-minute drive with multiple chain options."
+      },
+      {
+        "name": "Dell City RV Parks",
+        "description": "RV options on west side of park."
+      }
+    ]
+  },
+  {
+    "id": "68",
+    "name": "Death Valley National Park",
+    "state": "California, Nevada",
+    "coordinates": "36.5054, -117.0794",
+    "parkCode": "deva",
+    "bestSeason": "Winter",
+    "bestTimeToVisit": {
+      "spring": "March\u2013April: Mild weather and wildflower blooms after rains.",
+      "summer": "May\u2013August: Extremely hot, travel with caution.",
+      "fall": "September\u2013October: Cooler evenings, fewer crowds.",
+      "winter": "November\u2013February: Ideal for hiking and photography."
+    },
+    "placesToVisit": [
+      {
+        "name": "Badwater Basin",
+        "description": "Lowest point in North America, famous for salt flats."
+      },
+      {
+        "name": "Zabriskie Point",
+        "description": "Scenic viewpoint with striking badland formations."
+      },
+      {
+        "name": "Dante\u2019s View",
+        "description": "Panoramic overlook of Death Valley from the Black Mountains."
+      },
+      {
+        "name": "Mesquite Flat Sand Dunes",
+        "description": "Popular for sunrise photography and sandboarding."
+      },
+      {
+        "name": "Artist\u2019s Drive and Palette",
+        "description": "Scenic loop with colorful mineral-streaked hills."
+      }
+    ],
+    "nearbyFoods": [
+      {
+        "name": "The Inn at Death Valley Dining Room",
+        "description": "Upscale meals with views of the oasis."
+      },
+      {
+        "name": "The Ranch at Death Valley Buffet",
+        "description": "Casual dining with classic American options."
+      },
+      {
+        "name": "Timbisha Shoshone Frybread Taco Stand",
+        "description": "Local Indigenous food stand near Furnace Creek."
+      },
+      {
+        "name": "Panamint Springs Restaurant",
+        "description": "Rustic dining with burgers, pasta, and beers."
+      },
+      {
+        "name": "Stovepipe Wells Saloon",
+        "description": "Old-West style bar with hearty entrees."
+      }
+    ],
+    "hotelsAndCampgrounds": [
+      {
+        "name": "The Inn at Death Valley",
+        "description": "Historic luxury resort in Furnace Creek."
+      },
+      {
+        "name": "The Ranch at Death Valley",
+        "description": "Family-friendly lodging with pools and amenities."
+      },
+      {
+        "name": "Stovepipe Wells Village Hotel",
+        "description": "Comfortable rooms near Mesquite Sand Dunes."
+      },
+      {
+        "name": "Furnace Creek Campground",
+        "description": "NPS-run campground near Furnace Creek Visitor Center."
+      },
+      {
+        "name": "Texas Spring Campground",
+        "description": "Scenic and quiet camping with views of the valley."
+      }
+    ]
+  }
+]

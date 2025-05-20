@@ -107,7 +107,9 @@ const ParkDetails = () => {
   useEffect(() => {
     const fetchPark = async () => {
       const snap = await getDoc(doc(db, "parks", id));
-      if (snap.exists()) setPark(snap.data());
+      if (snap.exists()) {
+        setPark({ id: snap.id, ...snap.data() });
+      }
     };
     fetchPark();
   }, [id]);

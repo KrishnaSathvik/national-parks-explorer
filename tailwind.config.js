@@ -46,13 +46,22 @@ export default {
           '0%': { backgroundPosition: '-100% 0' },
           '100%': { backgroundPosition: '100% 0' },
         },
+        pop: {
+              '0%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.3)' },
+              '100%': { transform: 'scale(1)' },
+            },
       },
 
       // 🎬 Animations
       animation: {
         'fade-in-up': 'fade-in-up 0.3s ease-out',
         shimmer: 'shimmer 1.5s infinite linear',
+       // ✨ New pop animation
+        pop: 'pop 0.3s ease-in-out',
       },
+
+    }
 
       // 💎 Background Image (for shimmer loader if needed)
       backgroundImage: {
@@ -63,6 +72,16 @@ export default {
       lineClamp: {
         3: '3',
         5: '5',
+      },
+
+      // 🔁 Rotation for flip card
+      rotate: {
+        'y-180': '180deg',
+      },
+
+      // 🧩 Transform utilities (needed for 3D perspective)
+      transformOrigin: {
+        'center': 'center',
       },
     },
   },

@@ -1,0 +1,60 @@
+id,name,entryFee,hours,highlight
+acad,Acadia National Park,$30 ,6AM–10PM,Cadillac Mountain
+arch,Arches National Park,$30 ,24/7,Delicate Arch
+badl,Badlands National Park,$30 ,24/7,Fossil Exhibit Trail
+bibe,Big Bend National Park,$30 ,24/7,Santa Elena Canyon
+bisc,Biscayne National Park,Free,24/7,Coral reefs & snorkeling
+blca,Black Canyon of the Gunnison,$30 ,24/7,Painted Wall
+brca,Bryce Canyon National Park,$35 ,24/7,Hoodoos at Sunrise Point
+cany,Canyonlands National Park,$30 ,24/7,Island in the Sky
+care,Capitol Reef National Park,$20 ,24/7,Fruita Historic District
+cave,Carlsbad Caverns National Park,$15 ,8AM–5PM,The Big Room
+chis,Channel Islands National Park,Free,Daylight hours,Kayaking sea caves
+cong,Congaree National Park,Free,24/7,Boardwalk Loop Trail
+crla,Crater Lake National Park,$30 ,24/7,Crater Lake views
+cuva,Cuyahoga Valley National Park,Free,24/7,Brandywine Falls
+dena,Denali National Park,$15 ,24/7,Mount Denali
+drto,Dry Tortugas National Park,$15 ,8AM–5PM,Fort Jefferson
+ever,Everglades National Park,$30 ,24/7,Shark Valley
+gaar,Gates of the Arctic National Park,Free,24/7,Brooks Range Wilderness
+jeff,Gateway Arch National Park,$3 ,9AM–6PM,Gateway Arch
+glac,Glacier National Park,$35 ,24/7,Going-to-the-Sun Road
+glba,Glacier Bay National Park,Free,24/7,Tidewater glaciers
+grca,Grand Canyon National Park,$35 ,24/7,South Rim Viewpoints
+grsa,Great Sand Dunes National Park,$25 ,24/7,Star Dune
+grsm,Great Smoky Mountains,$5/day,24/7,Clingmans Dome
+gumo,Guadalupe Mountains National Park,$10 ,24/7,El Capitan
+hale,Haleakalā National Park,$30 ,3AM–7PM,Sunrise at Summit
+havo,Hawai‘i Volcanoes National Park,$30 ,24/7,Kīlauea Volcano
+hosp,Hot Springs National Park,Free,24/7,Historic Bathhouses
+indu,Indiana Dunes National Park,$25 ,6AM–11PM,Lake Michigan Beaches
+isro,Isle Royale National Park,$7/day,Seasonal,Remote hiking & wolves
+jotr,Joshua Tree National Park,$30 ,24/7,Jumbo Rocks
+katm,Katmai National Park,Free,24/7,Brooks Falls Bears
+kefj,Kenai Fjords National Park,Free,24/7,Exit Glacier
+kica,Kings Canyon National Park,$35 ,24/7,Zumwalt Meadow
+kova,Kobuk Valley National Park,Free,24/7,Great Kobuk Sand Dunes
+lacl,Lake Clark National Park,Free,24/7,Tanalian Falls
+lavo,Lassen Volcanic National Park,$30 ,24/7,Bumpass Hell
+maca,Mammoth Cave National Park,$20 ,8AM–6PM,Cave Tours
+meve,Mesa Verde National Park,$30 ,8AM–6PM,Cliff Dwellings
+mora,Mount Rainier National Park,$30 ,24/7,Paradise Valley
+neri,New River Gorge National Park,Free,24/7,New River Gorge Bridge
+noca,North Cascades National Park,Free,24/7,Diablo Lake
+olym,Olympic National Park,$30 ,24/7,Hoh Rain Forest
+pefo,Petrified Forest National Park,$25 ,8AM–5PM,Painted Desert
+pinn,Pinnacles National Park,$30 ,7:30AM–8PM,Condor Gulch Trail
+redw,Redwood National Park,Free,24/7,Tallest Trees
+romo,Rocky Mountain National Park,$30 ,24/7,Trail Ridge Road
+sagu,Saguaro National Park,$25 ,Sunrise–Sunset,Cactus Forest Drive
+seki,Sequoia National Park,$35 ,24/7,General Sherman Tree
+shen,Shenandoah National Park,$30 ,24/7,Skyline Drive
+thro,Theodore Roosevelt National Park,$30 ,24/7,Painted Canyon
+viis,Virgin Islands National Park,Free,24/7,Trunk Bay Beach
+voya,Voyageurs National Park,Free,24/7,Water-based Adventure
+whsa,White Sands National Park,$25 ,7AM–9PM,Gypsum Sand Dunes
+wica,Wind Cave National Park,$12 ,8AM–5PM,Boxwork Formations
+wrst,Wrangell–St. Elias National Park,Free,24/7,Nabesna Glacier
+yell,Yellowstone National Park,$35 ,24/7,Old Faithful Geyser
+yose,Yosemite National Park,$35 ,24/7,Yosemite Falls
+zion,Zion National Park,$35 ,24/7,Angels Landing
