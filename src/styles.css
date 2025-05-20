@@ -4,6 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+.body-base {
   @apply font-sans text-gray-800 bg-gray-50 antialiased;
 }

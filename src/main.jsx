@@ -8,6 +8,9 @@ import './styles.css';
 import { AuthProvider } from "./context/AuthContext";
 import { ToastProvider } from "./context/ToastContext";
 
+// ✅ Add Tailwind class to body
+document.body.classList.add("body-base");
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
@@ -15,11 +18,9 @@ root.render(
     <BrowserRouter>
       <AuthProvider>
         <ToastProvider>
-          {/* Future providers like ThemeProvider or GlobalStateProvider can go here */}
           <App />
         </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
-
