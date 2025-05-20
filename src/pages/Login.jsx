@@ -1,18 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../firebase";
-import { useEffect } from "react";
-import { requestNotificationPermission } from "../firebase";
+import { db, requestNotificationPermission } from "../firebase";
 import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, currentUser } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -94,12 +91,11 @@ const Login = () => {
         );
       }, 1000);
     }
-  }, [currentUser]);
-  
+  }, [currentUser, showToast]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 font-sans">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
-
         {/* 🌄 Logo and Welcome Message */}
         <div className="flex flex-col items-center mb-6">
           <img
@@ -111,7 +107,6 @@ const Login = () => {
             Welcome to <span className="text-pink-600">National Parks Explorer</span>
           </h1>
         </div>
-
         {/* 🔐 Original Login Heading */}
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           🔐 Log In to Your Account

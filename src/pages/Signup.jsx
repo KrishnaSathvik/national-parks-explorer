@@ -1,24 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import { doc, setDoc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, requestNotificationPermission } from "../firebase";
 import { FaGoogle } from "react-icons/fa";
-import { useEffect } from "react";
-import { requestNotificationPermission } from "../firebase";
-
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { signup, loginWithGoogle } = useAuth();
+  const { signup, loginWithGoogle, currentUser } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
   const [error, setError] = useState("");
-
-
 
   // ✨ Email/Password Signup
   const handleSubmit = async (e) => {
@@ -99,13 +93,11 @@ const Signup = () => {
         );
       }, 1000);
     }
-  }, [currentUser]);
+  }, [currentUser, showToast]);
 
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4 font-sans">
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">
-
         {/* 🖼️ Logo + Welcome Message */}
         <div className="flex flex-col items-center mb-6">
           <img
@@ -117,7 +109,6 @@ const Signup = () => {
             Welcome to <span className="text-pink-600">National Parks Explorer</span>
           </h1>
         </div>
-
         {/* 📝 Form Heading */}
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           📝 Create Your Account
@@ -142,7 +133,6 @@ const Signup = () => {
               required
             />
           </div>
-
           <div>
             <label className="sr-only" htmlFor="password">Password</label>
             <input
@@ -157,7 +147,6 @@ const Signup = () => {
               required
             />
           </div>
-
           <button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-full shadow-md transition"
