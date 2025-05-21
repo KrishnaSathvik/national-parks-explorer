@@ -23,23 +23,65 @@ const BlogPost = () => {
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [user] = useAuthState(auth);
+  const { slug } = useParams();
 
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const docRef = doc(db, "blogs", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setPost(docSnap.data());
-        }
-      } catch (error) {
-        console.error("Error fetching post:", error);
-      } finally {
-        setLoading(false);
-      }
+    if (!post) return;
+
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: post.title,
+      author: {
+        "@type": "Person",
+        name: post.author,
+      },
+      datePublished: post.date?.toDate().toISOString() || new Date().toISOString(),
+      url: `https://www.nationalparksexplorerusa.com/blog/${post.slug}`,
     };
-    fetchPost();
-  }, [id]);
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.innerText = JSON.stringify(jsonLd);
+    script.id = "blog-structured-data";
+    document.head.appendChild(script);
+
+    return () => {
+      const existing = document.getElementById("blog-structured-data");
+      if (existing) document.head.removeChild(existing);
+    };
+  }, [post]);
+
+  useEffect(() => {
+  const fetchPost = async () => {
+    try {
+      const q = query(collection(db, "blogs"), where("slug", "==", slug));
+      const snap = await getDocs(q);
+
+      if (!snap.empty) {
+        const docData = snap.docs[0].data();
+        setPost({
+          ...docData,
+          id: snap.docs[0].id,
+        });
+
+        if (docData.content) {
+          const raw = JSON.parse(docData.content);
+          const contentState = convertFromRaw(raw);
+          setEditorState(EditorState.createWithContent(contentState));
+        }
+      } else {
+        setNotFound(true);
+      }
+    } catch (err) {
+      console.error("Error loading blog post:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchPost();
+}, [slug]);
 
   useEffect(() => {
     const q = query(collection(db, "comments"), where("blogId", "==", id));

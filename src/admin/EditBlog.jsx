@@ -25,6 +25,7 @@ const EditBlog = () => {
   const [imageUrl, setImageUrl] = useState("");
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
+  const [slug, setSlug] = useState("");
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty());
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const EditBlog = () => {
           setTitle(data.title);
           setImageUrl(data.imageUrl || "");
           setTags(data.tags || []);
+          setSlug(data.slug || "");
 
           try {
             const rawContent = JSON.parse(data.content);
@@ -77,7 +79,9 @@ const EditBlog = () => {
         title,
         imageUrl,
         tags,
+        slug, 
         content: JSON.stringify(rawContent),
+        lastEdited: serverTimestamp(),
       });
       alert("✅ Blog updated!");
       navigate(`/blog/${id}`);
@@ -141,6 +145,14 @@ const EditBlog = () => {
           className="w-full p-3 border rounded-lg mb-4"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+        />
+        <label className="block mb-2 font-semibold">Slug (URL-friendly)</label>
+        <input
+          type="text"
+          className="w-full p-3 border rounded-lg mb-4"
+          value={slug}
+          onChange={(e) => setSlug(e.target.value)}
+          placeholder="auto-generated-from-title"
         />
 
         <label className="block mb-2 font-semibold">Tags</label>

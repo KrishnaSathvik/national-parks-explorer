@@ -14,6 +14,7 @@ import { Editor } from "react-draft-wysiwyg";
 import draftToHtml from "draftjs-to-html";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
+
 const AdminBlogEditor = () => {
   const [user] = useAuthState(auth);
   const navigate = useNavigate();
@@ -27,26 +28,38 @@ const AdminBlogEditor = () => {
   const wordCount = editorState.getCurrentContent().getPlainText(" ").trim().split(/\s+/).length;
   const readTime = Math.ceil(wordCount / 200);
 
-  const handlePost = async () => {
-    setSubmitting(true);
-    try {
-      const rawContent = convertToRaw(editorState.getCurrentContent());
-      await addDoc(collection(db, "blogs"), {
-        title,
-        tags,
-        content: JSON.stringify(rawContent),
-        author: user.email,
-        date: serverTimestamp(),
-      });
-      alert("✅ Blog posted!");
-      navigate("/blog");
-    } catch (err) {
-      console.error("Error posting blog:", err.message);
-      alert("❌ Failed to post blog.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const slugify = (str) =>
+  str
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .slice(0, 100);
+
+const handlePost = async () => {
+  setSubmitting(true);
+  try {
+    const rawContent = convertToRaw(editorState.getCurrentContent());
+    const slug = slugify(title);
+
+    const newDoc = await addDoc(collection(db, "blogs"), {
+      title,
+      tags,
+      slug,
+      content: JSON.stringify(rawContent),
+      author: user.email,
+      date: serverTimestamp(),
+    });
+
+    alert("✅ Blog posted!");
+    navigate(`/blog/${slug}`);
+  } catch (err) {
+    console.error("Error posting blog:", err.message);
+    alert("❌ Failed to post blog.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleTagAdd = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim().toLowerCase())) {

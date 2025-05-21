@@ -79,7 +79,7 @@
 
       return (
         <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
-          <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
+          <div className="bg-white/90 backdrop-blur-md px-4 py-6 rounded-2xl shadow-sm">
             {/* 🔗 Header */}
             <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4 sm:gap-6 mb-6">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-pink-600 flex items-center gap-2 text-center sm:text-left">
@@ -116,7 +116,7 @@
                     <Marker key={park.id} position={[lat, lng]}>
                       <Popup>
                         <strong>{park.name}</strong><br />
-                        <button onClick={() => navigate(`/park/${park.id}?page=${currentPage}`)} className="text-blue-600 underline mt-1">
+                        <button onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)} className="text-blue-600 underline mt-1">
                           View Park →
                         </button>
                       </Popup>
@@ -173,8 +173,7 @@
                   {season}
                 </button>
               ))}
-            </div>
-            
+            </div>    
           {/* 🏞️ Park Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
             {parks.length === 0 ? (
@@ -201,15 +200,20 @@
                       </button>
                     )}
 
-                    <ParkCardFlip 
-                      id={park.id}
-                      name={park.name}
-                      state={park.state}
-                      bestSeason={park.bestSeason}
-                      entryFee={park.entryFee}
-                      hours={park.hours}
-                      highlight={park.highlight}
-                    />
+                    <div
+                      onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
+                      className="cursor-pointer"
+                    >
+                      <ParkCardFlip 
+                        id={park.id}
+                        name={park.name}
+                        state={park.state}
+                        bestSeason={park.bestSeason}
+                        entryFee={park.entryFee}
+                        hours={park.hours}
+                        highlight={park.highlight}
+                      />
+                    </div>
                   </div>
                 </FadeInWrapper>
               ))

@@ -99,20 +99,55 @@ const ParkDetails = () => {
   const [fadeOut, setFadeOut] = useState(false);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [alertsLoading, setAlertsLoading] = useState(true);
+  const { slug } = useParams();
 
   const averageRating = reviews.length
     ? (reviews.reduce((sum, r) => sum + (parseInt(r.rating) || 0), 0) / reviews.length).toFixed(1)
     : null;
 
+
+  useEffect(() => {
+    if (!park) return;
+
+    const jsonLd = {
+      "@context": "https://schema.org",
+      "@type": "Place",
+      name: park.name,
+      address: {
+        "@type": "PostalAddress",
+        addressCountry: "USA",
+        addressRegion: park.state,
+      },
+      description: park.highlight || "",
+      url: `https://www.nationalparksexplorerusa.com/park/${park.slug}`,
+    };
+
+    const script = document.createElement("script");
+    script.type = "application/ld+json";
+    script.innerText = JSON.stringify(jsonLd);
+    script.id = "park-structured-data";
+    document.head.appendChild(script);
+
+    return () => {
+      const existing = document.getElementById("park-structured-data");
+      if (existing) document.head.removeChild(existing);
+    };
+  }, [park]);
+
   useEffect(() => {
     const fetchPark = async () => {
-      const snap = await getDoc(doc(db, "parks", id));
-      if (snap.exists()) {
-        setPark({ id: snap.id, ...snap.data() });
+      const q = query(collection(db, "parks"), where("slug", "==", slug));
+      const snapshot = await getDocs(q);
+
+      if (!snapshot.empty) {
+        setPark(snapshot.docs[0].data());
+      } else {
+        setNotFound(true); // Optional error handling
       }
     };
+
     fetchPark();
-  }, [id]);
+  }, [slug]);
 
   useEffect(() => {
     const fetchReviews = async () => {

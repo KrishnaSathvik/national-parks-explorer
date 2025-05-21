@@ -1,4 +1,4 @@
-// ✅ Blog.jsx (Polished Blog List)
+// ✅ Blog.jsx (Polished Blog List with Slug)
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
@@ -37,7 +37,7 @@ const Blog = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {blogs.map((blog) => (
                 <Link
-                  to={`/blog/${blog.id}`}
+                  to={`/blog/${blog.slug || blog.id}`}
                   key={blog.id}
                   className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition transform hover:-translate-y-1 cursor-pointer flex flex-col justify-between min-h-[180px] border border-gray-100"
                 >

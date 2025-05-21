@@ -156,7 +156,7 @@ function App() {
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />
               <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:id" element={<BlogPost />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
 
               {/* ✅ Protected Routes */}
@@ -169,7 +169,7 @@ function App() {
                 }
               />
               <Route
-                path="/park/:id"
+                path="/park/:slug"
                 element={
                   <PrivateRoute>
                     <ParkDetails />
