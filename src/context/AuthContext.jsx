@@ -78,8 +78,10 @@ export const AuthProvider = ({ children }) => {
 
         if (permission === "granted") {
           try {
+            const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
             const token = await getToken(messaging, {
               vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+              serviceWorkerRegistration: registration,
             });
 
             if (token) {
