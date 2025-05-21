@@ -36,13 +36,13 @@ const ParkCardFlip = ({
       onTouchStart={() => setFlipped(!flipped)}
     >
       <div className={`flip-card-inner ${flipped ? "rotate-y-180" : ""}`}>
-        <div className="flip-card-front p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
-          <div className="text-2xl">{emoji}</div>
+        <div className="flip-card-front flex flex-col justify-between text-center">
+          <div className="text-2xl mt-4">{emoji}</div>
           <div>
             <h2 className="text-lg font-bold text-pink-600">{name}</h2>
             <p className="text-sm text-gray-600 mt-1">📍 {state}</p>
             <p className="mt-2 text-sm">
-              📆 Best Season:{" "}
+              📆 Best Season: {" "}
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   bestSeason === "Spring"
@@ -58,11 +58,11 @@ const ParkCardFlip = ({
               </span>
             </p>
           </div>
-          <div className="text-sm text-gray-400 mt-2">Tap to flip →</div>
+          <div className="text-sm text-gray-400 mb-2">Tap to flip →</div>
         </div>
 
-        <div className="flip-card-back p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
-          <div>
+        <div className="flip-card-back flex flex-col justify-between text-center">
+          <div className="mt-4">
             <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
             <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
             <p className="text-sm text-gray-700">🕒 Hours: {hours}</p>
@@ -73,7 +73,7 @@ const ParkCardFlip = ({
               e.stopPropagation();
               navigate(`/park/${id}?page=${currentPage}`);
             }}
-            className="mt-4 inline-block bg-pink-600 text-white text-sm px-4 py-2 rounded-full hover:bg-pink-700 transition"
+            className="mb-3 inline-block bg-pink-600 text-white text-sm px-4 py-2 rounded-full hover:bg-pink-700 transition"
           >
             View Park →
           </button>

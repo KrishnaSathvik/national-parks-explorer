@@ -8,9 +8,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'auto',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        cleanupOutdatedCaches: true, // ✅ Add this
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/national-parks-explorer\.vercel\.app\/.*$/,
