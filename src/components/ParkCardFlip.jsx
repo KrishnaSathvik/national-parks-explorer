@@ -28,53 +28,33 @@ const ParkCardFlip = ({
   const [flipped, setFlipped] = useState(false);
   const emoji = getEmojiByRegion(state);
   const finalHighlight = highlight || "Explore breathtaking scenery";
-
   return (
     <div
       className="flip-card h-64 w-full cursor-pointer"
       onClick={() => setFlipped(!flipped)}
       onTouchStart={() => setFlipped(!flipped)}
     >
-      <div className={`flip-card-inner ${flipped ? "rotate-y-180" : ""}`}>
-        <div className="flip-card-front flex flex-col justify-between text-center">
-          <div className="text-2xl mt-4">{emoji}</div>
-          <div>
-            <h2 className="text-lg font-bold text-pink-600">{name}</h2>
-            <p className="text-sm text-gray-600 mt-1">📍 {state}</p>
-            <p className="mt-2 text-sm">
-              📆 Best Season: {" "}
-              <span
-                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  bestSeason === "Spring"
-                    ? "bg-green-100 text-green-800"
-                    : bestSeason === "Summer"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : bestSeason === "Fall"
-                    ? "bg-orange-100 text-orange-800"
-                    : "bg-blue-100 text-blue-800"
-                }`}
-              >
-                {bestSeason}
-              </span>
-            </p>
-          </div>
-          <div className="text-sm text-gray-400 mb-2">Tap to flip →</div>
+      <div className={`flip-card-inner relative w-full h-full ${flipped ? "flipped" : ""}`}>
+        {/* Front */}
+        <div className="flip-card-front">
+          <div className="text-2xl">🌲</div>
+          <h2 className="text-lg font-bold text-pink-600 mt-2">{name}</h2>
+          <p className="text-sm text-gray-600">📍 {state}</p>
+          <p className="mt-2 text-sm">
+            📆 Best Season:
+            <span className="ml-1 bg-orange-100 text-orange-800 text-xs font-medium px-2 py-0.5 rounded-full">
+              {bestSeason}
+            </span>
+          </p>
+          <p className="text-sm text-gray-400 mt-3">Tap to flip →</p>
         </div>
-
-        <div className="flip-card-back flex flex-col justify-between text-center">
-          <div className="mt-4">
-            <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
-            <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
-            <p className="text-sm text-gray-700">🕒 Hours: {hours}</p>
-            <p className="text-sm text-gray-700">🌄 Highlight: {finalHighlight}</p>
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/park/${id}?page=${currentPage}`);
-            }}
-            className="mb-3 inline-block bg-pink-600 text-white text-sm px-4 py-2 rounded-full hover:bg-pink-700 transition"
-          >
+        {/* Back */}
+        <div className="flip-card-back">
+          <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
+          <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
+          <p className="text-sm text-gray-700">🕒 Hours: {hours}</p>
+          <p className="text-sm text-gray-700">🌄 Highlight: {highlight}</p>
+          <button className="mt-4 bg-pink-600 text-white px-4 py-2 rounded-full hover:bg-pink-700 text-sm">
             View Park →
           </button>
         </div>
