@@ -93,39 +93,17 @@ export const requestNotificationPermission = async () => {
       console.log("📦 Token saved to anonymousTokens/", anonId);
     }
 
-    // ✅ Send welcome notification
-    await sendWelcomeNotification(token);
+    // ✅ Send welcome push via secure Cloud Function
+    await fetch("https://us-central1-national-parks-explorer-7bc55.cloudfunctions.net/sendWelcomePush", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ token })
+    });
 
   } catch (err) {
     console.error("❌ Error getting or saving FCM token:", err);
-  }
-};
-
-// ✅ Trigger welcome push after token is saved
-const sendWelcomeNotification = async (token) => {
-  try {
-    const payload = {
-      to: token,
-      notification: {
-        title: "🎉 Welcome to National Parks Explorer!",
-        body: "You’ll now receive park updates and alerts.",
-        icon: "/icons/icon-192x192.png"
-      }
-    };
-
-    const response = await fetch("https://fcm.googleapis.com/fcm/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `key=${import.meta.env.VITE_FIREBASE_WEB_API_KEY}`
-      },
-      body: JSON.stringify(payload)
-    });
-
-    const result = await response.json();
-    console.log("🚀 Push sent:", result);
-  } catch (error) {
-    console.error("❌ Failed to send welcome push:", error);
   }
 };
 
