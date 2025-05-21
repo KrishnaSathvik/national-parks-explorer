@@ -1,11 +1,11 @@
-.test-wrapper {
-  width: 18rem;
+.park-card-wrapper {
+  width: 100%;
   height: 16rem;
   perspective: 1000px;
   margin: auto;
 }
 
-.test-flip-card-inner {
+.park-flip-inner {
   width: 100%;
   height: 100%;
   position: relative;
@@ -13,12 +13,12 @@
   transform-style: preserve-3d;
 }
 
-.test-flip-card-inner.flipped {
+.park-flip-inner.flipped {
   transform: rotateY(180deg);
 }
 
-.test-flip-card-front,
-.test-flip-card-back {
+.park-flip-front,
+.park-flip-back {
   position: absolute;
   width: 100%;
   height: 100%;
@@ -31,15 +31,16 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
-.test-flip-card-front {
+.park-flip-front {
   background-color: white;
   transform: rotateY(0deg);
   z-index: 2;
 }
 
-.test-flip-card-back {
+.park-flip-back {
   background-color: #ffe4ec;
   transform: rotateY(180deg);
   z-index: 1;

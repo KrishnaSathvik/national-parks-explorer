@@ -7,7 +7,6 @@ import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import PrivateRoute from "./components/PrivateRoute";
 import { db } from "./firebase";
-import TestFlip from './components/TestFlip';
 import {
   collection,
   getDocs,
@@ -159,7 +158,6 @@ function App() {
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:id" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
-              <Route path="/test-flip" element={<TestFlip />} />
 
               {/* ✅ Protected Routes */}
               <Route
