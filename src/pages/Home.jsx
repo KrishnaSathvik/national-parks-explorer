@@ -8,6 +8,7 @@
   import ParkCardFlip from "../components/ParkCardFlip";
   import { useToast } from "../context/ToastContext";
   import SkeletonLoader from "../components/SkeletonLoader";
+
   import {
     FaCalendarAlt,
     FaNewspaper,
@@ -84,6 +85,7 @@
             <h1 className="text-2xl sm:text-3xl font-extrabold text-pink-600 flex items-center gap-2 text-center sm:text-left">
               🌍 Explore National Parks
             </h1>
+            <Link to="/test-flip" className="text-blue-600 underline">Flip Demo</Link>
             <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 text-sm font-medium">
               <Link
                 to="/calendar"
