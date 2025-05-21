@@ -113,10 +113,33 @@ export const AuthProvider = ({ children }) => {
     []
   );
   const logout = useCallback(() => signOut(auth), []);
-  const loginWithGoogle = useCallback(
-    () => signInWithPopup(auth, new GoogleAuthProvider()),
-    []
-  );
+  
+  const loginWithGoogle = useCallback(async () => {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+
+    const userRef = doc(db, "users", result.user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await updateDoc(userRef, {
+        email: result.user.email,
+        displayName: result.user.displayName || "",
+        createdAt: serverTimestamp(),
+        role: "user",
+      }).catch(async () => {
+        // fallback to setDoc if doc doesn't exist
+        await setDoc(userRef, {
+          email: result.user.email,
+          displayName: result.user.displayName || "",
+          createdAt: serverTimestamp(),
+          role: "user",
+        });
+      });
+    }
+
+    return result;
+  }, []);
 
   return (
     <AuthContext.Provider
