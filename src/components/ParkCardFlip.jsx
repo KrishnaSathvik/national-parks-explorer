@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+// Better region emoji logic
 const getEmojiByRegion = (state) => {
   if (!state) return "🌲";
   const s = state.toLowerCase();
-  if (s.includes("california") || s.includes("west")) return "🌄";
-  if (s.includes("arizona") || s.includes("desert")) return "🏜️";
-  if (s.includes("mount")) return "🗻";
-  if (s.includes("florida")) return "🌴";
+  if (s.includes("california")) return "🌉";
+  if (s.includes("arizona") || s.includes("utah")) return "🏜️";
+  if (s.includes("montana") || s.includes("colorado") || s.includes("wyoming")) return "⛰️";
+  if (s.includes("florida") || s.includes("hawaii")) return "🌴";
   if (s.includes("alaska")) return "❄️";
+  if (s.includes("texas") || s.includes("new mexico")) return "🤠";
   return "🌲";
 };
 
@@ -19,7 +21,7 @@ const ParkCardFlip = ({
   bestSeason,
   entryFee = "$35",
   hours = "24/7",
-  highlight
+  highlight,
 }) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -36,9 +38,9 @@ const ParkCardFlip = ({
     >
       <div className={`flip-card-inner ${flipped ? "rotate-y-180" : ""}`}>
         {/* Front */}
-        <div className="flip-card-front bg-white p-5 shadow-md rounded-2xl flex flex-col justify-between">
-          <div className="absolute top-3 left-3 text-xl">{emoji}</div>
-          <div className="text-center">
+        <div className="flip-card-front bg-white p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
+          <div className="text-2xl">{emoji}</div>
+          <div>
             <h2 className="text-lg font-bold text-pink-600">{name}</h2>
             <p className="text-sm text-gray-600 mt-1">📍 {state}</p>
             <p className="mt-2 text-sm">
@@ -58,11 +60,11 @@ const ParkCardFlip = ({
               </span>
             </p>
           </div>
-          <div className="text-sm text-gray-500 text-center mt-4">Tap to flip →</div>
+          <div className="text-sm text-gray-400 mt-2">Tap to flip →</div>
         </div>
 
         {/* Back */}
-        <div className="flip-card-back bg-pink-50 p-5 shadow-md rounded-2xl flex flex-col justify-between text-center">
+        <div className="flip-card-back bg-pink-50 p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
           <div>
             <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
             <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
