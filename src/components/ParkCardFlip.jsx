@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-// Better region emoji logic
 const getEmojiByRegion = (state) => {
   if (!state) return "🌲";
   const s = state.toLowerCase();
@@ -37,8 +36,7 @@ const ParkCardFlip = ({
       onTouchStart={() => setFlipped(!flipped)}
     >
       <div className={`flip-card-inner ${flipped ? "rotate-y-180" : ""}`}>
-        {/* Front */}
-        <div className="flip-card-front bg-white p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
+        <div className="flip-card-front p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
           <div className="text-2xl">{emoji}</div>
           <div>
             <h2 className="text-lg font-bold text-pink-600">{name}</h2>
@@ -63,8 +61,7 @@ const ParkCardFlip = ({
           <div className="text-sm text-gray-400 mt-2">Tap to flip →</div>
         </div>
 
-        {/* Back */}
-        <div className="flip-card-back bg-pink-50 p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
+        <div className="flip-card-back p-4 shadow-md rounded-2xl flex flex-col justify-between text-center">
           <div>
             <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
             <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
