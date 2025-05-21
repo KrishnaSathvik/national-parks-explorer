@@ -1,3 +1,4 @@
+// ✅ Polished ReviewModeration.jsx UI
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, deleteDoc, doc, getDocs } from "firebase/firestore";
@@ -43,20 +44,20 @@ const ReviewModeration = () => {
   );
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen font-sans">
-      <h1 className="text-2xl font-bold mb-4">🛠 Review Moderation</h1>
+    <div className="p-6 bg-gradient-to-br from-white via-pink-50 to-pink-100 min-h-screen font-sans">
+      <h1 className="text-3xl font-bold text-pink-700 mb-6">🛠 Review Moderation</h1>
 
       {/* Search */}
       <input
         type="text"
         placeholder="Search by park ID or author..."
-        className="mb-6 p-3 border w-full max-w-xl rounded-lg"
+        className="mb-6 p-3 border border-gray-300 rounded-full w-full max-w-xl shadow-sm"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
       {/* Table */}
-      <div className="overflow-x-auto bg-white rounded-2xl shadow">
+      <div className="overflow-x-auto bg-white/90 backdrop-blur-md rounded-2xl shadow">
         <table className="w-full text-sm">
           <thead className="bg-gray-100">
             <tr className="text-left">
@@ -70,16 +71,16 @@ const ReviewModeration = () => {
           <tbody>
             {filteredReviews.map((r) => (
               <tr key={r.id} className="border-t hover:bg-gray-50">
-                <td className="p-4">{r.parkId}</td>
-                <td className="p-4">{r.author}</td>
-                <td className="p-4">{r.rating}⭐</td>
-                <td className="p-4 max-w-md break-words">{r.comment}</td>
+                <td className="p-4 font-medium text-gray-800">{r.parkId}</td>
+                <td className="p-4 text-gray-700">{r.author}</td>
+                <td className="p-4 text-yellow-600">{r.rating}⭐</td>
+                <td className="p-4 max-w-md break-words text-gray-600">{r.comment}</td>
                 <td className="p-4">
                   <button
                     onClick={() => deleteReview(r.id)}
-                    className="text-red-600 hover:underline"
+                    className="text-red-600 hover:underline text-sm"
                   >
-                    Delete
+                    🗑 Delete
                   </button>
                 </td>
               </tr>

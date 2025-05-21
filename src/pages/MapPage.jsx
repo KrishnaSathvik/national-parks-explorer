@@ -1,3 +1,4 @@
+// ✅ Polished MapPage.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -6,7 +7,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 
-// 🛠️ Fix Leaflet default icon issues (needed for Webpack/Vite apps)
+// 🛠️ Fix Leaflet default icon issues
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -34,14 +35,14 @@ const MapPage = () => {
 
   return (
     <div className="relative h-screen w-full font-sans">
-      {/* Header Overlay */}
-      <div className="absolute top-4 left-4 z-[999] bg-white rounded-full shadow px-4 py-2 text-sm font-medium text-gray-800">
-        🗺️ Explore Parks on the Map
+      {/* 🧭 Header Overlay */}
+      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-md rounded-full shadow px-6 py-2 text-sm font-medium text-gray-800">
+        🗺️ Explore National Parks Map
       </div>
 
-      {/* Leaflet Map */}
+      {/* 🗺️ Leaflet Map */}
       <MapContainer
-        center={[39.8283, -98.5795]} // Center of continental US
+        center={[39.8283, -98.5795]}
         zoom={4}
         scrollWheelZoom={true}
         className="h-full w-full z-0"
@@ -67,9 +68,11 @@ const MapPage = () => {
                 }}
               >
                 <Popup>
-                  <strong className="text-base text-gray-800">{park.name}</strong>
-                  <br />
-                  <span className="text-sm text-gray-600">{park.state}</span>
+                  <div className="text-sm">
+                    <p className="text-base font-semibold text-pink-600">{park.name}</p>
+                    <p className="text-gray-600">📍 {park.state}</p>
+                    <p className="text-xs text-gray-400">Click to explore →</p>
+                  </div>
                 </Popup>
               </Marker>
             );

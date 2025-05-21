@@ -1,3 +1,4 @@
+// ✅ Polished EventsManager.jsx with soft UI upgrades
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -48,31 +49,28 @@ const EventsManager = () => {
 
   const parks = Array.from(new Set(events.map((e) => e.park))).sort();
   const filteredEvents =
-    selectedPark === "All"
-      ? events
-      : events.filter((e) => e.park === selectedPark);
+    selectedPark === "All" ? events : events.filter((e) => e.park === selectedPark);
 
   return (
-    <div>
+    <div className="p-6 bg-gradient-to-br from-white via-pink-50 to-pink-100 min-h-screen font-sans">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">🎪 Events Manager</h1>
+        <h1 className="text-2xl font-bold text-pink-700">🎪 Events Manager</h1>
         <button
           onClick={handleRefresh}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+          className="bg-pink-600 hover:bg-pink-700 text-white px-5 py-2 rounded-full shadow-md"
         >
           🔁 Refresh Events
         </button>
       </div>
 
       <p className="text-sm text-gray-500 mb-4">
-        Last updated:{" "}
-        {lastUpdated ? new Date(lastUpdated).toLocaleString() : "Unknown"}
+        Last updated: {lastUpdated ? new Date(lastUpdated).toLocaleString() : "Unknown"}
       </p>
 
       <select
         value={selectedPark}
         onChange={(e) => setSelectedPark(e.target.value)}
-        className="mb-4 p-2 border rounded-lg"
+        className="mb-6 p-3 border border-gray-300 rounded-full w-full max-w-xs bg-white shadow-sm"
       >
         <option value="All">All Parks</option>
         {parks.map((park) => (
@@ -87,7 +85,7 @@ const EventsManager = () => {
       ) : filteredEvents.length === 0 ? (
         <p className="text-gray-500">No events found.</p>
       ) : (
-        <div className="overflow-x-auto bg-white rounded-2xl shadow">
+        <div className="overflow-x-auto bg-white/90 backdrop-blur-md rounded-2xl shadow">
           <table className="w-full text-sm">
             <thead className="bg-gray-100 text-left">
               <tr>
@@ -101,18 +99,18 @@ const EventsManager = () => {
             <tbody>
               {filteredEvents.map((event) => (
                 <tr key={event.id} className="border-t hover:bg-gray-50">
-                  <td className="p-4">{event.title}</td>
-                  <td className="p-4">{event.park}</td>
-                  <td className="p-4">{event.start}</td>
-                  <td className="p-4">{event.end}</td>
+                  <td className="p-4 font-medium text-gray-800">{event.title}</td>
+                  <td className="p-4 text-gray-600">{event.park}</td>
+                  <td className="p-4 text-gray-500">{event.start}</td>
+                  <td className="p-4 text-gray-500">{event.end}</td>
                   <td className="p-4">
                     <a
                       href={event.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-green-700 hover:underline"
+                      className="text-pink-600 hover:underline"
                     >
-                      View
+                      🔗 View
                     </a>
                   </td>
                 </tr>

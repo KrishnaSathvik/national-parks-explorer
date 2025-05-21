@@ -127,9 +127,6 @@ const UserAccount = () => {
           </div>
           <h1 className="text-3xl font-bold text-pink-600 font-heading">My Account</h1>
         </div>
-        <div className="w-12 h-12 rounded-full bg-pink-100 text-pink-600 font-bold flex items-center justify-center text-lg shadow">
-          {userDoc?.displayName?.[0] || currentUser?.email?.[0]}
-        </div>
         <div className="grid sm:grid-cols-2 gap-6 mb-10">
           <div className="text-gray-700 text-sm">
             <p><strong>Email:</strong> {currentUser.email}</p>

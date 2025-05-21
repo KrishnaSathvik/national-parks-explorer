@@ -1,3 +1,4 @@
+// ✅ Polished MediaManager.jsx with visual upgrades
 import React, { useEffect, useState } from "react";
 import { getStorage, ref, listAll, getDownloadURL, deleteObject } from "firebase/storage";
 
@@ -50,8 +51,8 @@ const MediaManager = () => {
   };
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4">🖼 Media Manager</h1>
+    <div className="p-6 bg-gradient-to-br from-white via-pink-50 to-pink-100 min-h-screen font-sans">
+      <h1 className="text-3xl font-bold text-pink-600 mb-6">🖼 Media Manager</h1>
 
       {loading ? (
         <p className="text-gray-500">Loading images...</p>
@@ -62,28 +63,30 @@ const MediaManager = () => {
           {images.map((img) => (
             <div
               key={img.fullPath}
-              className="bg-white rounded-2xl shadow p-4 flex flex-col gap-2"
+              className="bg-white/90 backdrop-blur rounded-2xl shadow p-4 flex flex-col gap-3"
             >
               <img
                 src={img.url}
                 alt={img.name}
-                className="rounded-md w-full h-48 object-cover"
+                className="rounded-md w-full h-48 object-cover shadow-md"
               />
-              <div className="text-sm text-gray-600 break-all">{img.name}</div>
-              <a
-                href={img.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-green-700 hover:underline text-sm"
-              >
-                View Full Image
-              </a>
-              <button
-                onClick={() => handleDelete(img.fullPath)}
-                className="text-red-600 text-sm hover:underline"
-              >
-                Delete Image
-              </button>
+              <div className="text-xs text-gray-600 break-all">{img.name}</div>
+              <div className="flex justify-between items-center">
+                <a
+                  href={img.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  🔗 View Full Image
+                </a>
+                <button
+                  onClick={() => handleDelete(img.fullPath)}
+                  className="text-red-600 text-sm hover:underline"
+                >
+                  🗑 Delete
+                </button>
+              </div>
             </div>
           ))}
         </div>
