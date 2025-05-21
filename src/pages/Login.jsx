@@ -14,7 +14,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // 🔐 Email/Password Login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -25,12 +24,10 @@ const Login = () => {
       showToast("✅ Logged in successfully!", "success");
       navigate(role === "admin" ? "/admin" : "/account");
     } catch (err) {
-      console.error("Login Error:", err);
       handleAuthError(err);
     }
   };
 
-  // 🔐 Google OAuth Login
   const handleGoogleLogin = async () => {
     try {
       const userCredential = await loginWithGoogle();
@@ -52,31 +49,27 @@ const Login = () => {
       showToast("✅ Logged in with Google!", "success");
       navigate(role === "admin" ? "/admin" : "/account");
     } catch (err) {
-      console.error("Google Login Error:", err);
       showToast("❌ Google login failed", "error");
     }
   };
 
-  // 🧠 Role Resolver
   const resolveUserRole = async (uid) => {
     const userRef = doc(db, "users", uid);
     const userSnap = await getDoc(userRef);
     return userSnap.exists() ? userSnap.data().role || "user" : "user";
   };
 
-  // 🚨 Error Handling
   const handleAuthError = (err) => {
-    let message = "❌ Login failed. Please try again.";
-    if (err.code === "auth/user-not-found") message = "🙅 No account found with this email.";
-    else if (err.code === "auth/wrong-password") message = "🔑 Incorrect password.";
-    else if (err.code === "auth/too-many-requests") message = "⏳ Too many attempts. Try again later.";
-    else if (err.code === "auth/invalid-email") message = "⚠️ Invalid email format.";
+    let message = "❌ Login failed.";
+    if (err.code === "auth/user-not-found") message = "🙅 No account with this email.";
+    else if (err.code === "auth/wrong-password") message = "🔑 Wrong password.";
+    else if (err.code === "auth/too-many-requests") message = "⏳ Too many attempts.";
+    else if (err.code === "auth/invalid-email") message = "⚠️ Invalid email.";
 
     setError(message);
     showToast(message, "error");
   };
 
-  // 🔔 Prompt user to enable push notifications after login
   useEffect(() => {
     if (currentUser && Notification.permission !== "granted") {
       setTimeout(() => {
@@ -85,7 +78,7 @@ const Login = () => {
             onClick={requestNotificationPermission}
             className="cursor-pointer hover:underline"
           >
-            🔔 Tap here to enable push notifications for park updates!
+            🔔 Tap here to enable push notifications!
           </span>,
           "info"
         );
@@ -95,49 +88,31 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 font-sans">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
-        {/* 🌄 Logo and Welcome Message */}
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md transition duration-300 hover:scale-[1.01]">
         <div className="flex flex-col items-center mb-6">
-          <img
-            src="/logo.png"
-            alt="National Parks Explorer"
-            className="w-20 h-20 mb-3"
-          />
+          <img src="/logo.png" alt="National Parks Explorer" className="w-20 h-20 mb-3" />
           <h1 className="text-xl sm:text-2xl font-bold text-gray-700 text-center">
             Welcome to <span className="text-pink-600">National Parks Explorer</span>
           </h1>
         </div>
-        {/* 🔐 Original Login Heading */}
+
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           🔐 Log In to Your Account
         </h2>
+
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-              setError("");
-            }}
+          <input type="email" placeholder="Email" value={email}
+            onChange={(e) => { setEmail(e.target.value); setError(""); }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError("");
-            }}
+          <input type="password" placeholder="Password" value={password}
+            onChange={(e) => { setPassword(e.target.value); setError(""); }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />
-
           <button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-full shadow transition"

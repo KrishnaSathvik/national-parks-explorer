@@ -9,7 +9,7 @@ const getEmojiByRegion = (state) => {
   if (s.includes("mount")) return "🗻";
   if (s.includes("florida")) return "🌴";
   if (s.includes("alaska")) return "❄️";
-  return "🌲"; // Default
+  return "🌲";
 };
 
 const ParkCardFlip = ({
@@ -30,19 +30,19 @@ const ParkCardFlip = ({
 
   return (
     <div
-      className="flip-card w-full h-64"
-      onClick={() => setFlipped(!flipped)} // Enable tap flip
+      className="flip-card w-full h-64 cursor-pointer"
+      onClick={() => setFlipped(!flipped)}
       onTouchStart={() => setFlipped(!flipped)}
     >
-      <div className={`flip-card-inner w-full h-full rounded-2xl ${flipped ? "rotate-y-180" : ""}`}> 
+      <div className={`flip-card-inner ${flipped ? "rotate-y-180" : ""}`}>
         {/* Front */}
-        <div className="flip-card-front bg-white shadow-md p-5 relative flex flex-col justify-between rounded-2xl">
+        <div className="flip-card-front bg-white p-5 shadow-md rounded-2xl flex flex-col justify-between">
           <div className="absolute top-3 left-3 text-xl">{emoji}</div>
           <div className="text-center">
             <h2 className="text-lg font-bold text-pink-600">{name}</h2>
             <p className="text-sm text-gray-600 mt-1">📍 {state}</p>
             <p className="mt-2 text-sm">
-              📆 Best Season: {" "}
+              📆 Best Season:{" "}
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                   bestSeason === "Spring"
@@ -58,11 +58,11 @@ const ParkCardFlip = ({
               </span>
             </p>
           </div>
-          <div className="text-center text-sm text-gray-500 mt-4">Tap to flip →</div>
+          <div className="text-sm text-gray-500 text-center mt-4">Tap to flip →</div>
         </div>
 
         {/* Back */}
-        <div className="flip-card-back shadow-md p-5 flex flex-col justify-between text-center rounded-2xl bg-pink-50">
+        <div className="flip-card-back bg-pink-50 p-5 shadow-md rounded-2xl flex flex-col justify-between text-center">
           <div>
             <h3 className="text-md font-semibold text-pink-600 mb-2">Quick Facts</h3>
             <p className="text-sm text-gray-700">💵 Entry Fee: {entryFee}</p>
@@ -71,7 +71,7 @@ const ParkCardFlip = ({
           </div>
           <button
             onClick={(e) => {
-              e.stopPropagation(); // prevent flip on tap
+              e.stopPropagation();
               navigate(`/park/${id}?page=${currentPage}`);
             }}
             className="mt-4 inline-block bg-pink-600 text-white text-sm px-4 py-2 rounded-full hover:bg-pink-700 transition"
