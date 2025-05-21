@@ -32,7 +32,7 @@ const ParkCardFlip = ({
 
   return (
     <div
-      className="flip-card w-full h-64 cursor-pointer"
+      className="flip-card h-64 w-full cursor-pointer"
       onClick={() => setFlipped(!flipped)}
       onTouchStart={() => setFlipped(!flipped)}
     >
