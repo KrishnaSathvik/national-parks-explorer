@@ -13,13 +13,27 @@ const Signup = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   // ✨ Email/Password Signup
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
+    if (!isValidEmail(email)) {
+      showToast("⚠️ Invalid email format", "warning");
+      return;
+    }
+
+    if (password.length < 6) {
+      showToast("🔒 Password should be at least 6 characters", "warning");
+      return;
+    }
+
     try {
+      setLoading(true);
       const userCredential = await signup(email, password);
       const uid = userCredential.user.uid;
 
@@ -32,7 +46,7 @@ const Signup = () => {
       });
 
       showToast("🎉 Account created successfully!", "success");
-      navigate("/account");
+      navigate("/");
     } catch (err) {
       console.error("Firebase Signup Error:", err);
       let message = "❌ Signup failed. Please try again.";
@@ -49,12 +63,15 @@ const Signup = () => {
 
       setError(message);
       showToast(message, "error");
+    } finally {
+      setLoading(false);
     }
   };
 
   // 🔐 Google OAuth Signup
   const handleGoogleSignup = async () => {
     try {
+      setLoading(true);
       const userCredential = await loginWithGoogle();
       const user = userCredential.user;
       const userRef = doc(db, "users", user.uid);
@@ -63,22 +80,26 @@ const Signup = () => {
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: user.email,
-          displayName: user.displayName,
+          displayName: user.displayName || "",
           role: "user",
           favoriteParks: [],
           favoriteEvents: [],
         });
+        showToast("🎉 Google account created!", "success");
+      } else {
+        showToast("✅ Logged in with Google!", "success");
       }
 
-      showToast("✅ Signed up with Google!", "success");
-      navigate("/account");
+      navigate("/");
     } catch (err) {
       console.error("Google Signup Error:", err);
       showToast("❌ Google signup failed", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
-  // 🔔 Prompt user to enable push notifications after sign-up
+  // 🔔 Prompt push notifications
   useEffect(() => {
     if (currentUser && Notification.permission !== "granted") {
       setTimeout(() => {
@@ -100,58 +121,53 @@ const Signup = () => {
       <div className="w-full max-w-md bg-white p-8 rounded-3xl shadow-xl transition duration-300 hover:scale-[1.01]">
         {/* 🖼️ Logo + Welcome Message */}
         <div className="flex flex-col items-center mb-6">
-          <img
-            src="/logo.png"
-            alt="National Parks Explorer"
-            className="w-20 h-20 mb-3"
-          />
+          <img src="/logo.png" alt="National Parks Explorer" className="w-20 h-20 mb-3" />
           <h1 className="text-xl sm:text-2xl font-bold text-gray-700 text-center">
             Welcome to <span className="text-pink-600">National Parks Explorer</span>
           </h1>
         </div>
+
         {/* 📝 Form Heading */}
         <h2 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-6 text-pink-600">
           📝 Create Your Account
         </h2>
+
         {error && (
           <div className="text-red-500 text-sm mb-4 text-center">{error}</div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="sr-only" htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Email"
-              autoFocus
-              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-              }}
-              required
-            />
-          </div>
-          <div>
-            <label className="sr-only" htmlFor="password">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
-              onChange={(e) => {
-                setPassword(e.target.value);
-                setError("");
-              }}
-              required
-            />
-          </div>
+          <input
+            id="email"
+            type="email"
+            placeholder="Email"
+            autoFocus
+            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
+            required
+          />
+
+          <input
+            id="password"
+            type="password"
+            placeholder="Password"
+            className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError("");
+            }}
+            required
+          />
+
           <button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-full shadow-md transition"
+            disabled={loading}
           >
-            Sign Up
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
@@ -165,6 +181,7 @@ const Signup = () => {
         <button
           onClick={handleGoogleSignup}
           className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 font-medium py-3 rounded-full shadow text-sm transition flex items-center justify-center gap-2"
+          disabled={loading}
         >
           <FaGoogle className="text-lg" /> Continue with Google
         </button>

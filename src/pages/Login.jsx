@@ -2,8 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db, requestNotificationPermission } from "../firebase";
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "firebase/firestore";
+import {
+  sendPasswordResetEmail
+} from "firebase/auth";
+import { db, requestNotificationPermission, auth } from "../firebase";
 import { FaGoogle } from "react-icons/fa";
 
 const Login = () => {
@@ -13,18 +20,24 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
       const userCredential = await login(email, password);
       const role = await resolveUserRole(userCredential.user.uid);
       showToast("✅ Logged in successfully!", "success");
-      navigate(role === "admin" ? "/admin" : "/account");
+      navigate(role === "admin" ? "/admin" : "/");
     } catch (err) {
       handleAuthError(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -38,18 +51,44 @@ const Login = () => {
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           email: user.email,
-          displayName: user.displayName,
+          displayName: user.displayName || "",
           role: "user",
           favoriteParks: [],
           favoriteEvents: [],
         });
+        showToast("🎉 Account created with Google!", "success");
+      } else {
+        showToast("✅ Logged in with Google!", "success");
       }
 
       const role = userSnap.data()?.role || "user";
-      showToast("✅ Logged in with Google!", "success");
-      navigate(role === "admin" ? "/admin" : "/account");
+      navigate(role === "admin" ? "/admin" : "/");
     } catch (err) {
+      console.error("Google login error:", err);
       showToast("❌ Google login failed", "error");
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      showToast("⚠️ Please enter your email first", "warning");
+      return;
+    }
+
+    if (!isValidEmail(email)) {
+      showToast("⚠️ Invalid email format", "warning");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await sendPasswordResetEmail(auth, email);
+      showToast("📬 Password reset email sent!", "success");
+    } catch (err) {
+      console.error("Forgot password error:", err);
+      showToast("❌ Failed to send reset email", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -103,21 +142,47 @@ const Login = () => {
         {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input type="email" placeholder="Email" value={email}
-            onChange={(e) => { setEmail(e.target.value); setError(""); }}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError("");
+            }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />
-          <input type="password" placeholder="Password" value={password}
-            onChange={(e) => { setPassword(e.target.value); setError(""); }}
+
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setError("");
+            }}
             className="w-full px-4 py-3 border border-gray-300 rounded-full text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-400"
             required
           />
+
+          <div className="text-right text-sm">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-blue-500 hover:underline"
+              disabled={loading}
+            >
+              Forgot password?
+            </button>
+          </div>
+
           <button
             type="submit"
             className="w-full bg-pink-600 hover:bg-pink-700 text-white font-medium py-3 rounded-full shadow transition"
+            disabled={loading}
           >
-            Log In
+            {loading ? "Loading..." : "Log In"}
           </button>
         </form>
 
@@ -131,6 +196,7 @@ const Login = () => {
         <button
           onClick={handleGoogleLogin}
           className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-100 font-medium py-3 rounded-full shadow text-sm transition flex items-center justify-center gap-2"
+          disabled={loading}
         >
           <FaGoogle className="text-lg" /> Continue with Google
         </button>

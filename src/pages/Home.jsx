@@ -276,7 +276,7 @@
           )}
         </div>
         {/* 📄 Pagination */}
-        <div className="flex justify-center mt-10 mb-14 flex-wrap gap-2 z-10 relative">
+        <div className="flex overflow-x-auto whitespace-nowrap justify-center gap-2 mt-10 mb-14 px-2 z-10 relative">
           {Array.from({ length: totalPages }, (_, i) => (
             <button
               key={i + 1}
