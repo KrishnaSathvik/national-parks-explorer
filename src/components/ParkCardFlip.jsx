@@ -14,7 +14,7 @@ const getEmojiByRegion = (state) => {
   return '🌲';
 };
 
-const ParkCardFlip = ({ id, name, state, bestSeason, entryFee = '$35', hours = '24/7', highlight }) => {
+const ParkCardFlip = ({ id, name, slug, state, bestSeason, entryFee = '$35', hours = '24/7', highlight }) => {
   const [flipped, setFlipped] = useState(false);
   const [searchParams] = useSearchParams();
   const currentPage = searchParams.get('page') || 1;
@@ -45,7 +45,7 @@ const ParkCardFlip = ({ id, name, state, bestSeason, entryFee = '$35', hours = '
           <button
             onClick={(e) => {
               e.stopPropagation();
-              navigate(`/park/${id}?page=${currentPage}`);
+              navigate(`/park/${slug}?page=${currentPage}`);
             }}
             className="mt-4 bg-pink-600 text-white px-4 py-2 rounded-full hover:bg-pink-700 text-sm"
           >

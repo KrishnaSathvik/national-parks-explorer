@@ -200,20 +200,18 @@
                       </button>
                     )}
 
-                    <div
-                      onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-                      className="cursor-pointer"
-                    >
-                      <ParkCardFlip 
-                        id={park.id}
-                        name={park.name}
-                        state={park.state}
-                        bestSeason={park.bestSeason}
-                        entryFee={park.entryFee}
-                        hours={park.hours}
-                        highlight={park.highlight}
-                      />
-                    </div>
+                    {/* 🌀 Card Flip Component */}
+                    <ParkCardFlip 
+                      id={park.id}
+                      slug={park.slug}
+                      name={park.name}
+                      state={park.state}
+                      bestSeason={park.bestSeason}
+                      entryFee={park.entryFee}
+                      hours={park.hours}
+                      highlight={park.highlight}
+                      currentPage={currentPage}
+                    />
                   </div>
                 </FadeInWrapper>
               ))
