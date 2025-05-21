@@ -132,36 +132,38 @@ exports.cacheNPSEvents = onRequest({ secrets: [NPS_API_KEY] }, (req, res) => {
   });
 });
 
-exports.sendWelcomePush = onRequest(async (req, res) => {
-  const { token } = req.body;
+  exports.sendWelcomePush = onRequest((req, res) => {
+    corsHandler(req, res, async () => {
+      const { token } = req.body;
 
-  if (!token) {
-    return res.status(400).send("Missing FCM token");
-  }
-
-  try {
-    const payload = {
-      to: token,
-      notification: {
-        title: "🎉 Welcome to National Parks Explorer!",
-        body: "You’ll now receive park updates and alerts.",
-        icon: "/icons/icon-192x192.png"
+      if (!token) {
+        return res.status(400).send("Missing FCM token");
       }
-    };
 
-    await axios.post("https://fcm.googleapis.com/fcm/send", payload, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `key=${process.env.FCM_API_KEY}`
+      try {
+        const payload = {
+          to: token,
+          notification: {
+            title: "🎉 Welcome to National Parks Explorer!",
+            body: "You’ll now receive park updates and alerts.",
+            icon: "/icons/icon-192x192.png"
+          }
+        };
+
+        await axios.post("https://fcm.googleapis.com/fcm/send", payload, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `key=${process.env.FCM_API_KEY}`
+          }
+        });
+
+        res.status(200).send("✅ Welcome push sent");
+      } catch (err) {
+        console.error("❌ Welcome push failed:", err.message);
+        res.status(500).send("Push failed");
       }
     });
-
-    res.status(200).send("✅ Welcome push sent");
-  } catch (err) {
-    console.error("❌ Welcome push failed:", err.message);
-    res.status(500).send("Push failed");
-  }
-});
+  });
 
   // ✅ Broadcast Push Notification to All Devices (users & anonymous)
   exports.broadcastPush = onRequest(async (req, res) => {
