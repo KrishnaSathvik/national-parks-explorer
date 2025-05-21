@@ -18,6 +18,10 @@ A responsive React + Firebase app to explore U.S. National Parks, view seasonal 
 - 📤 Social media sharing support  
 - 🔥 Firebase Functions caching to prevent API overuse  
 - 🧭 Dynamic themes and mobile-responsive design  
+- ✍️ Blog system with slugs, live preview, and rich formatting  
+- 🔔 Push notifications (welcome + preferences)  
+- 🔐 Admin panel with blog/user/event/media moderation  
+- 🌐 SEO support with sitemap, robots.txt, and structured data  
 
 ---
 
@@ -32,14 +36,35 @@ src/
 ├── pages/
 │   ├── Home.jsx
 │   ├── Favorites.jsx
-│   ├── ParkDetail.jsx
+│   ├── ParkDetails.jsx
 │   ├── MapPage.jsx
-│   └── CalendarView.jsx
+│   ├── CalendarView.jsx
+│   ├── Blog.jsx
+│   ├── BlogPost.jsx
+│   └── About.jsx
+├── admin/
+│   ├── AdminPage.jsx
+│   ├── AdminBlogEditor.jsx
+│   ├── EditBlog.jsx
+│   ├── EventsManager.jsx
+│   └── UserManagement.jsx
 ├── components/
 │   ├── Layout.jsx
-│   └── EventHeatmap.jsx
+│   ├── ParkCardFlip.jsx
+│   ├── EventHeatmap.jsx
+│   ├── ShareButtons.jsx
+│   └── SkeletonLoader.jsx
 ├── context/
-│   └── AuthContext.jsx
+│   ├── AuthContext.jsx
+│   └── ToastContext.jsx
+functions/
+├── index.js (Cloud Functions incl. sendWelcomePush with CORS fix)
+scripts/
+├── generate_sitemap.py
+├── backfill_blog_slugs.py
+public/
+├── sitemap.xml
+├── robots.txt
 ```
 
 ---
@@ -48,41 +73,41 @@ src/
 
 | File | Description |
 |------|-------------|
-| **App.jsx** | Core routes + park & favorites logic synced with Firebase |
-| **firebase.js** | Firebase and Firestore config |
-| **main.jsx** | App root mount point |
-| **index.css** | Tailwind CSS import and base styles |
-| **Home.jsx** | Map view, search, pagination, and favorites toggle |
-| **Favorites.jsx** | Park cards & saved events rendered from Firestore |
-| **ParkDetail.jsx** | Park metadata, alerts, weather, food, lodging |
-| **MapPage.jsx** | Dedicated full-screen interactive map |
-| **CalendarView.jsx** | Monthly NPS event heatmap with filters |
-| **EventHeatmap.jsx** | Reusable heatmap component for event overview |
-| **Layout.jsx** | Common layout with navigation/header/footer |
-| **AuthContext.jsx** | Provides global user auth state and actions |
+| **App.jsx** | Main routing + layout structure |
+| **firebase.js** | Firebase config & services (Auth, Firestore, Messaging) |
+| **Home.jsx** | Map, park cards, search, filters, flip UI |
+| **ParkDetails.jsx** | Full park info, tips, alerts, weather, reviews |
+| **Blog.jsx** | Blog listing from Firestore |
+| **BlogPost.jsx** | SEO-friendly blog viewer via slug |
+| **AdminBlogEditor.jsx** | WYSIWYG blog creation with image upload |
+| **EditBlog.jsx** | Edit existing blog post |
+| **UserManagement.jsx** | Admin view to manage users |
+| **CalendarView.jsx** | NPS event calendar + filters |
+| **MapPage.jsx** | Full screen map of parks |
+| **ShareButtons.jsx** | Social share component |
+| **SkeletonLoader.jsx** | Reusable loading skeleton |
+| **generate_sitemap.py** | Builds sitemap with park/blog slugs |
+| **backfill_blog_slugs.py** | Assigns slugs to existing blog posts |
 
 ---
 
 ## 🔐 Firebase Setup
 
-1. Create a Firebase project  
-2. Enable Firestore and Firebase Auth  
-3. Upload `parks` collection & deploy functions  
-4. Set Firebase config in `firebase.js`
+1. Create Firebase project  
+2. Enable Firestore, Auth, Cloud Messaging  
+3. Add config to `.env` and `firebase.js`  
+4. Add your domain in Firebase Authentication → Authorized Domains  
+5. Upload parks to Firestore  
+6. Deploy Cloud Functions
 
 ```js
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_APP.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  ...
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  messagingSenderId: "...",
+  appId: "...",
 };
-
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
 ```
 
 ---
@@ -91,8 +116,8 @@ export const db = getFirestore(app);
 
 | Function | Purpose |
 |---------|---------|
-| **getParkEvents** | Proxy for real-time NPS event API requests |
-| **cacheNPSEvents** | Caches all events into Firestore (manual trigger) |
+| **sendWelcomePush** | Sends a push notification after signup (CORS fixed) |
+| **cacheNPSEvents** | (Optional) caches events from NPS API |
 
 ---
 
@@ -100,19 +125,30 @@ export const db = getFirestore(app);
 
 ```bash
 npm install         # install dependencies
-npm run dev         # start dev server
+npm run dev         # start Vite dev server
 npm run build       # production build
-firebase deploy     # deploy functions and Firestore rules
+firebase deploy     # deploy functions & Firestore
 ```
 
 ---
 
-## 🙌 Contributing
+## 📈 SEO Optimizations
 
-Contributions welcome! Feel free to fork, improve, and submit PRs.
+- `/sitemap.xml` with park + blog slugs
+- `/robots.txt` for crawlers
+- JSON-LD structured data for blogs and parks
+- Optimized mobile-first UI
+- Firebase Hosting OR Vercel + Google Search Console verified
 
 ---
 
 ## 🔗 Live Demo
 
-[https://national-parks-explorer.vercel.app](https://national-parks-explorer.vercel.app)
+🌐 [https://www.nationalparksexplorerusa.com](https://www.nationalparksexplorerusa.com)
+
+---
+
+## 🙌 Contributing
+
+Pull requests and feedback welcome. Made with ❤️ under starry skies.
+
