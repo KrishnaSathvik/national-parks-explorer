@@ -159,15 +159,21 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
 
-              {/* ✅ Protected Routes */}
+              {/* ✅ Redirect root path to /signup for unauthenticated users */}
               <Route
                 path="/"
                 element={
-                  <PrivateRoute>
-                    <Home parks={parks} favorites={favorites} toggleFavorite={toggleFavorite} />
-                  </PrivateRoute>
+                  currentUser ? (
+                    <PrivateRoute>
+                      <Home parks={parks} favorites={favorites} toggleFavorite={toggleFavorite} />
+                    </PrivateRoute>
+                  ) : (
+                    <Signup />
+                  )
                 }
               />
+
+              {/* ✅ Protected Routes */}
               <Route
                 path="/park/:slug"
                 element={
