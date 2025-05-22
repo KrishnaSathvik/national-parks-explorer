@@ -1,6 +1,7 @@
 import React from "react";
 import Footer from "./Footer";
 import ScrollToTopButton from "./ScrollToTopButton";
+import BottomNav from "./BottomNav"; // Add this at top
 
 const Layout = ({ children }) => {
   return (
@@ -9,6 +10,7 @@ const Layout = ({ children }) => {
         {children}
       </main>
       <Footer />
+      <BottomNav /> 
       <ScrollToTopButton />
     </div>
   );

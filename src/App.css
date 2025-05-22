@@ -51,3 +51,34 @@
 .hover-zoom:hover {
   transform: scale(1.03);
 }
+
+/* ============================================
+   Ripple Effect
+============================================ */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 9999px;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 1;
+  pointer-events: none;
+  left: 50%;
+  top: 50%;
+  animation: ripple-animation 0.5s linear;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
