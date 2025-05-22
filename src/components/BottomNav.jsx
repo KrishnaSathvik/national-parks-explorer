@@ -5,7 +5,7 @@ import {
   CalendarIcon,
   StarIcon,
   UserIcon,
-} from "@heroicons/react/outline";
+} from "@heroicons/react/24/outline";
 
 const BottomNav = () => {
   const { pathname } = useLocation();
