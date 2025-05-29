@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +21,7 @@ const MapPage = () => {
   const [fullscreen, setFullscreen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const mapRef = useRef(); // ✅ Reference for Leaflet map
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -34,6 +35,15 @@ const MapPage = () => {
     };
     fetchParks();
   }, []);
+
+  // ✅ Invalidate map size on fullscreen toggle
+  useEffect(() => {
+    if (fullscreen && mapRef.current) {
+      setTimeout(() => {
+        mapRef.current.invalidateSize();
+      }, 300);
+    }
+  }, [fullscreen]);
 
   return (
     <motion.div
@@ -81,6 +91,9 @@ const MapPage = () => {
         zoom={4}
         scrollWheelZoom={true}
         className="w-full h-full z-0"
+        whenCreated={(mapInstance) => {
+          mapRef.current = mapInstance; // ✅ Assign map reference
+        }}
       >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
