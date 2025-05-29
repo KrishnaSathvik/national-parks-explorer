@@ -167,7 +167,6 @@ function App() {
           <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
             <Routes>
               {/* ✅ Public Routes */}
-              {isMobile && <Route path="/map" element={<MapPage />} />}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />

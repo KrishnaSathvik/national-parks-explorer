@@ -3,9 +3,11 @@ import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import draftToHtml from "draftjs-to-html";
+import useIsMobile from "../hooks/useIsMobile";
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const loadBlogs = async () => {
@@ -24,12 +26,13 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 py-12 px-4 font-sans">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-4">
-          <Link to="/" className="text-sm text-blue-600 hover:underline">
-            ← Back to Parks
-          </Link>
-        </div>
-
+        {!isMobile && (
+          <div className="mb-4">
+            <Link to="/" className="text-sm text-blue-600 hover:underline">
+              ← Back to Parks
+            </Link>
+          </div>
+        )}
         <div className="bg-white/80 backdrop-blur-md border border-white p-6 sm:p-10 rounded-3xl shadow-xl">
           <h1 className="text-3xl sm:text-4xl font-extrabold text-pink-600 mb-6 text-center sm:text-left font-heading">
             📚 Travel Stories

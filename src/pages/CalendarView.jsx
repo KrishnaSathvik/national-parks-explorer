@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import useIsMobile from "../hooks/useIsMobile";
 import { useAuth } from "../context/AuthContext";
 import { db } from "../firebase";
 import {
@@ -27,6 +28,7 @@ const CalendarView = () => {
 
   const navigate = useNavigate();
   const { currentUser } = useAuth();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -114,13 +116,14 @@ const CalendarView = () => {
     <div className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 py-12 px-4 font-sans">
       <ToastContainer />
       <div className="max-w-7xl mx-auto">
-        <button
-          onClick={() => navigate("/")}
-          className="text-pink-600 hover:underline text-sm mb-6 inline-block"
-        >
-          ← Back to Parks
-        </button>
-
+        {!isMobile && (
+          <button
+            onClick={() => navigate("/")}
+            className="text-pink-600 hover:underline text-sm mb-6 inline-block"
+          >
+            ← Back to Parks
+          </button>
+        )}
         <div className="bg-white/80 backdrop-blur-md border border-white p-6 sm:p-10 rounded-3xl shadow-xl">
           <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-center mb-4 text-pink-600">
             🗓️ National Park Events

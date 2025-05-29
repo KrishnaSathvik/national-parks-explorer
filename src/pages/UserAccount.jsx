@@ -140,12 +140,13 @@ const UserAccount = () => {
       transition={{ duration: 0.6 }}
       className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-8"
     >
-      <div className="mb-4">
-        <Link to="/" className="text-sm text-blue-600 hover:underline">
-          ← Back to Explore
-        </Link>
-      </div>
-
+     {!isMobile && (
+       <div className="mb-4">
+         <Link to="/" className="text-sm text-blue-600 hover:underline">
+           ← Back to Explore
+         </Link>
+       </div>
+     )}
       <div className="bg-white/80 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-xl max-w-7xl mx-auto border border-white">
         {/* Account Header */}
         <div className="flex items-center gap-4 mb-6">

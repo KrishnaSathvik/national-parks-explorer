@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import useIsMobile from "../hooks/useIsMobile";
 import { FaMapMarkedAlt, FaCameraRetro, FaGlobeAmericas } from "react-icons/fa";
 
+const isMobile = useIsMobile();
 const About = () => {
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 py-12">
@@ -110,12 +112,14 @@ const About = () => {
 
           {/* CTA */}
           <div className="pt-10 text-center space-y-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition text-sm sm:text-base font-medium shadow"
-            >
-              🌲 Explore National Parks
-            </Link>
+            {!isMobile && (
+              <Link
+                to="/"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition text-sm sm:text-base font-medium shadow"
+              >
+                🌲 Explore National Parks
+              </Link>
+            )}
             <p className="mt-4 text-xs text-gray-400">
               Made under starry skies, powered by passion for the wild.
             </p>

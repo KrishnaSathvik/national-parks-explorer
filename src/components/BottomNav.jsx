@@ -10,20 +10,23 @@ import {
 const BottomNav = () => {
   const { pathname } = useLocation();
 
+  // ⛔️ Hide on login/signup/admin routes
+  const hiddenRoutes = ["/login", "/signup", "/admin/login"];
+  if (hiddenRoutes.includes(pathname)) return null;
+
   const navItems = [
     { name: "Home", icon: <HomeIcon className="h-6 w-6 icon-pop" />, path: "/" },
     { name: "Map", icon: <MapIcon className="h-6 w-6 icon-pop" />, path: "/map" },
-    { name: "Calendar", icon: <CalendarIcon className="h-6 w-6 icon-pop" />, path: "/calendar" },
-    { name: "Favorites", icon: <StarIcon className="h-6 w-6 icon-pop" />, path: "/favorites" }, // 👈 update path
+    { name: "Events", icon: <CalendarIcon className="h-6 w-6 icon-pop" />, path: "/calendar" },
+    { name: "Favorites", icon: <StarIcon className="h-6 w-6 icon-pop" />, path: "/favorites" },
     { name: "Account", icon: <UserIcon className="h-6 w-6 icon-pop" />, path: "/account" },
   ];
 
-
   const handleClick = (e) => {
-    const icon = e.currentTarget.querySelector('.icon-pop');
+    const icon = e.currentTarget.querySelector(".icon-pop");
     if (icon) {
-      icon.classList.add('animate-pop');
-      setTimeout(() => icon.classList.remove('animate-pop'), 300);
+      icon.classList.add("animate-pop");
+      setTimeout(() => icon.classList.remove("animate-pop"), 300);
     }
   };
 

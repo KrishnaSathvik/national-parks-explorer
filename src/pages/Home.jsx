@@ -88,20 +88,65 @@
                 🌍 Explore National Parks
               </h1>
               <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 text-sm font-medium">
-                <Link to="/calendar" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"><FaCalendarAlt /> Park Events</Link>
-                <Link to="/blog" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"><FaNewspaper /> Blog Stories</Link>
-                <Link to="/about" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"><FaBookOpen /> About</Link>
+                {!isMobile && (
+                  <Link
+                    to="/calendar"
+                    className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                  >
+                    <FaCalendarAlt /> Park Events
+                  </Link>
+                )}
+
+                <Link
+                  to="/blog"
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                >
+                  <FaNewspaper /> Blog Stories
+                </Link>
+
+                <Link
+                  to="/about"
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                >
+                  <FaBookOpen /> About
+                </Link>
+
                 {currentUser ? (
                   <>
-                    {userRole === "admin" ? (
-                      <a href="/admin" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"><FaCogs /> Admin Panel</a>
-                    ) : (
-                      <Link to="/account" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"><FaUser /> My Account</Link>
+                    {!isMobile && userRole !== "admin" && (
+                      <Link
+                        to="/account"
+                        className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                      >
+                        <FaUser /> My Account
+                      </Link>
                     )}
-                    <button onClick={handleLogout} className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border hover:bg-red-50 hover:text-red-500 transition">Logout</button>
+
+                    {userRole === "admin" && (
+                      <a
+                        href="/admin"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"
+                      >
+                        <FaCogs /> Admin Panel
+                      </a>
+                    )}
+
+                    <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border hover:bg-red-50 hover:text-red-500 transition"
+                    >
+                      Logout
+                    </button>
                   </>
                 ) : (
-                  <Link to="/login" className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"><FaLock /> Login</Link>
+                  <Link
+                    to="/login"
+                    className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition"
+                  >
+                    <FaLock /> Login
+                  </Link>
                 )}
               </div>
             </div>
