@@ -1,12 +1,11 @@
 // ✅ Polished ParkDetails.jsx (Airbnb-style layout, rich UI)
 import React, { useEffect, useState } from "react";
-import { useParams, useSearchParams, useLocation, Link } from "react-router-dom";
+import { useParams, useSearchParams, useLocation, useNavigate, Link } from "react-router-dom";
 import {
   doc, getDoc, collection, addDoc, query, where,
   getDocs, serverTimestamp
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useLocation, useNavigate } from "react-router-dom";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import Accordion from "./Accordion";
 import { motion } from "framer-motion";
