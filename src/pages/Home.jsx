@@ -7,6 +7,7 @@
     import { useAuth } from "../context/AuthContext";
     import ParkCardFlip from "../components/ParkCardFlip";
     import { useToast } from "../context/ToastContext";
+    import useIsMobile from "../hooks/useIsMobile";
     import SkeletonLoader from "../components/SkeletonLoader";
 
     import {
@@ -36,6 +37,7 @@
       const navigate = useNavigate();
       const { showToast } = useToast();
       const { currentUser, userRole, logout } = useAuth();
+      const isMobile = useIsMobile();
 
       const parksPerPage = 9;
 
@@ -103,6 +105,14 @@
                 )}
               </div>
             </div>
+
+            // show embedded map only for desktop
+            {!isMobile && (
+              <section className="mt-8">
+                <h2 className="text-xl font-bold mb-4 text-pink-600">🗺️ Explore the Map</h2>
+                <MapComponent /> {/* or however your map is embedded */}
+              </section>
+            )}
 
             {/* 🗺️ Map */}
             <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow mb-6">

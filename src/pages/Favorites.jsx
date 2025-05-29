@@ -4,96 +4,94 @@ import { useAuth } from "../context/AuthContext";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import FavoritesView from "../components/FavoritesView";
+import SkeletonLoader from "../components/SkeletonLoader";
 
 const Favorites = () => {
   const { currentUser } = useAuth();
   const [userDoc, setUserDoc] = useState(null);
   const [favoriteParks, setFavoriteParks] = useState([]);
   const [favoriteEvents, setFavoriteEvents] = useState([]);
+  const [parksLoading, setParksLoading] = useState(true);
+  const [eventsLoading, setEventsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!currentUser) return;
+
     const fetchData = async () => {
-      if (!currentUser) return;
-      const userRef = doc(db, "users", currentUser.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) return;
+      try {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (!userSnap.exists()) return;
 
-      const userData = userSnap.data();
-      setUserDoc(userData);
+        const userData = userSnap.data();
+        setUserDoc(userData);
 
-      // Fetch all parks
-      const parkSnap = await getDocs(collection(db, "parks"));
-      const parks = parkSnap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+        const parksSnap = await getDocs(collection(db, "parks"));
+        const allParks = parksSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const favorites = allParks.filter((p) => userData.favoriteParks?.includes(p.id));
+        setFavoriteParks(favorites);
+        setParksLoading(false);
 
-      const favorites = parks.filter((p) =>
-        userData.favoriteParks?.includes(p.id)
-      );
-      setFavoriteParks(favorites);
-
-      setFavoriteEvents(userData.favoriteEvents || []);
+        const parsedEvents = (userData.favoriteEvents || []).map((event) => {
+          const safeStart = event?.start ? new Date(event.start) : null;
+          const safeEnd = event?.end ? new Date(event.end) : safeStart;
+          return {
+            ...event,
+            start: safeStart instanceof Date && !isNaN(safeStart) ? safeStart : null,
+            end: safeEnd instanceof Date && !isNaN(safeEnd) ? safeEnd : null,
+          };
+        });
+        setFavoriteEvents(parsedEvents);
+        setEventsLoading(false);
+      } catch (error) {
+        console.error("Failed to fetch favorites:", error);
+      }
     };
+
     fetchData();
   }, [currentUser]);
 
-  if (!currentUser)
+  if (!currentUser) {
     return (
-      <p className="text-center text-pink-600 py-10">
-        Please log in to view your favorites.
-      </p>
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl mx-auto px-4 py-10 text-center"
+      >
+        <h1 className="text-2xl font-bold text-pink-600 mb-4">Please log in to view your favorites.</h1>
+      </motion.div>
     );
+  }
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-pink-600">🌟 Your Favorites</h1>
-      <div className="space-y-10">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">💖 Favorite Parks</h2>
-          {favoriteParks.length === 0 ? (
-            <p className="text-gray-500 text-sm">No favorite parks yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {favoriteParks.map((park) => (
-                <li
-                  key={park.id}
-                  onClick={() =>
-                    navigate(`/park/${park.slug}?id=${park.id}`, {
-                      state: { from: "favorites" },
-                    })
-                  }
-                  className="p-4 bg-white border rounded-xl shadow hover:shadow-md cursor-pointer transition"
-                >
-                  <h3 className="text-lg font-medium text-pink-600">{park.name}</h3>
-                  <p className="text-sm text-gray-500">📍 {park.state}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-8"
+    >
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-heading font-bold mb-6 text-pink-600 text-center">🌟 Your Favorites</h1>
 
-        <div>
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">📅 Favorite Events</h2>
-          {favoriteEvents.length === 0 ? (
-            <p className="text-gray-500 text-sm">No favorite events yet.</p>
-          ) : (
-            <ul className="space-y-3">
-              {favoriteEvents.map((event) => (
-                <li key={event.id} className="bg-white p-4 rounded-xl shadow border">
-                  <h4 className="text-pink-600 font-semibold">{event.title}</h4>
-                  <p className="text-sm text-gray-600">📍 {event.park}</p>
-                  <p className="text-sm text-gray-600">
-                    🗓️ {event.start ? new Date(event.start).toDateString() : "No date"}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        {parksLoading && eventsLoading ? (
+          <SkeletonLoader />
+        ) : (
+          <FavoritesView
+            parks={favoriteParks}
+            events={favoriteEvents}
+            onRemovePark={() => {}}
+            onRemoveEvent={() => {}}
+            parksLoading={parksLoading}
+            eventsLoading={eventsLoading}
+            hideRemoveButtons
+          />
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 };
 

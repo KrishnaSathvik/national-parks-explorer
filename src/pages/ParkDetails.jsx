@@ -100,7 +100,7 @@ const ParkDetails = () => {
   const [fadeOut, setFadeOut] = useState(false);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [alertsLoading, setAlertsLoading] = useState(true);
-  
+  const [notFound, setNotFound] = useState(false); // ✅ Added to fix crash
 
   const averageRating = reviews.length
     ? (reviews.reduce((sum, r) => sum + (parseInt(r.rating) || 0), 0) / reviews.length).toFixed(1)
@@ -234,6 +234,14 @@ const ParkDetails = () => {
     setEditingIndex(null);
     setEditComment("");
   };
+
+  if (notFound) {
+    return (
+      <div className="text-center py-20 text-gray-600">
+        ❌ Park not found. Please check the URL or try again later.
+      </div>
+    );
+  }
 
   if (!park) {
     return (

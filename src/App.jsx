@@ -8,6 +8,7 @@ import ScrollToTopButton from "./components/ScrollToTopButton";
 import PrivateRoute from "./components/PrivateRoute";
 import { db } from "./firebase";
 import Favorites from "./pages/Favorites";
+import useIsMobile from "./hooks/useIsMobile";
 import {
   collection,
   getDocs,
@@ -34,6 +35,8 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const About = lazy(() => import("./pages/About"));
 const UserAccount = lazy(() => import("./pages/UserAccount"));
+const isMobile = useIsMobile();
+
 
 // ✅ Admin lazy-loaded
 const AdminLogin = lazy(() => import("./admin/AdminLogin"));
@@ -153,6 +156,8 @@ function App() {
           <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
             <Routes>
               {/* ✅ Public Routes */}
+              <Route path="/" element={<Home />} />
+                {isMobile && <Route path="/map" element={<MapPage />} />}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />

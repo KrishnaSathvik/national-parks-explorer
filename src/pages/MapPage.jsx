@@ -1,13 +1,13 @@
-// ✅ Polished MapPage.jsx
+// src/pages/MapPage.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import { db } from "../firebase";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-// 🛠️ Fix Leaflet default icon issues
+// 🛠️ Fix missing marker icons
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -25,27 +25,25 @@ const MapPage = () => {
         const snapshot = await getDocs(collection(db, "parks"));
         const parksList = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         setParks(parksList);
-      } catch (err) {
-        console.error("Failed to load parks for map:", err);
+      } catch (error) {
+        console.error("Failed to fetch parks:", error);
       }
     };
-
     fetchParks();
   }, []);
 
   return (
-    <div className="relative h-screen w-full font-sans">
-      {/* 🧭 Header Overlay */}
-      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-[999] bg-white/90 backdrop-blur-md rounded-full shadow px-6 py-2 text-sm font-medium text-gray-800">
+    <div className="relative w-full h-screen">
+      {/* Floating header */}
+      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow text-sm font-medium text-gray-800">
         🗺️ Explore National Parks Map
       </div>
 
-      {/* 🗺️ Leaflet Map */}
       <MapContainer
-        center={[39.8283, -98.5795]}
+        center={[39.8283, -98.5795]} // Center of USA
         zoom={4}
         scrollWheelZoom={true}
-        className="h-full w-full z-0"
+        className="w-full h-full z-0"
       >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
@@ -64,7 +62,7 @@ const MapPage = () => {
                 key={park.id}
                 position={[lat, lng]}
                 eventHandlers={{
-                  click: () => navigate(`/park/${park.id}`),
+                  click: () => navigate(`/park/${park.slug || park.id}`),
                 }}
               >
                 <Popup>

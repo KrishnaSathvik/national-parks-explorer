@@ -1,10 +1,9 @@
-// ✅ BlogPost.jsx (Polished Blog Detail)
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { db, auth } from "../firebase";
 import {
   doc,
-  getDoc,
+  getDocs,
   collection,
   addDoc,
   query,
@@ -17,13 +16,48 @@ import draftToHtml from "draftjs-to-html";
 import ShareButtons from "../components/ShareButtons";
 
 const BlogPost = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(true);
   const [user] = useAuthState(auth);
-  const { slug } = useParams();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const q = query(collection(db, "blogs"), where("slug", "==", slug));
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+          const docData = snap.docs[0].data();
+          setPost({
+            ...docData,
+            id: snap.docs[0].id,
+          });
+        } else {
+          setPost(null);
+        }
+      } catch (err) {
+        console.error("Error loading blog post:", err.message);
+        setPost(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [slug]);
+
+  useEffect(() => {
+    if (!post?.id) return;
+
+    const q = query(collection(db, "comments"), where("blogId", "==", post.id));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setComments(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
+  }, [post?.id]);
 
   useEffect(() => {
     if (!post) return;
@@ -52,45 +86,6 @@ const BlogPost = () => {
     };
   }, [post]);
 
-  useEffect(() => {
-  const fetchPost = async () => {
-    try {
-      const q = query(collection(db, "blogs"), where("slug", "==", slug));
-      const snap = await getDocs(q);
-
-      if (!snap.empty) {
-        const docData = snap.docs[0].data();
-        setPost({
-          ...docData,
-          id: snap.docs[0].id,
-        });
-
-        if (docData.content) {
-          const raw = JSON.parse(docData.content);
-          const contentState = convertFromRaw(raw);
-          setEditorState(EditorState.createWithContent(contentState));
-        }
-      } else {
-        setNotFound(true);
-      }
-    } catch (err) {
-      console.error("Error loading blog post:", err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchPost();
-}, [slug]);
-
-  useEffect(() => {
-    const q = query(collection(db, "comments"), where("blogId", "==", id));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setComments(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-    return () => unsubscribe();
-  }, [id]);
-
   const isAuthor = user?.email === post?.author;
   const isAdmin = user?.email === "krishnasathvikm@gmail.com";
 
@@ -100,7 +95,7 @@ const BlogPost = () => {
 
     try {
       await addDoc(collection(db, "comments"), {
-        blogId: id,
+        blogId: post.id,
         text: newComment,
         author: user.email,
         date: serverTimestamp(),
@@ -165,7 +160,7 @@ const BlogPost = () => {
 
           {(isAuthor || isAdmin) && (
             <Link
-              to={`/admin/edit-blog/${id}`}
+              to={`/admin/edit-blog/${post?.id}`}
               className="inline-block mt-6 bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm"
             >
               ✏️ Edit Post
