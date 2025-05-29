@@ -275,12 +275,14 @@ const ParkDetails = () => {
       className={`min-h-screen px-4 py-8 font-sans ${backgroundThemes[park?.parkCode?.toLowerCase()] || "bg-white"}`}
     >
       <div className="max-w-5xl mx-auto">
-        <Link
-          to={from === "favorites" ? "/favorites" : `/?page=${page}`}
-          className="text-sm text-blue-600 hover:underline mb-4 inline-block"
-        >
-          ← Back to parks
-        </Link>
+        {!fromAccount && (
+            <button
+              onClick={() => navigate("/")}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              ← Back to parks
+            </button>
+          )}
         {fromAccount && (
           <div className="mb-4">
             <button
