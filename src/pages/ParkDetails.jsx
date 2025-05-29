@@ -81,12 +81,13 @@ const backgroundThemes = {
 };
 
 const ParkDetails = () => {
-  const { id } = useParams();
+  
+  const { slug } = useParams();
   const [searchParams] = useSearchParams();
+  const parkId = searchParams.get("id");
   const location = useLocation();
   const from = location.state?.from;
   const page = searchParams.get("page") || 1;
-
   const [park, setPark] = useState(null);
   const [weather, setWeather] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -99,7 +100,7 @@ const ParkDetails = () => {
   const [fadeOut, setFadeOut] = useState(false);
   const [reviewsLoading, setReviewsLoading] = useState(true);
   const [alertsLoading, setAlertsLoading] = useState(true);
-  const { slug } = useParams();
+  
 
   const averageRating = reviews.length
     ? (reviews.reduce((sum, r) => sum + (parseInt(r.rating) || 0), 0) / reviews.length).toFixed(1)
@@ -150,15 +151,16 @@ const ParkDetails = () => {
   }, [slug]);
 
   useEffect(() => {
+    if (!parkId) return;
     const fetchReviews = async () => {
       setReviewsLoading(true);
-      const q = query(collection(db, "reviews"), where("parkId", "==", id));
+      const q = query(collection(db, "reviews"), where("parkId", "==", parkId));
       const snapshot = await getDocs(q);
       setReviews(snapshot.docs.map((doc) => doc.data()));
       setReviewsLoading(false);
     };
     fetchReviews();
-  }, [id]);
+  }, [parkId]);
 
   useEffect(() => {
     if (!park?.name) return;
@@ -195,7 +197,7 @@ const ParkDetails = () => {
     await addDoc(collection(db, "reviews"), {
       ...newReview,
       rating: parseInt(newReview.rating),
-      parkId: id,
+      parkId: parkId,
       timestamp: serverTimestamp(),
       likes: 0,
     });
@@ -210,7 +212,7 @@ const ParkDetails = () => {
   };
 
   const handleLike = async (index) => {
-    const likedKey = `liked-${id}-${index}`;
+    const likedKey = `liked-${parkId}-${index}`;
     if (localStorage.getItem(likedKey)) return;
     const q = query(collection(db, "reviews"), where("parkId", "==", id));
     const snapshot = await getDocs(q);
