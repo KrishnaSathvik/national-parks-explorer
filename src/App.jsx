@@ -56,8 +56,9 @@ function App() {
   const location = useLocation();
   const hiddenRoutes = ["/login", "/signup", "/admin/login"];
   const shouldHideBottomNav =
-    hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
-    location.pathname === "/" && !currentUser;
+  hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
+  (location.pathname === "/" && !currentUser);
+
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -258,10 +259,12 @@ function App() {
           </Suspense>
         </div>
       </Layout>
-      {/* 📲 Install */}
-              <InstallButton />
       <ScrollToTopButton />
-      {isMobile && !shouldHideBottomNav && <BottomNav />} {/* ✅ This line hides it on login/signup */}
+      <InstallButton />
+      {/* ✅ Debug bottom nav visibility */}
+      console.log("📍 Current Path:", location.pathname);
+      console.log("🙈 Should Hide BottomNav:", shouldHideBottomNav);
+      {isMobile && !shouldHideBottomNav && <BottomNav />}
     </div>
   );
 }
