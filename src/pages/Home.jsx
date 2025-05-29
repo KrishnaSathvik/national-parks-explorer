@@ -106,35 +106,31 @@
               </div>
             </div>
 
-            // show embedded map only for desktop
             {!isMobile && (
-              <section className="mt-8">
-                <h2 className="text-xl font-bold mb-4 text-pink-600">🗺️ Explore the Map</h2>
-                <MapComponent /> {/* or however your map is embedded */}
-              </section>
+              <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow mb-6">
+                <MapContainer center={[39.5, -98.35]} zoom={4} scrollWheelZoom={false} className="w-full h-full">
+                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                  {parks.map((park) => {
+                    if (!park.coordinates?.includes(",")) return null;
+                    const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
+                    if (isNaN(lat) || isNaN(lng)) return null;
+                    return (
+                      <Marker key={park.id} position={[lat, lng]}>
+                        <Popup>
+                          <strong>{park.name}</strong><br />
+                          <button
+                            onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
+                            className="text-blue-600 underline mt-1"
+                          >
+                            View Park →
+                          </button>
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
+                </MapContainer>
+              </div>
             )}
-
-            {/* 🗺️ Map */}
-            <div className="w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow mb-6">
-              <MapContainer center={[39.5, -98.35]} zoom={4} scrollWheelZoom={false} className="w-full h-full">
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {parks.map((park) => {
-                  if (!park.coordinates?.includes(",")) return null;
-                  const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
-                  if (isNaN(lat) || isNaN(lng)) return null;
-                  return (
-                    <Marker key={park.id} position={[lat, lng]}>
-                      <Popup>
-                        <strong>{park.name}</strong><br />
-                        <button onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)} className="text-blue-600 underline mt-1">
-                          View Park →
-                        </button>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
-              </MapContainer>
-            </div>
 
             {/* 🔍 Search & State Filters */}
             <div className="flex flex-col sm:flex-row gap-3 mb-6">

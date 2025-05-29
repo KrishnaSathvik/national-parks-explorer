@@ -55,6 +55,7 @@ const BlogPost = () => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setComments(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
     });
+
     return () => unsubscribe();
   }, [post?.id]);
 
@@ -103,10 +104,20 @@ const BlogPost = () => {
     }
   };
 
-  if (loading)
+  if (loading) {
     return <div className="p-6 text-gray-500 font-sans">Loading blog...</div>;
-  if (!post)
+  }
+
+  if (!post) {
     return <div className="p-6 text-red-500 font-sans">❌ Blog post not found.</div>;
+  }
+
+  const postContentHTML = draftToHtml(
+    typeof post.content === "string" ? JSON.parse(post.content) : post.content
+  );
+
+  const wordCount = postContentHTML.split(" ").length;
+  const readTime = Math.ceil(wordCount / 200);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 py-12 px-4 font-sans">
@@ -125,12 +136,8 @@ const BlogPost = () => {
           <p className="text-sm text-gray-500 mb-4">
             📅 {post.date?.seconds
               ? new Date(post.date.seconds * 1000).toLocaleDateString()
-              : "Unknown date"} · 📖 {(() => {
-              const wordCount = draftToHtml(
-                typeof post.content === "string" ? JSON.parse(post.content) : post.content
-              ).split(" ").length;
-              return `${Math.ceil(wordCount / 200)} min read`;
-            })()}
+              : "Unknown date"}{" "}
+            · 📖 {readTime} min read
           </p>
 
           <ShareButtons title={post.title} />
@@ -145,13 +152,7 @@ const BlogPost = () => {
 
           <div
             className="prose prose-sm sm:prose-base max-w-none text-gray-800 leading-relaxed space-y-4 font-sans"
-            dangerouslySetInnerHTML={{
-              __html: draftToHtml(
-                typeof post.content === "string"
-                  ? JSON.parse(post.content)
-                  : post.content
-              ),
-            }}
+            dangerouslySetInnerHTML={{ __html: postContentHTML }}
           />
 
           {(isAuthor || isAdmin) && (
@@ -164,6 +165,7 @@ const BlogPost = () => {
           )}
 
           <hr className="my-8" />
+
           <div>
             <h3 className="text-lg font-semibold mb-4">💬 Comments</h3>
 
@@ -194,6 +196,7 @@ const BlogPost = () => {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
+
             <button
               onClick={handleCommentSubmit}
               className="mt-3 bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded-lg text-sm"
