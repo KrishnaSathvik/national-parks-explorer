@@ -54,10 +54,10 @@ function App() {
   const { showToast } = useToast();
   const isMobile = useIsMobile();
   const location = useLocation();
+  const hiddenRoutes = ["/login", "/signup", "/admin/login"];
   const shouldHideBottomNav =
-  !currentUser || ["/login", "/signup", "/admin/login"].includes(location.pathname);
-
-
+    hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
+    location.pathname === "/" && !currentUser;
 
   useEffect(() => {
     const fetchParks = async () => {

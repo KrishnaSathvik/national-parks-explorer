@@ -38,12 +38,12 @@ const MapPage = () => {
 
   // ✅ Invalidate map size on fullscreen toggle
   useEffect(() => {
-    if (fullscreen && mapRef.current) {
+    if (fullscreen && isMobile) {
       setTimeout(() => {
-        mapRef.current.invalidateSize();
-      }, 300);
+        window.dispatchEvent(new Event('resize'));
+      }, 300); // Delay to give DOM time to apply styles
     }
-  }, [fullscreen]);
+  }, [fullscreen, isMobile]);
 
   return (
     <motion.div
