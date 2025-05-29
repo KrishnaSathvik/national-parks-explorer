@@ -30,10 +30,14 @@ const corsHandler = cors({
     "https://national-parks-explorer.vercel.app",
     "http://localhost:5173"
   ],
-  methods: ["GET"],
+  methods: ["GET", "POST", "OPTIONS"],
+  credentials: true
 });
 
 app.use(corsHandler);
+// ✅ Handle preflight OPTIONS for all routes (required for CORS in Gen 2)
+app.options("*", corsHandler);
+
 
 // 🔁 Live NPS Events Proxy
 app.get("/", async (req, res) => {

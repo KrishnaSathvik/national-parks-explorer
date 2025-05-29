@@ -35,7 +35,10 @@ const UserAccount = () => {
 
         const parksSnap = await getDocs(collection(db, "parks"));
         const allParks = parksSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        const favorites = allParks.filter((p) => userData.favoriteParks?.includes(p.id));
+        const favorites = userData.favoriteParks
+          ?.map(id => allParks.find(p => p.id === id))
+          .filter(Boolean); // Remove undefined (i.e., parkId not found)
+
         setFavoriteParks(favorites);
         setParksLoading(false);
 

@@ -193,7 +193,17 @@ const ParkDetails = () => {
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
+
     if (!newReview.author || !newReview.comment || !newReview.rating) return;
+
+    const parkRef = doc(db, "parks", parkId);
+    const parkSnap = await getDoc(parkRef);
+
+    if (!parkSnap.exists()) {
+      alert("❌ Cannot submit review. Park ID is invalid.");
+      return;
+    }
+
     await addDoc(collection(db, "reviews"), {
       ...newReview,
       rating: parseInt(newReview.rating),
@@ -201,15 +211,18 @@ const ParkDetails = () => {
       timestamp: serverTimestamp(),
       likes: 0,
     });
+
     setSuccessMessage("✅ Review submitted successfully!");
     setFadeOut(false);
     setTimeout(() => setFadeOut(true), 3000);
     setTimeout(() => setSuccessMessage(""), 4000);
     setNewReview({ author: "", comment: "", rating: "" });
-    const q = query(collection(db, "reviews"), where("parkId", "==", id));
+
+    const q = query(collection(db, "reviews"), where("parkId", "==", parkId));
     const snapshot = await getDocs(q);
     setReviews(snapshot.docs.map((doc) => doc.data()));
   };
+
 
   const handleLike = async (index) => {
     const likedKey = `liked-${parkId}-${index}`;
