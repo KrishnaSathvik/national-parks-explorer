@@ -234,6 +234,7 @@ const UserAccount = () => {
               ))}
             </div>
           </Section>
+          </div>
         {/* Reviews */}
         {userReviews.length > 0 && (
           <div className="mt-10">
