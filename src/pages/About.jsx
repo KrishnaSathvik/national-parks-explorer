@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import useIsMobile from "../hooks/useIsMobile";
 import { FaMapMarkedAlt, FaCameraRetro, FaGlobeAmericas } from "react-icons/fa";
 
-const isMobile = useIsMobile();
 const About = () => {
+  const isMobile = useIsMobile(); // ⬅️ Fix: call inside component
+
   return (
     <div className="relative min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 py-12">
       <motion.div
@@ -15,6 +16,7 @@ const About = () => {
         transition={{ duration: 0.8 }}
       >
         <section className="bg-white/80 backdrop-blur-md p-8 sm:p-10 rounded-3xl shadow-xl space-y-8 border border-white">
+          
           {/* 👤 About Me */}
           <div>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-pink-600 font-heading mb-4 flex items-center gap-2">
@@ -56,7 +58,7 @@ const About = () => {
             </p>
           </div>
 
-          {/* 🧭 About the App */}
+          {/* 🛠️ About the App */}
           <div>
             <h2 className="text-3xl sm:text-4xl font-bold text-pink-600 font-heading mb-4 flex items-center gap-2">
               🛠️ About This App

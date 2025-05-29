@@ -50,11 +50,14 @@ const MapPage = () => {
   }, [fullscreen]);
 
   return (
+  <div className="w-full h-full min-h-screen bg-white">
     <motion.div
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`relative w-full ${isMobile && fullscreen ? "fixed inset-0 z-50 bg-white" : "min-h-screen"}`}
+      className={`relative w-full h-full ${
+        isMobile && fullscreen ? "fixed inset-0 z-50 bg-white" : "min-h-screen"
+      }`}
     >
       {/* ✅ Top heading hidden in fullscreen mode */}
       {!fullscreen && (
@@ -99,11 +102,11 @@ const MapPage = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {/* ✅ Add valid park markers */}
+        {/* ✅ Valid park markers only */}
         {parks
           .filter((park) => {
-            const [lat, lng] = park.coordinates?.split(",").map((c) => parseFloat(c.trim()));
-            return !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+            const coords = park.coordinates?.split(",").map((c) => parseFloat(c.trim()));
+            return coords?.length === 2 && coords.every((n) => !isNaN(n) && n !== 0);
           })
           .map((park) => {
             const [lat, lng] = park.coordinates.split(",").map((c) => parseFloat(c.trim()));
@@ -127,7 +130,7 @@ const MapPage = () => {
           })}
       </MapContainer>
     </motion.div>
-  );
-};
+  </div>
+);
 
 export default MapPage;
