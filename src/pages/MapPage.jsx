@@ -44,7 +44,7 @@ const MapPage = () => {
         isMobile
           ? fullscreen
             ? "fixed inset-0 z-50 h-screen"
-            : "min-h-[90vh]"   // ✅ Give height on mobile when not fullscreen
+            : "min-h-[90vh]"
           : "min-h-screen"
       }`}
     >
@@ -81,7 +81,7 @@ const MapPage = () => {
         zoom={4}
         scrollWheelZoom={true}
         className="w-full h-full z-0"
-      />
+      >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
