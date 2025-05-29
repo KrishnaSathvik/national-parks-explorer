@@ -35,7 +35,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const About = lazy(() => import("./pages/About"));
 const UserAccount = lazy(() => import("./pages/UserAccount"));
-const isMobile = useIsMobile();
+
 
 
 // ✅ Admin lazy-loaded
@@ -50,6 +50,7 @@ function App() {
   const [favorites, setFavorites] = useState([]);
   const { currentUser } = useAuth();
   const { showToast } = useToast();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -156,8 +157,7 @@ function App() {
           <Suspense fallback={<div className="p-6 text-gray-500">Loading...</div>}>
             <Routes>
               {/* ✅ Public Routes */}
-              <Route path="/" element={<Home />} />
-                {isMobile && <Route path="/map" element={<MapPage />} />}
+              {isMobile && <Route path="/map" element={<MapPage />} />}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/about" element={<About />} />
