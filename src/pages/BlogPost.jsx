@@ -28,7 +28,6 @@ const BlogPost = () => {
       try {
         const q = query(collection(db, "blogs"), where("slug", "==", slug));
         const snap = await getDocs(q);
-
         if (!snap.empty) {
           const docData = snap.docs[0].data();
           setPost({
@@ -66,10 +65,7 @@ const BlogPost = () => {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
       headline: post.title,
-      author: {
-        "@type": "Person",
-        name: post.author,
-      },
+      author: { "@type": "Person", name: post.author },
       datePublished: post.date?.toDate().toISOString() || new Date().toISOString(),
       url: `https://www.nationalparksexplorerusa.com/blog/${post.slug}`,
     };

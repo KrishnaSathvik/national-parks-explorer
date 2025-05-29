@@ -1,9 +1,9 @@
-// src/pages/MapPage.jsx
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase";
+import useIsMobile from "../hooks/useIsMobile";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -17,7 +17,9 @@ L.Icon.Default.mergeOptions({
 
 const MapPage = () => {
   const [parks, setParks] = useState([]);
+  const [fullscreen, setFullscreen] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -33,14 +35,37 @@ const MapPage = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-screen">
-      {/* Floating header */}
-      <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-50 bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow text-sm font-medium text-gray-800">
-        🗺️ Explore National Parks Map
-      </div>
+    <div className={`relative w-full ${isMobile && fullscreen ? "fixed inset-0 z-50" : "min-h-screen"}`}>
+      {/* Header (hidden in fullscreen mobile) */}
+      {!fullscreen && (
+        <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-40 bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow text-sm font-medium text-gray-800">
+          🗺️ Explore National Parks Map
+        </div>
+      )}
+
+      {/* Toggle button for mobile fullscreen */}
+      {isMobile && (
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-40">
+          {!fullscreen ? (
+            <button
+              onClick={() => setFullscreen(true)}
+              className="bg-pink-600 text-white px-4 py-2 rounded-full shadow-md text-sm"
+            >
+              🗺️ Fullscreen Map
+            </button>
+          ) : (
+            <button
+              onClick={() => setFullscreen(false)}
+              className="bg-gray-700 text-white px-4 py-2 rounded-full shadow-md text-sm"
+            >
+              ✖️ Exit Map
+            </button>
+          )}
+        </div>
+      )}
 
       <MapContainer
-        center={[39.8283, -98.5795]} // Center of USA
+        center={[39.8283, -98.5795]}
         zoom={4}
         scrollWheelZoom={true}
         className="w-full h-full z-0"
