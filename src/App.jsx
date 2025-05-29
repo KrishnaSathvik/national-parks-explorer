@@ -54,7 +54,7 @@ function App() {
   const { showToast } = useToast();
   const isMobile = useIsMobile();
   const location = useLocation();
-  const hideBottomNavOn = ["/login", "/signup", "/admin/login"];
+  const hideBottomNavOn = ["/", "/login", "/signup", "/admin/login"];
   const shouldHideBottomNav = hideBottomNavOn.includes(location.pathname);
 
 

@@ -40,7 +40,13 @@ const MapPage = () => {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className={`relative w-full ${isMobile && fullscreen ? "fixed inset-0 z-50" : "min-h-screen"}`}
+      className={`relative w-full ${
+        isMobile
+          ? fullscreen
+            ? "fixed inset-0 z-50 h-screen"
+            : "min-h-[90vh]"   // ✅ Give height on mobile when not fullscreen
+          : "min-h-screen"
+      }`}
     >
       {/* Header (hidden in fullscreen mobile) */}
       {!fullscreen && (
@@ -74,8 +80,8 @@ const MapPage = () => {
         center={[39.8283, -98.5795]}
         zoom={4}
         scrollWheelZoom={true}
-        className={`w-full ${fullscreen ? "h-full" : "h-[90vh]"}`} // ✅ Fix for mobile height
-      >
+        className="w-full h-full z-0"
+      />
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
