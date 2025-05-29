@@ -6,6 +6,7 @@ import {
   getDocs, serverTimestamp
 } from "firebase/firestore";
 import { db } from "../firebase";
+import { useLocation, useNavigate } from "react-router-dom";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import Accordion from "./Accordion";
 import { motion } from "framer-motion";
@@ -86,6 +87,8 @@ const ParkDetails = () => {
   const [searchParams] = useSearchParams();
   const parkId = searchParams.get("id");
   const location = useLocation();
+  const navigate = useNavigate();
+  const fromAccount = location.state?.from === "account" || location.state?.from === "favorites";
   const from = location.state?.from;
   const page = searchParams.get("page") || 1;
   const [park, setPark] = useState(null);
@@ -279,7 +282,16 @@ const ParkDetails = () => {
         >
           ← Back to parks
         </Link>
-
+        {fromAccount && (
+          <div className="mb-4">
+            <button
+              onClick={() => navigate("/account")}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              ← Back to Account
+            </button>
+          </div>
+        )}
         <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4">
             <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-800 leading-snug break-words">
