@@ -9,6 +9,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import { db } from "./firebase";
 import Favorites from "./pages/Favorites";
 import useIsMobile from "./hooks/useIsMobile";
+import { useLocation } from "react-router-dom";
+import BottomNav from "./components/BottomNav"; // or adjust path if needed
 import {
   collection,
   getDocs,
@@ -51,6 +53,10 @@ function App() {
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const isMobile = useIsMobile();
+  const location = useLocation();
+  const hideBottomNavOn = ["/login", "/signup", "/admin/login"];
+  const shouldHideBottomNav = hideBottomNavOn.includes(location.pathname);
+
 
   useEffect(() => {
     const fetchParks = async () => {
@@ -254,6 +260,7 @@ function App() {
       {/* 📲 Install */}
               <InstallButton />
       <ScrollToTopButton />
+      {isMobile && !shouldHideBottomNav && <BottomNav />} {/* ✅ This line hides it on login/signup */}
     </div>
   );
 }

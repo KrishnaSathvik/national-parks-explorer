@@ -6,6 +6,7 @@ import { db } from "../firebase";
 import useIsMobile from "../hooks/useIsMobile";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { motion } from "framer-motion";
 
 // 🛠️ Fix missing marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -35,7 +36,12 @@ const MapPage = () => {
   }, []);
 
   return (
-    <div className={`relative w-full ${isMobile && fullscreen ? "fixed inset-0 z-50" : "min-h-screen"}`}>
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className={`relative w-full ${isMobile && fullscreen ? "fixed inset-0 z-50" : "min-h-screen"}`}
+    >
       {/* Header (hidden in fullscreen mobile) */}
       {!fullscreen && (
         <div className="absolute top-5 left-1/2 transform -translate-x-1/2 z-40 bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow text-sm font-medium text-gray-800">
@@ -68,7 +74,7 @@ const MapPage = () => {
         center={[39.8283, -98.5795]}
         zoom={4}
         scrollWheelZoom={true}
-        className="w-full h-full z-0"
+        className={`w-full ${fullscreen ? "h-full" : "h-[90vh]"}`} // ✅ Fix for mobile height
       >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
@@ -101,7 +107,7 @@ const MapPage = () => {
             );
           })}
       </MapContainer>
-    </div>
+    </motion.div>
   );
 };
 

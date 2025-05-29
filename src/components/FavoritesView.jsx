@@ -1,4 +1,3 @@
-// src/components/FavoritesView.jsx
 import React from "react";
 import FadeInWrapper from "./FadeInWrapper";
 import DOMPurify from "dompurify";
@@ -27,7 +26,7 @@ const FavoritesView = ({
           {parks.map((park, idx) => (
             <FadeInWrapper key={park.id} delay={idx * 0.1}>
               <div
-                onClick={() => navigate(`/park/${park.id}?page=1`, { state: { from: "favorites" } })}
+                onClick={() => navigate(`/park/${park.slug}?page=1`, { state: { from: "favorites" } })}
                 className="p-5 bg-white rounded-xl shadow hover:shadow-md border hover:scale-[1.01] transition cursor-pointer relative"
               >
                 {onRemovePark && (
