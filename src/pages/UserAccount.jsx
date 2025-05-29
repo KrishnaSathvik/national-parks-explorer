@@ -98,12 +98,17 @@ const UserAccount = () => {
 
   if (!currentUser) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-10 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-3xl mx-auto px-4 py-10 text-center"
+      >
         <h1 className="text-2xl font-bold text-pink-600 mb-4">Please log in to view your account.</h1>
         <Link to="/login" className="bg-pink-500 text-white px-5 py-2 rounded-full hover:bg-pink-600">
           🔐 Go to Login
         </Link>
-      </div>
+      </motion.div>
     );
   }
 
