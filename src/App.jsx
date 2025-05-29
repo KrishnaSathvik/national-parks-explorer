@@ -7,6 +7,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import ScrollToTopButton from "./components/ScrollToTopButton";
 import PrivateRoute from "./components/PrivateRoute";
 import { db } from "./firebase";
+import Favorites from "./pages/Favorites";
 import {
   collection,
   getDocs,
@@ -158,6 +159,7 @@ function App() {
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
+              <Route path="/favorites" element={<Favorites />} />
 
               {/* ✅ Redirect root path to /signup for unauthenticated users */}
               <Route

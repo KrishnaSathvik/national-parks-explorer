@@ -14,9 +14,10 @@ const BottomNav = () => {
     { name: "Home", icon: <HomeIcon className="h-6 w-6 icon-pop" />, path: "/" },
     { name: "Map", icon: <MapIcon className="h-6 w-6 icon-pop" />, path: "/map" },
     { name: "Calendar", icon: <CalendarIcon className="h-6 w-6 icon-pop" />, path: "/calendar" },
-    { name: "Favorites", icon: <StarIcon className="h-6 w-6 icon-pop" />, path: "/account" },
+    { name: "Favorites", icon: <StarIcon className="h-6 w-6 icon-pop" />, path: "/favorites" }, // 👈 update path
     { name: "Account", icon: <UserIcon className="h-6 w-6 icon-pop" />, path: "/account" },
   ];
+
 
   const handleClick = (e) => {
     const icon = e.currentTarget.querySelector('.icon-pop');
