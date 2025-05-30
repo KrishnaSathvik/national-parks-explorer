@@ -11,17 +11,18 @@ body {
 }
 
 /* ============================================
-   Root Container
+   Root Container Fix for Map
 ============================================ */
 #root {
-  width: 100%;
-  height: 100%;
+  height: 100vh;
+  width: 100vw;
   max-width: 100%;
-  margin: 0 auto;
-  padding: 0; /* ✅ Removed padding for fullscreen compatibility */
-  text-align: left;
-  background-color: #f9f9f9;
   overflow: hidden;
+  margin: 0 auto;
+  padding: 0;
+  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ============================================
@@ -96,15 +97,19 @@ body {
     opacity: 0;
   }
 }
-/* Ensure the leaflet map always fills container */
+
+/* ============================================
+   Leaflet Fixes
+============================================ */
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
   z-index: 0;
+  flex: 1;
 }
+
 @media (max-width: 640px) {
   .leaflet-container {
-    min-height: 300px;
-    max-height: calc(100vh - 64px);
+    height: calc(100vh - 64px); /* Account for bottom nav */
   }
 }

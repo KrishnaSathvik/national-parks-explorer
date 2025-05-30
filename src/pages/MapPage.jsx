@@ -7,7 +7,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-// ✅ Fix Leaflet icon path issue
+// ✅ Fix Leaflet icon paths
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
@@ -39,17 +39,24 @@ const MapPage = () => {
     fetchParks();
   }, []);
 
+  useEffect(() => {
+    if (mapRef.current) {
+      setTimeout(() => {
+        mapRef.current.invalidateSize();
+      }, 500);
+    }
+  }, [parks]);
+
   return (
-    <div className="w-full h-[calc(100vh-64px)] sm:h-[calc(100vh-80px)] px-2 py-2 bg-white">
+    <div className="w-screen h-[calc(100vh-64px)] sm:h-[calc(100vh-80px)] overflow-hidden">
       <MapContainer
         center={[39.8283, -98.5795]}
         zoom={4}
         scrollWheelZoom={true}
-        whenCreated={(map) => {
-          mapRef.current = map;
-          setTimeout(() => map.invalidateSize(), 300);
+        className="w-full h-full z-10"
+        whenCreated={(mapInstance) => {
+          mapRef.current = mapInstance;
         }}
-        className="w-full h-full rounded-2xl shadow"
       >
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
