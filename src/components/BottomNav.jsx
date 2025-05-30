@@ -6,7 +6,6 @@ import {
   CalendarIcon,
   StarIcon,
   UserIcon,
-  RouteIcon, 
 } from "@heroicons/react/24/outline";
 
 const BottomNav = () => {
