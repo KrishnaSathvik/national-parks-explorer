@@ -1,4 +1,4 @@
-// src/components/TripBuilder.jsx - Enhanced Version
+// src/components/TripBuilder.jsx - Complete Enhanced Version
 import React, { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -110,11 +110,11 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
     return R * c;
   };
 
-  const optimizeRoute = () => {
-    if (tripData.parks.length < 2) return;
+  const optimizeNearestNeighbor = (parks) => {
+    if (parks.length <= 2) return parks;
     
     const optimized = [];
-    const remaining = [...tripData.parks];
+    const remaining = [...parks];
     
     let current = remaining.shift();
     optimized.push(current);
@@ -135,30 +135,135 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
       optimized.push(current);
     }
     
-    setTripData({ ...tripData, parks: optimized });
-    showToast('🎯 Route optimized for minimum travel time!', 'success');
+    return optimized;
+  };
+
+  const optimizeMultipleStartPoints = (parks) => {
+    if (parks.length <= 2) return parks;
+    
+    let bestRoute = parks;
+    let bestDistance = getTotalDistance(parks);
+    
+    for (let startIndex = 0; startIndex < Math.min(parks.length, 5); startIndex++) {
+      const reorderedParks = [
+        parks[startIndex],
+        ...parks.slice(0, startIndex),
+        ...parks.slice(startIndex + 1)
+      ];
+      
+      const optimizedFromThisStart = optimizeNearestNeighbor([...reorderedParks]);
+      const distance = getTotalDistance(optimizedFromThisStart);
+      
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestRoute = optimizedFromThisStart;
+      }
+    }
+    
+    return bestRoute;
+  };
+
+  const getTotalDistance = (parks) => {
+    if (parks.length < 2) return 0;
+    
+    let total = 0;
+    for (let i = 0; i < parks.length - 1; i++) {
+      total += calculateDistance(parks[i].coordinates, parks[i + 1].coordinates);
+    }
+    return total;
+  };
+
+  const optimizeRoute = () => {
+    if (tripData.parks.length < 2) {
+      showToast('You need at least 2 parks to optimize the route', 'info');
+      return;
+    }
+    
+    const originalParks = [...tripData.parks];
+    
+    try {
+      const nearestNeighborRoute = optimizeNearestNeighbor([...tripData.parks]);
+      const multiStartRoute = optimizeMultipleStartPoints([...tripData.parks]);
+      
+      const bestRoute = getTotalDistance(nearestNeighborRoute) <= getTotalDistance(multiStartRoute) 
+        ? nearestNeighborRoute 
+        : multiStartRoute;
+      
+      const oldDistance = getTotalDistance(originalParks);
+      const newDistance = getTotalDistance(bestRoute);
+      const savings = oldDistance - newDistance;
+      
+      setTripData({ ...tripData, parks: bestRoute });
+      
+      if (savings > 5) {
+        showToast(`🎯 Route optimized! Saved ${Math.round(savings)} miles and $${Math.round(savings * 0.15)} in gas costs!`, 'success');
+      } else {
+        showToast('✅ Your route is already well optimized!', 'info');
+      }
+    } catch (error) {
+      console.error('Optimization error:', error);
+      showToast('⚠️ Optimization failed, keeping original route', 'warning');
+    }
   };
 
   const calculateTotalDistance = () => {
-    if (tripData.parks.length < 2) return 0;
+    return Math.round(getTotalDistance(tripData.parks));
+  };
+
+  const calculateDetailedBudget = () => {
+    const distance = calculateTotalDistance();
+    const numParks = tripData.parks.length;
+    const totalDays = tripData.parks.reduce((sum, park) => sum + park.stayDuration, 0);
     
-    let totalDistance = 0;
-    for (let i = 0; i < tripData.parks.length - 1; i++) {
-      const distance = calculateDistance(
-        tripData.parks[i].coordinates,
-        tripData.parks[i + 1].coordinates
-      );
-      totalDistance += distance;
-    }
-    return Math.round(totalDistance);
+    const breakdown = {
+      transportation: {
+        gasoline: Math.round(distance * 0.15),
+        wear: Math.round(distance * 0.05),
+        tolls: Math.round(distance * 0.02),
+      },
+      accommodation: {
+        camping: Math.round(totalDays * 35),
+        hotels: Math.round(totalDays * 120),
+        recommended: Math.round(totalDays * 85)
+      },
+      parkFees: {
+        entries: numParks * 30,
+        parking: numParks * 5,
+        permits: Math.round(numParks * 0.3 * 25)
+      },
+      food: {
+        budget: totalDays * 35,
+        moderate: totalDays * 65,
+        dining: totalDays * 95
+      }
+    };
+    
+    const budgetLevels = {
+      budget: breakdown.transportation.gasoline + breakdown.transportation.wear + 
+               breakdown.accommodation.camping + breakdown.parkFees.entries + 
+               breakdown.parkFees.parking + breakdown.food.budget,
+               
+      moderate: breakdown.transportation.gasoline + breakdown.transportation.wear + 
+                breakdown.transportation.tolls + breakdown.accommodation.recommended + 
+                breakdown.parkFees.entries + breakdown.parkFees.parking + 
+                breakdown.parkFees.permits + breakdown.food.moderate,
+                
+      comfortable: breakdown.transportation.gasoline + breakdown.transportation.wear + 
+                   breakdown.transportation.tolls + breakdown.accommodation.hotels + 
+                   breakdown.parkFees.entries + breakdown.parkFees.parking + 
+                   breakdown.parkFees.permits + breakdown.food.dining
+    };
+    
+    return {
+      breakdown,
+      budgetLevels,
+      recommended: budgetLevels.moderate
+    };
   };
 
   const calculateEstimatedCost = () => {
-    const distance = calculateTotalDistance();
-    const gasCost = distance * 0.15;
-    const parkFees = tripData.parks.length * 30;
-    const lodging = tripData.parks.reduce((sum, park) => sum + (park.stayDuration * 150), 0);
-    return Math.round(gasCost + parkFees + lodging);
+    const detailedBudget = calculateDetailedBudget();
+    return detailedBudget.recommended;
   };
 
   const handleSave = async () => {
@@ -277,28 +382,65 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">Start Date</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">
+                        Start Date
+                      </label>
                       <div className="relative">
                         <input
                           type="date"
                           value={tripData.startDate}
                           onChange={(e) => setTripData({...tripData, startDate: e.target.value})}
-                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
+                          min={new Date().toISOString().split('T')[0]}
+                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all text-gray-700 bg-white"
+                          style={{
+                            colorScheme: 'light',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'textfield'
+                          }}
                         />
-                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                       </div>
+                      {tripData.startDate && (
+                        <div className="mt-2 text-sm text-green-600 font-medium">
+                          ✓ {new Date(tripData.startDate).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      )}
                     </div>
+                    
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">End Date</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">
+                        End Date
+                      </label>
                       <div className="relative">
                         <input
                           type="date"
                           value={tripData.endDate}
                           onChange={(e) => setTripData({...tripData, endDate: e.target.value})}
-                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
+                          min={tripData.startDate || new Date().toISOString().split('T')[0]}
+                          className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all text-gray-700 bg-white"
+                          style={{
+                            colorScheme: 'light',
+                            WebkitAppearance: 'none',
+                            MozAppearance: 'textfield'
+                          }}
                         />
-                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
                       </div>
+                      {tripData.endDate && (
+                        <div className="mt-2 text-sm text-green-600 font-medium">
+                          ✓ {new Date(tripData.endDate).toLocaleDateString('en-US', { 
+                            weekday: 'long', 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -328,7 +470,6 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                   loading={parksLoading}
                 />
                 
-                {/* Selected Parks with Enhanced UI */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-xl font-bold text-gray-800 flex items-center gap-3">
@@ -368,6 +509,8 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                                     type="date"
                                     value={park.visitDate}
                                     onChange={(e) => updateParkDetails(park.parkId, 'visitDate', e.target.value)}
+                                    min={tripData.startDate || new Date().toISOString().split('T')[0]}
+                                    max={tripData.endDate || undefined}
                                     className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
                                   />
                                 </div>
@@ -415,9 +558,9 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                 {tripData.parks.length > 1 ? (
                   <div className="space-y-6">
                     <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                      <h4 className="font-semibold text-blue-800 mb-2">Route Optimization</h4>
+                      <h4 className="font-semibold text-blue-800 mb-2">Smart Route Optimization</h4>
                       <p className="text-blue-700 text-sm mb-4">
-                        We can automatically optimize your route to minimize travel time between parks.
+                        Our algorithm analyzes multiple routes and finds the shortest path between all your selected parks.
                       </p>
                       <button
                         onClick={optimizeRoute}
@@ -505,10 +648,6 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                       <div className="text-pink-200 text-sm">Parks</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-3xl font-bold">{calculateTotalDistance()}</div>
-                      <div className="text-pink-200 text-sm">Miles</div>
-                    </div>
-                    <div className="text-center">
                       <div className="text-3xl font-bold">
                         {tripData.parks.reduce((sum, park) => sum + park.stayDuration, 0)}
                       </div>
@@ -521,40 +660,247 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                   </div>
                 </div>
 
-                {/* Final Details */}
+                {/* Enhanced Budget Breakdown */}
                 <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-800 mb-6">Final Check</h3>
+                  <h3 className="text-xl font-bold text-gray-800 mb-6">Detailed Budget Breakdown</h3>
                   
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="font-medium text-gray-700">Trip Title</span>
-                      <span className="text-gray-900">{tripData.title || 'Not set'}</span>
+                  {(() => {
+                    const budget = calculateDetailedBudget();
+                    return (
+                      <>
+                        {/* Budget Level Selector */}
+                        <div className="grid grid-cols-3 gap-4 mb-6">
+                          {Object.entries(budget.budgetLevels).map(([level, cost]) => (
+                            <div key={level} className={`p-4 rounded-xl border-2 text-center transition-all ${
+                              level === 'moderate' ? 'border-pink-300 bg-pink-50' : 'border-gray-200'
+                            }`}>
+                              <div className="text-lg font-bold capitalize text-gray-800">{level}</div>
+                              <div className="text-2xl font-bold text-pink-600">${cost}</div>
+                              <div className="text-xs text-gray-500">Total Trip Cost</div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Breakdown Details */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-700">Transportation</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Gasoline ({calculateTotalDistance()} miles)</span>
+                                <span>${budget.breakdown.transportation.gasoline}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Vehicle wear & tear</span>
+                                <span>${budget.breakdown.transportation.wear}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Tolls (estimated)</span>
+                                <span>${budget.breakdown.transportation.tolls}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-700">
+                              Accommodation ({tripData.parks.reduce((sum, park) => sum + park.stayDuration, 0)} nights)
+                            </h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Camping</span>
+                                <span>${budget.breakdown.accommodation.camping}</span>
+                              </div>
+                              <div className="flex justify-between text-pink-600 font-medium">
+                                <span>Mixed (recommended)</span>
+                                <span>${budget.breakdown.accommodation.recommended}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Hotels</span>
+                                <span>${budget.breakdown.accommodation.hotels}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-700">Park Fees</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Entry fees ({tripData.parks.length} parks)</span>
+                                <span>${budget.breakdown.parkFees.entries}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Parking fees</span>
+                                <span>${budget.breakdown.parkFees.parking}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Special permits</span>
+                                <span>${budget.breakdown.parkFees.permits}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <h4 className="font-semibold text-gray-700">
+                              Food ({tripData.parks.reduce((sum, park) => sum + park.stayDuration, 0)} days)
+                            </h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Budget meals</span>
+                                <span>${budget.breakdown.food.budget}</span>
+                              </div>
+                              <div className="flex justify-between text-pink-600 font-medium">
+                                <span>Moderate (recommended)</span>
+                                <span>${budget.breakdown.food.moderate}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Restaurant dining</span>
+                                <span>${budget.breakdown.food.dining}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Budget Tips */}
+                        <div className="mt-6 bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200">
+                          <h4 className="font-semibold text-blue-800 mb-3 flex items-center gap-2">
+                            <span className="text-xl">💡</span>
+                            Money-Saving Tips
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-blue-700">
+                            <div>• Book campsites in advance for better rates</div>
+                            <div>• Pack meals and snacks to reduce food costs</div>
+                            <div>• Get the America the Beautiful Annual Pass ($80)</div>
+                            <div>• Consider visiting during shoulder seasons</div>
+                            <div>• Use GasBuddy app to find cheapest gas stations</div>
+                            <div>• Stay in nearby towns for cheaper accommodation</div>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+
+                {/* Parks Itinerary */}
+                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6">Your Itinerary</h3>
+                  
+                  {tripData.parks.length > 0 ? (
+                    <div className="space-y-4">
+                      {tripData.parks.map((park, index) => (
+                        <div key={park.parkId} className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-pink-50 rounded-xl border border-gray-200">
+                          <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-lg font-bold flex-shrink-0">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-gray-800 text-lg">{park.parkName}</h4>
+                            <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                              {park.visitDate && (
+                                <div className="flex items-center gap-1">
+                                  <FaCalendarAlt className="text-pink-500" />
+                                  {new Date(park.visitDate).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  })}
+                                </div>
+                              )}
+                              <div className="flex items-center gap-1">
+                                <FaClock className="text-blue-500" />
+                                {park.stayDuration} day{park.stayDuration > 1 ? 's' : ''}
+                              </div>
+                              {index < tripData.parks.length - 1 && (
+                                <div className="flex items-center gap-1">
+                                  <FaRoute className="text-green-500" />
+                                  {Math.round(calculateDistance(park.coordinates, tripData.parks[index + 1].coordinates))} mi to next
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                    
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="font-medium text-gray-700">Date Range</span>
-                      <span className="text-gray-900">
-                        {tripData.startDate && tripData.endDate 
-                          ? `${new Date(tripData.startDate).toLocaleDateString()} - ${new Date(tripData.endDate).toLocaleDateString()}`
-                          : 'Not set'
-                        }
-                      </span>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <span className="text-4xl block mb-2">📋</span>
+                      <p>No parks in your itinerary yet</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Final Details Summary */}
+                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                  <h3 className="text-xl font-bold text-gray-800 mb-6">Trip Summary</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span className="font-medium text-gray-700">Trip Title</span>
+                        <span className="text-gray-900">{tripData.title || 'Not set'}</span>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span className="font-medium text-gray-700">Date Range</span>
+                        <span className="text-gray-900">
+                          {tripData.startDate && tripData.endDate 
+                            ? `${new Date(tripData.startDate).toLocaleDateString()} - ${new Date(tripData.endDate).toLocaleDateString()}`
+                            : 'Not set'
+                          }
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span className="font-medium text-gray-700">Total Duration</span>
+                        <span className="text-gray-900">
+                          {tripData.startDate && tripData.endDate 
+                            ? (() => {
+                                const start = new Date(tripData.startDate);
+                                const end = new Date(tripData.endDate);
+                                const diffTime = Math.abs(end - start);
+                                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                                return `${diffDays} day${diffDays !== 1 ? 's' : ''}`;
+                              })()
+                            : 'Not set'
+                          }
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="font-medium text-gray-700">Parks Selected</span>
-                      <span className="text-gray-900">{tripData.parks.length} parks</span>
-                    </div>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span className="font-medium text-gray-700">Parks Selected</span>
+                        <span className="text-gray-900">{tripData.parks.length} parks</span>
+                      </div>
 
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                      <span className="font-medium text-gray-700">Estimated Total Cost</span>
-                      <span className="text-gray-900 font-semibold">${calculateEstimatedCost()}</span>
+                      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                        <span className="font-medium text-gray-700">Total Distance</span>
+                        <span className="text-gray-900">{calculateTotalDistance()} miles</span>
+                      </div>
+
+                      <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border border-green-200">
+                        <span className="font-medium text-green-700">Estimated Total Cost</span>
+                        <span className="text-green-900 font-bold text-lg">${calculateEstimatedCost()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ready to Save Message */}
+                  <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+                    <div className="flex items-center gap-3">
+                      <div className="bg-green-500 text-white rounded-full p-2">
+                        <FaCheckCircle />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-green-800">Ready to Save Your Trip!</h4>
+                        <p className="text-green-700 text-sm">
+                          Your trip plan is complete. Click "Save Trip" to store it and start your adventure planning!
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </FadeInWrapper>
           )}
+
         </div>
 
         {/* Right Sidebar - Map */}
