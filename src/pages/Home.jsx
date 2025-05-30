@@ -95,15 +95,15 @@
                   >
                     <FaCalendarAlt /> Park Events
                   </Link>
-                )}
-
+               
+                {!isMobile && (
                 <Link
                   to="/trip-planner"
                   className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
                 >
                   <FaRoute /> Trip Planner
                 </Link>
-
+                 )}
                 <Link
                   to="/blog"
                   className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"

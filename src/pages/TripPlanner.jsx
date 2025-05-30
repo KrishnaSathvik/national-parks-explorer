@@ -1,4 +1,4 @@
-// src/pages/TripPlanner.jsx
+// src/pages/TripPlanner.jsx - Enhanced Version
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -7,7 +7,7 @@ import { db } from '../firebase';
 import TripBuilder from '../components/TripBuilder';
 import TripList from '../components/TripList';
 import FadeInWrapper from '../components/FadeInWrapper';
-import { FaPlus, FaRoute, FaCalendarAlt } from 'react-icons/fa';
+import { FaPlus, FaRoute, FaCalendarAlt, FaMapMarkerAlt, FaDollarSign, FaClock } from 'react-icons/fa';
 
 const TripPlanner = () => {
   const { currentUser } = useAuth();
@@ -20,7 +20,6 @@ const TripPlanner = () => {
     if (currentUser) {
       fetchUserTrips();
     } else {
-      // Load from localStorage for non-logged users
       const savedTrips = JSON.parse(localStorage.getItem('trips')) || [];
       setTrips(savedTrips);
       setLoading(false);
@@ -60,7 +59,6 @@ const TripPlanner = () => {
 
   const saveTrip = async (tripData) => {
     if (!currentUser) {
-      // Save to localStorage for non-logged users
       const newTrip = { id: Date.now().toString(), ...tripData };
       const updatedTrips = [...trips, newTrip];
       setTrips(updatedTrips);
@@ -110,14 +108,16 @@ const TripPlanner = () => {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="bg-white/90 backdrop-blur-md px-4 py-6 rounded-2xl shadow-sm">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1,2,3].map(i => (
-                <div key={i} className="h-48 bg-gray-200 rounded-xl"></div>
-              ))}
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl p-8">
+            <div className="animate-pulse space-y-6">
+              <div className="h-12 bg-gradient-to-r from-pink-200 to-purple-200 rounded-2xl w-1/3"></div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1,2,3].map(i => (
+                  <div key={i} className="h-64 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl"></div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -126,77 +126,114 @@ const TripPlanner = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 font-sans">
-      <div className="bg-white/90 backdrop-blur-md px-4 py-6 rounded-2xl shadow-sm">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between items-center gap-4 sm:gap-6 mb-6">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-pink-600 flex items-center gap-2 text-center sm:text-left">
-            🗺️ Trip Planner
-          </h1>
-          <button 
-            onClick={createNewTrip}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-pink-600 text-white hover:bg-pink-700 transition font-medium"
-          >
-            <FaPlus /> Create New Trip
-          </button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+      <div className="max-w-7xl mx-auto px-4 py-8 font-sans">
+        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
+          
+          {/* Hero Header */}
+          <div className="relative bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 p-8 text-white overflow-hidden">
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="relative z-10">
+              <FadeInWrapper delay={0.1}>
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+                  <div>
+                    <h1 className="text-4xl lg:text-5xl font-extrabold mb-4 bg-gradient-to-r from-white to-pink-100 bg-clip-text">
+                      🗺️ Trip Planner
+                    </h1>
+                    <p className="text-xl text-pink-100 max-w-2xl">
+                      Plan your perfect national parks adventure with intelligent routing, cost estimation, and beautiful visualizations.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={createNewTrip}
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-white text-purple-600 rounded-2xl hover:bg-pink-50 transition-all duration-300 font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  >
+                    <FaPlus className="group-hover:rotate-180 transition-transform duration-300" /> 
+                    Create New Trip
+                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-pink-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity"></div>
+                  </button>
+                </div>
+              </FadeInWrapper>
 
-        {/* Stats */}
-        {trips.length > 0 && !activeTrip && (
-          <FadeInWrapper delay={0.1}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-gradient-to-r from-pink-50 to-rose-50 p-4 rounded-xl border border-pink-100">
-                <div className="flex items-center gap-3">
-                  <FaRoute className="text-pink-600 text-xl" />
-                  <div>
-                    <div className="text-2xl font-bold text-pink-700">{trips.length}</div>
-                    <div className="text-sm text-pink-600">Total Trips</div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-100">
-                <div className="flex items-center gap-3">
-                  <FaCalendarAlt className="text-blue-600 text-xl" />
-                  <div>
-                    <div className="text-2xl font-bold text-blue-700">
-                      {trips.reduce((sum, trip) => sum + (trip.parks?.length || 0), 0)}
-                    </div>
-                    <div className="text-sm text-blue-600">Parks to Visit</div>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-100">
-                <div className="flex items-center gap-3">
-                  <span className="text-green-600 text-xl">🛣️</span>
-                  <div>
-                    <div className="text-2xl font-bold text-green-700">
-                      {Math.round(trips.reduce((sum, trip) => sum + (trip.totalDistance || 0), 0))}
-                    </div>
-                    <div className="text-sm text-green-600">Total Miles</div>
-                  </div>
-                </div>
-              </div>
+              {/* Decorative Elements */}
+              <div className="absolute -top-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+              <div className="absolute -bottom-8 -left-8 w-40 h-40 bg-pink-300/20 rounded-full blur-2xl"></div>
             </div>
-          </FadeInWrapper>
-        )}
+          </div>
 
-        {/* Main Content */}
-        {activeTrip ? (
-          <TripBuilder 
-            trip={activeTrip}
-            onSave={async (savedTrip) => {
-              await saveTrip(savedTrip);
-              setActiveTrip(null);
-            }}
-            onCancel={() => setActiveTrip(null)}
-          />
-        ) : (
-          <TripList 
-            trips={trips}
-            onEditTrip={setActiveTrip}
-            onDeleteTrip={deleteTrip}
-          />
-        )}
+          <div className="p-8">
+            {/* Enhanced Stats Cards */}
+            {trips.length > 0 && !activeTrip && (
+              <FadeInWrapper delay={0.2}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="group bg-gradient-to-br from-pink-500 to-rose-500 p-6 rounded-2xl text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold">{trips.length}</div>
+                        <div className="text-pink-100 font-medium">Total Trips</div>
+                      </div>
+                      <FaRoute className="text-4xl text-pink-200 group-hover:rotate-12 transition-transform" />
+                    </div>
+                  </div>
+
+                  <div className="group bg-gradient-to-br from-blue-500 to-cyan-500 p-6 rounded-2xl text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold">
+                          {trips.reduce((sum, trip) => sum + (trip.parks?.length || 0), 0)}
+                        </div>
+                        <div className="text-blue-100 font-medium">Parks to Visit</div>
+                      </div>
+                      <FaMapMarkerAlt className="text-4xl text-blue-200 group-hover:bounce transition-transform" />
+                    </div>
+                  </div>
+
+                  <div className="group bg-gradient-to-br from-green-500 to-emerald-500 p-6 rounded-2xl text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold">
+                          {Math.round(trips.reduce((sum, trip) => sum + (trip.totalDistance || 0), 0)).toLocaleString()}
+                        </div>
+                        <div className="text-green-100 font-medium">Total Miles</div>
+                      </div>
+                      <FaClock className="text-4xl text-green-200 group-hover:rotate-45 transition-transform" />
+                    </div>
+                  </div>
+
+                  <div className="group bg-gradient-to-br from-yellow-500 to-orange-500 p-6 rounded-2xl text-white transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-3xl font-bold">
+                          ${Math.round(trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0)).toLocaleString()}
+                        </div>
+                        <div className="text-yellow-100 font-medium">Total Budget</div>
+                      </div>
+                      <FaDollarSign className="text-4xl text-yellow-200 group-hover:scale-110 transition-transform" />
+                    </div>
+                  </div>
+                </div>
+              </FadeInWrapper>
+            )}
+
+            {/* Main Content */}
+            {activeTrip ? (
+              <TripBuilder 
+                trip={activeTrip}
+                onSave={async (savedTrip) => {
+                  await saveTrip(savedTrip);
+                  setActiveTrip(null);
+                }}
+                onCancel={() => setActiveTrip(null)}
+              />
+            ) : (
+              <TripList 
+                trips={trips}
+                onEditTrip={setActiveTrip}
+                onDeleteTrip={deleteTrip}
+              />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
