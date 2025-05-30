@@ -102,3 +102,9 @@ body {
   height: 100% !important;
   z-index: 0;
 }
+@media (max-width: 640px) {
+  .leaflet-container {
+    min-height: 300px;
+    max-height: calc(100vh - 64px);
+  }
+}
