@@ -74,8 +74,13 @@ const Favorites = () => {
       transition={{ duration: 0.6 }}
       className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-8"
     >
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-heading font-bold mb-6 text-pink-600 text-center">🌟 Your Favorites</h1>
+      <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-xl border border-white">
+        <div className="flex items-center gap-4 mb-8">
+          <div className="bg-pink-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner">
+            {currentUser.email?.[0]?.toUpperCase()}
+          </div>
+          <h1 className="text-3xl font-heading font-bold text-pink-600">My Favorites</h1>
+        </div>
 
         {parksLoading && eventsLoading ? (
           <SkeletonLoader />

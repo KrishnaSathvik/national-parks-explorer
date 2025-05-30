@@ -14,7 +14,7 @@ import {
 import { auth, db } from "../firebase";
 import { motion } from "framer-motion";
 import { useToast } from "../context/ToastContext";
-import useIsMobile from "../hooks/useIsMobile"; // 📱 custom hook
+import useIsMobile from "../hooks/useIsMobile";
 import FavoritesView from "../components/FavoritesView";
 
 const UserAccount = () => {
@@ -27,7 +27,7 @@ const UserAccount = () => {
   const [parksLoading, setParksLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
   const { showToast } = useToast();
-  const isMobile = useIsMobile(); // detect viewport
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     if (!currentUser) return;
@@ -40,9 +40,7 @@ const UserAccount = () => {
 
         const parksSnap = await getDocs(collection(db, "parks"));
         const allParks = parksSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-        const favorites = userData.favoriteParks
-          ?.map(id => allParks.find(p => p.id === id))
-          .filter(Boolean);
+        const favorites = userData.favoriteParks?.map((id) => allParks.find((p) => p.id === id)).filter(Boolean);
         setFavoriteParks(favorites);
         setParksLoading(false);
 
@@ -138,17 +136,18 @@ const UserAccount = () => {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-8"
+      className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-pink-100 px-4 py-8 font-sans"
     >
-     {!isMobile && (
-       <div className="mb-4">
-         <Link to="/" className="text-sm text-blue-600 hover:underline">
-           ← Back to Explore
-         </Link>
-       </div>
-     )}
+      {!isMobile && (
+        <div className="mb-4">
+          <Link to="/" className="text-sm text-blue-600 hover:underline">
+            ← Back to Explore
+          </Link>
+        </div>
+      )}
+
       <div className="bg-white/80 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-xl max-w-7xl mx-auto border border-white">
-        {/* Account Header */}
+        {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <div className="bg-pink-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner">
             {currentUser.email?.[0]?.toUpperCase()}
@@ -156,7 +155,7 @@ const UserAccount = () => {
           <h1 className="text-3xl font-bold text-pink-600 font-heading">My Account</h1>
         </div>
 
-        {/* Email & Name */}
+        {/* Email & Display Name */}
         <div className="grid sm:grid-cols-2 gap-6 mb-10">
           <div className="text-gray-700 text-sm">
             <p><strong>Email:</strong> {currentUser.email}</p>
@@ -185,7 +184,6 @@ const UserAccount = () => {
           </div>
         </div>
 
-        {/* Only show FavoritesView on desktop */}
         {!isMobile && (
           <FavoritesView
             parks={favoriteParks}
@@ -199,20 +197,17 @@ const UserAccount = () => {
 
         {/* Reviews */}
         <div className="mt-10">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">📝 My Reviews</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold font-heading text-gray-800 mb-4">📝 My Reviews</h2>
           {userReviews.length === 0 ? (
             <p className="text-gray-400">No reviews posted yet.</p>
           ) : (
             <ul className="space-y-3">
               {userReviews.map((review, index) => (
-                <li key={index} className="bg-white p-4 rounded-lg shadow border">
+                <li key={index} className="bg-white p-4 rounded-xl shadow border">
                   <h3 className="font-semibold text-pink-600">{review.parkName || "Unnamed Park"}</h3>
                   <p className="text-gray-700 mt-1">{review.text}</p>
                   <p className="text-xs text-gray-400 mt-1">
-                    ⭐ {review.rating} ·{" "}
-                    {review.date?.seconds
-                      ? new Date(review.date.seconds * 1000).toLocaleDateString()
-                      : "Unknown date"}
+                    ⭐ {review.rating} · {review.date?.seconds ? new Date(review.date.seconds * 1000).toLocaleDateString() : "Unknown date"}
                   </p>
                 </li>
               ))}
@@ -222,7 +217,7 @@ const UserAccount = () => {
 
         {/* Notification Preferences */}
         <div className="mt-10">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">🔔 Notification Preferences</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold font-heading text-gray-800 mb-4">🔔 Notification Preferences</h2>
           <div className="grid gap-4 max-w-lg">
             <PreferenceToggle label="Receive Blog Updates" field="blogUpdates" />
             <PreferenceToggle label="Receive Park Alerts" field="parkAlerts" />
