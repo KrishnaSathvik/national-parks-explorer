@@ -1,5 +1,5 @@
 /* ============================================
-   Reset & Fullscreen Fixes
+   Reset & Viewport Fixes
 ============================================ */
 html,
 body {
@@ -8,21 +8,38 @@ body {
   height: 100%;
   width: 100%;
   overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  touch-action: manipulation;
+  font-family: 'Open Sans', sans-serif;
+  background: #fff;
 }
 
-/* ============================================
-   Root Container Fix for Map
-============================================ */
 #root {
   height: 100vh;
   width: 100vw;
   max-width: 100%;
-  overflow: hidden;
   margin: 0 auto;
   padding: 0;
-  background-color: #f9f9f9;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  background-color: #f9f9f9;
+}
+
+/* ============================================
+   Leaflet Fullscreen Fix
+============================================ */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0;
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .leaflet-container {
+    height: calc(100vh - 64px); /* accounting for bottom nav */
+  }
 }
 
 /* ============================================
@@ -69,7 +86,7 @@ body {
 }
 
 /* ============================================
-   Ripple Effect
+   Ripple Button Effect
 ============================================ */
 .ripple {
   position: relative;
@@ -95,21 +112,5 @@ body {
   to {
     transform: translate(-50%, -50%) scale(4);
     opacity: 0;
-  }
-}
-
-/* ============================================
-   Leaflet Fixes
-============================================ */
-.leaflet-container {
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 0;
-  flex: 1;
-}
-
-@media (max-width: 640px) {
-  .leaflet-container {
-    height: calc(100vh - 64px); /* Account for bottom nav */
   }
 }
