@@ -1,4 +1,3 @@
-// src/pages/Favorites.jsx
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { doc, getDoc, getDocs, collection } from "firebase/firestore";
@@ -7,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import FavoritesView from "../components/FavoritesView";
 import SkeletonLoader from "../components/SkeletonLoader";
+import useIsMobile from "../hooks/useIsMobile";
 
 const Favorites = () => {
   const { currentUser } = useAuth();
@@ -15,6 +15,7 @@ const Favorites = () => {
   const [favoriteEvents, setFavoriteEvents] = useState([]);
   const [parksLoading, setParksLoading] = useState(true);
   const [eventsLoading, setEventsLoading] = useState(true);
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -72,14 +73,14 @@ const Favorites = () => {
       initial={{ opacity: 0, y: 40 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-8"
+      className="min-h-screen bg-gradient-to-br from-white via-pink-50 to-white px-4 py-6 sm:py-8"
     >
-      <div className="max-w-6xl mx-auto bg-white/80 backdrop-blur-md p-6 sm:p-10 rounded-3xl shadow-xl border border-white">
-        <div className="flex items-center gap-4 mb-8">
-          <div className="bg-pink-600 text-white w-12 h-12 rounded-full flex items-center justify-center text-xl font-semibold shadow-inner">
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl max-w-5xl mx-auto p-4 sm:p-6 border border-white">
+        <div className="flex items-center gap-4 mb-6">
+          <div className="bg-pink-600 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-lg sm:text-xl font-semibold shadow-inner">
             {currentUser.email?.[0]?.toUpperCase()}
           </div>
-          <h1 className="text-3xl font-heading font-bold text-pink-600">My Favorites</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-pink-600 font-heading">My Favorites</h1>
         </div>
 
         {parksLoading && eventsLoading ? (

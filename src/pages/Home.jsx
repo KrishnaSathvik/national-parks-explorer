@@ -269,15 +269,15 @@
             )}
           </div>
           {/* 📄 Pagination */}
-          <div className="flex overflow-x-auto whitespace-nowrap justify-center gap-2 mt-10 mb-14 px-2 z-10 relative">
+          <div className="flex flex-wrap justify-center items-center gap-3 mt-10 mb-16 px-4 z-10">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i + 1}
                 onClick={() => setCurrentPage(i + 1)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition ${
+                className={`min-w-[44px] px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out ${
                   currentPage === i + 1
-                    ? "bg-pink-500 text-white border-pink-500"
-                    : "bg-white text-pink-500 border-pink-500 hover:bg-pink-50"
+                    ? "bg-pink-600 text-white border-pink-600"
+                    : "bg-white text-pink-600 border-pink-400 hover:bg-pink-50"
                 }`}
               >
                 {i + 1}
