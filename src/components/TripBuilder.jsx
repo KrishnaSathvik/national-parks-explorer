@@ -19,7 +19,7 @@ import {
   FaChevronRight,
   FaCheckCircle,
   FaEdit,
-  FaOptimize
+  FaCogs
 } from 'react-icons/fa';
 
 const TripBuilder = ({ trip, onSave, onCancel }) => {
@@ -340,7 +340,7 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                         onClick={optimizeRoute}
                         className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
                       >
-                        <FaOptimize /> Optimize Route
+                        <FaCogs /> Optimize Route
                       </button>
                     )}
                   </div>
@@ -423,7 +423,7 @@ const TripBuilder = ({ trip, onSave, onCancel }) => {
                         onClick={optimizeRoute}
                         className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition font-medium"
                       >
-                        <FaOptimize /> Optimize My Route
+                        <FaCogs /> Optimize My Route
                       </button>
                     </div>
 
