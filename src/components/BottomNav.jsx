@@ -1,10 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
+import { RouteIcon } from '@heroicons/react/24/outline'; 
 import {
   HomeIcon,
   MapIcon,
   CalendarIcon,
   StarIcon,
   UserIcon,
+  RouteIcon, 
 } from "@heroicons/react/24/outline";
 
 const BottomNav = () => {
@@ -16,8 +18,8 @@ const BottomNav = () => {
 
   const navItems = [
     { name: "Home", icon: <HomeIcon className="h-6 w-6 icon-pop" />, path: "/" },
+    { name: "Trips", icon: <RouteIcon className="h-6 w-6 icon-pop" />, path: "/trip-planner" }, // New item
     { name: "Map", icon: <MapIcon className="h-6 w-6 icon-pop" />, path: "/map" },
-    { name: "Events", icon: <CalendarIcon className="h-6 w-6 icon-pop" />, path: "/calendar" },
     { name: "Favorites", icon: <StarIcon className="h-6 w-6 icon-pop" />, path: "/favorites" },
     { name: "Account", icon: <UserIcon className="h-6 w-6 icon-pop" />, path: "/account" },
   ];

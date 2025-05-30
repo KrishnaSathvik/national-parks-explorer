@@ -37,6 +37,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const About = lazy(() => import("./pages/About"));
 const UserAccount = lazy(() => import("./pages/UserAccount"));
+const TripPlanner = lazy(() => import("./pages/TripPlanner"));
 
 
 
@@ -219,6 +220,15 @@ function App() {
                 element={
                   <PrivateRoute>
                     <UserAccount />
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/trip-planner"
+                element={
+                  <PrivateRoute>
+                    <TripPlanner />
                   </PrivateRoute>
                 }
               />

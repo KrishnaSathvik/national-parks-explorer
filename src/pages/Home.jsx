@@ -17,6 +17,7 @@
       FaUser,
       FaLock,
       FaCogs,
+      FaRoute,
     } from "react-icons/fa";
 
     // Fix Leaflet icons
@@ -88,7 +89,6 @@
                 🌍 Explore National Parks
               </h1>
               <div className="flex flex-wrap justify-center sm:justify-end gap-2 sm:gap-3 text-sm font-medium">
-                {!isMobile && (
                   <Link
                     to="/calendar"
                     className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
@@ -96,6 +96,13 @@
                     <FaCalendarAlt /> Park Events
                   </Link>
                 )}
+
+                <Link
+                  to="/trip-planner"
+                  className="inline-flex items-center gap-1 px-4 py-2 rounded-full bg-white text-gray-800 border hover:bg-pink-50 hover:text-pink-600 transition"
+                >
+                  <FaRoute /> Trip Planner
+                </Link>
 
                 <Link
                   to="/blog"
