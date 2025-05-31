@@ -1,11 +1,11 @@
+// src/pages/TripPlanner.jsx - Quick Fix (Remove all enhanced imports)
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import TripBuilder from '../components/TripBuilder';
-import TripList from '../components/TripList'; // Use the original TripList for now
-import TripViewer from '../components/TripViewer'; // Import the standalone TripViewer
+import TripList from '../components/TripList';
 import FadeInWrapper from '../components/FadeInWrapper';
 import { FaPlus, FaRoute, FaCalendarAlt, FaChartBar, FaStar, FaBrain } from 'react-icons/fa';
 
@@ -117,32 +117,110 @@ const TripPlanner = () => {
     }
   };
 
-  const selectTemplate = (template) => {
-    // Convert template to trip format
-    const templateTrip = {
-      title: template.title,
-      description: template.description,
-      parks: template.parks.map(park => {
-        const foundPark = allParks.find(p => p.name === park.name || p.fullName === park.name);
-        return {
-          parkId: foundPark?.id || `template-${park.name}`,
-          parkName: park.name,
-          visitDate: '',
-          stayDuration: park.days,
-          coordinates: foundPark ? parseCoordinates(foundPark.coordinates) : { lat: 0, lng: 0 },
-          slug: foundPark?.slug || ''
-        };
-      }),
-      startDate: '',
-      endDate: '',
-      transportationMode: 'driving',
-      tripStyle: 'balanced',
-      isPublic: false
+  // Simple trip viewer modal component
+  const SimpleTripViewer = ({ trip, onClose, onEdit }) => {
+    if (!trip) return null;
+
+    const formatDate = (dateString) => {
+      if (!dateString) return 'Not set';
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     };
-    
-    setActiveTrip(templateTrip);
-    setCurrentTab('my-trips');
-    showToast(`🌟 ${template.title} template loaded! Customize your dates and details.`, 'success');
+
+    const calculateDuration = () => {
+      if (!trip.startDate || !trip.endDate) return 0;
+      const start = new Date(trip.startDate);
+      const end = new Date(trip.endDate);
+      const diffTime = end.getTime() - start.getTime();
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
+          
+          {/* Header */}
+          <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-6 text-white">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">{trip.title}</h2>
+                {trip.description && (
+                  <p className="text-pink-100 mb-4">{trip.description}</p>
+                )}
+                <div className="flex flex-wrap gap-4 text-sm">
+                  <span>📅 {formatDate(trip.startDate)} - {formatDate(trip.endDate)}</span>
+                  <span>🏞️ {trip.parks?.length || 0} parks</span>
+                  <span>🛣️ {trip.totalDistance || 0} miles</span>
+                  <span>💰 ${trip.estimatedCost || 0}</span>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => onEdit(trip)}
+                  className="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={onClose}
+                  className="bg-white/20 hover:bg-white/30 p-2 rounded-lg transition"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="p-6 max-h-[60vh] overflow-y-auto">
+            {/* Quick Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="bg-pink-100 p-4 rounded-xl text-center">
+                <div className="text-2xl font-bold text-pink-600">{calculateDuration()}</div>
+                <div className="text-pink-700 text-sm">Days</div>
+              </div>
+              <div className="bg-blue-100 p-4 rounded-xl text-center">
+                <div className="text-2xl font-bold text-blue-600">{trip.parks?.length || 0}</div>
+                <div className="text-blue-700 text-sm">Parks</div>
+              </div>
+              <div className="bg-green-100 p-4 rounded-xl text-center">
+                <div className="text-2xl font-bold text-green-600">{trip.totalDistance || 0}</div>
+                <div className="text-green-700 text-sm">Miles</div>
+              </div>
+              <div className="bg-yellow-100 p-4 rounded-xl text-center">
+                <div className="text-2xl font-bold text-yellow-600">${trip.estimatedCost || 0}</div>
+                <div className="text-yellow-700 text-sm">Budget</div>
+              </div>
+            </div>
+
+            {/* Parks List */}
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-gray-800 mb-4">Parks to Visit</h3>
+              <div className="space-y-3">
+                {trip.parks?.map((park, index) => (
+                  <div key={park.parkId} className="flex items-center gap-4 p-3 bg-white rounded-lg">
+                    <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                      {index + 1}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">{park.parkName}</h4>
+                      <div className="text-sm text-gray-600">
+                        {park.visitDate && `Visit: ${formatDate(park.visitDate)}`} • 
+                        {park.stayDuration} day{park.stayDuration !== 1 ? 's' : ''}
+                      </div>
+                    </div>
+                  </div>
+                )) || <p className="text-gray-500">No parks selected</p>}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const parseCoordinates = (coordString) => {
@@ -304,7 +382,7 @@ const TripPlanner = () => {
                     onCancel={() => setActiveTrip(null)}
                   />
                 ) : (
-                  <EnhancedTripList 
+                  <TripList 
                     trips={trips}
                     onEditTrip={setActiveTrip}
                     onDeleteTrip={deleteTrip}
@@ -316,66 +394,80 @@ const TripPlanner = () => {
 
             {currentTab === 'templates' && (
               <FadeInWrapper delay={0.2}>
-                <TripTemplates 
-                  onSelectTemplate={selectTemplate}
-                  allParks={allParks}
-                />
+                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🌟</div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Trip Templates Coming Soon!</h3>
+                    <p className="text-gray-600 mb-6">
+                      We're working on expert-curated trip templates to help you plan amazing adventures quickly.
+                    </p>
+                    <button
+                      onClick={createNewTrip}
+                      className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition"
+                    >
+                      Create Custom Trip Instead
+                    </button>
+                  </div>
+                </div>
               </FadeInWrapper>
             )}
 
             {currentTab === 'analytics' && (
               <FadeInWrapper delay={0.2}>
-                <TripAnalytics trips={trips} />
+                <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">📊</div>
+                    <h3 className="text-2xl font-bold text-gray-800 mb-4">Analytics Dashboard Coming Soon!</h3>
+                    <p className="text-gray-600 mb-6">
+                      Get insights into your travel patterns, spending, and preferences with our upcoming analytics dashboard.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-200">
+                        <div className="text-blue-500 text-2xl mb-2">📈</div>
+                        <h4 className="font-semibold text-blue-800">Travel Trends</h4>
+                        <p className="text-sm text-blue-700">Track your travel frequency and patterns</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+                        <div className="text-green-500 text-2xl mb-2">💰</div>
+                        <h4 className="font-semibold text-green-800">Budget Analysis</h4>
+                        <p className="text-sm text-green-700">Understand your spending habits</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
+                        <div className="text-purple-500 text-2xl mb-2">🎯</div>
+                        <h4 className="font-semibold text-purple-800">Recommendations</h4>
+                        <p className="text-sm text-purple-700">Personalized park suggestions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </FadeInWrapper>
             )}
 
             {currentTab === 'recommendations' && (
               <FadeInWrapper delay={0.2}>
                 <div className="space-y-8">
-                  <SmartRecommendations
-                    userPreferences={{
-                      tripStyle: 'balanced',
-                      transportationMode: 'driving'
-                    }}
-                    selectedParks={[]}
-                    allParks={allParks}
-                    onAddPark={(park) => {
-                      // Create a new trip with the recommended park
-                      const newTrip = {
-                        title: `${park.name || park.fullName} Adventure`,
-                        description: `Explore the beauty of ${park.name || park.fullName}`,
-                        parks: [{
-                          parkId: park.id,
-                          parkName: park.name || park.fullName,
-                          visitDate: '',
-                          stayDuration: 2,
-                          coordinates: parseCoordinates(park.coordinates),
-                          slug: park.slug
-                        }],
-                        startDate: '',
-                        endDate: '',
-                        transportationMode: 'driving',
-                        tripStyle: 'balanced',
-                        isPublic: false
-                      };
-                      setActiveTrip(newTrip);
-                      setCurrentTab('my-trips');
-                      showToast(`🧠 Created trip with ${park.name || park.fullName}! Add more parks and set your dates.`, 'success');
-                    }}
-                  />
+                  <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">🧠</div>
+                      <h3 className="text-2xl font-bold text-gray-800 mb-4">AI Recommendations Coming Soon!</h3>
+                      <p className="text-gray-600 mb-6">
+                        Our AI will analyze your preferences and suggest perfect parks for your next adventure.
+                      </p>
+                    </div>
+                  </div>
                   
                   {/* Quick Start Section */}
                   <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
                     <div className="text-center mb-6">
-                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Get Started with AI</h3>
-                      <p className="text-gray-600">Tell us about your preferences to get personalized recommendations</p>
+                      <h3 className="text-2xl font-bold text-gray-800 mb-2">Get Started Today</h3>
+                      <p className="text-gray-600">Create your first trip to unlock personalized recommendations</p>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <button
                         onClick={() => {
                           setCurrentTab('templates');
-                          showToast('🌟 Check out our curated trip templates!', 'info');
+                          showToast('🌟 Templates feature coming soon!', 'info');
                         }}
                         className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-pink-400 hover:bg-pink-50 transition-all text-center group"
                       >
@@ -396,7 +488,7 @@ const TripPlanner = () => {
                       <button
                         onClick={() => {
                           setCurrentTab('analytics');
-                          showToast('📊 Explore your travel patterns!', 'info');
+                          showToast('📊 Analytics coming soon!', 'info');
                         }}
                         className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all text-center group"
                       >
@@ -413,9 +505,9 @@ const TripPlanner = () => {
         </div>
       </div>
 
-      {/* Trip Viewer Modal */}
+      {/* Simple Trip Viewer Modal */}
       {viewingTrip && (
-        <TripViewer
+        <SimpleTripViewer
           trip={viewingTrip}
           onClose={() => setViewingTrip(null)}
           onEdit={(trip) => {
