@@ -1,4 +1,3 @@
-// src/components/ParkSelector.jsx - Enhanced Version with AI Features
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
   FaSearch, 

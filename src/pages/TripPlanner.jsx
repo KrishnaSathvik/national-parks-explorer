@@ -1,18 +1,12 @@
-// src/pages/TripPlanner.jsx - Enhanced with all new features
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { collection, addDoc, getDocs, query, where, doc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import TripBuilder from '../components/TripBuilder';
+import TripList from '../components/TripList'; // Use the original TripList for now
+import TripViewer from '../components/TripViewer'; // Import the standalone TripViewer
 import FadeInWrapper from '../components/FadeInWrapper';
-import { 
-  SmartRecommendations, 
-  TripTemplates, 
-  TripAnalytics, 
-  TripViewer, 
-  EnhancedTripList 
-} from '../components/EnhancedTripFeatures';
 import { FaPlus, FaRoute, FaCalendarAlt, FaChartBar, FaStar, FaBrain } from 'react-icons/fa';
 
 const TripPlanner = () => {

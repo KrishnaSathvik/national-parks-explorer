@@ -1,4 +1,3 @@
-// src/components/EnhancedTripFeatures.jsx
 import React, { useState, useEffect } from 'react';
 import { 
   FaBrain, 

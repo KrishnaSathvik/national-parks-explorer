@@ -1,4 +1,3 @@
-// src/components/TripList.jsx - Enhanced Version with View/Edit Options
 import React, { useState } from 'react';
 import FadeInWrapper from './FadeInWrapper';
 import { 
