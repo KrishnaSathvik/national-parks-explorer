@@ -91,16 +91,36 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Date and calculation helpers
+  // FIXED: Single, accurate trip duration calculation
   const calculateTripDuration = () => {
     if (!tripData.startDate || !tripData.endDate) return 0;
     
     const start = new Date(tripData.startDate);
     const end = new Date(tripData.endDate);
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
     
-    return Math.max(1, diffDays);
+    // Reset time to avoid timezone issues
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    
+    // For trip planning: if you select Monday to Wednesday
+    // Monday (Day 1), Tuesday (Day 2), Wednesday (Day 3) = 3 days
+    return Math.max(1, diffDays + 1);
+  };
+
+  // ADDED: Missing calculateDistance function
+  const calculateDistance = (coord1, coord2) => {
+    const R = 3959; // Earth's radius in miles
+    const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
+    const dLon = (coord2.lng - coord1.lng) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(coord1.lat * Math.PI / 180) * Math.cos(coord2.lat * Math.PI / 180) * 
+      Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
   };
 
   const calculateTotalDistance = () => {
@@ -119,46 +139,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     
     return Math.round(totalDistance);
   };
-
-  // Fixed calculateTripDuration function in TripBuilder.jsx
-
-  const calculateTripDuration = () => {
-    if (!tripData.startDate || !tripData.endDate) return 0;
-    
-    const start = new Date(tripData.startDate);
-    const end = new Date(tripData.endDate);
-    
-    // Calculate the difference in milliseconds
-    const diffTime = end.getTime() - start.getTime();
-    
-    // Convert to days (don't add +1, just calculate actual days)
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    // If same day, it's 1 day. Otherwise it's the actual difference
-    return diffDays === 0 ? 1 : diffDays;
-  };
-
-  // Alternative more accurate calculation
-  const calculateTripDurationAccurate = () => {
-    if (!tripData.startDate || !tripData.endDate) return 0;
-    
-    const start = new Date(tripData.startDate);
-    const end = new Date(tripData.endDate);
-    
-    // Reset time to avoid timezone issues
-    start.setHours(0, 0, 0, 0);
-    end.setHours(0, 0, 0, 0);
-    
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
-    
-    // For trip planning, if you leave Monday and return Wednesday:
-    // Monday (Day 1), Tuesday (Day 2), Wednesday (Day 3) = 3 days
-    return Math.max(1, diffDays + 1);
-  };
-
-  // Use the accurate one
-  const calculateTripDuration = calculateTripDurationAccurate;
 
   const calculateEstimatedCost = () => {
     const duration = calculateTripDuration();
