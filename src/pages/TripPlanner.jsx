@@ -120,20 +120,103 @@ const TripPlanner = () => {
     setCurrentTab('my-trips'); // Switch to trips tab when creating
   };
 
-  const createTripFromTemplate = (template) => {
+  // Enhanced template system in TripPlanner.jsx
+
+const createTripFromTemplate = async (template) => {
+  try {
+    // First, find matching parks from our parks database
+    const templateParks = [];
+    
+    for (const templateParkName of template.parks) {
+      // Search for the park in our database
+      const matchingPark = allParks.find(park => 
+        park.name?.toLowerCase().includes(templateParkName.toLowerCase().split(' ')[0]) ||
+        park.fullName?.toLowerCase().includes(templateParkName.toLowerCase().split(' ')[0])
+      );
+      
+      if (matchingPark) {
+        // Parse coordinates
+        let coordinates = { lat: 0, lng: 0 };
+        if (matchingPark.coordinates && matchingPark.coordinates.includes(',')) {
+          const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
+          if (!isNaN(lat) && !isNaN(lng)) {
+            coordinates = { lat, lng };
+          }
+        }
+
+        templateParks.push({
+          parkId: matchingPark.id,
+          parkName: matchingPark.name || matchingPark.fullName,
+          visitDate: '', // User can still customize dates
+          stayDuration: Math.ceil(parseInt(template.duration.split('-')[0]) / template.parks.length), // Distribute days evenly
+          coordinates,
+          state: matchingPark.state,
+          description: matchingPark.description
+        });
+      } else {
+        // If park not found in database, create a placeholder
+        templateParks.push({
+          parkId: `template-${Date.now()}-${templateParkName.replace(/\s+/g, '-').toLowerCase()}`,
+          parkName: templateParkName,
+          visitDate: '',
+          stayDuration: 2,
+          coordinates: { lat: 0, lng: 0 },
+          state: '',
+          description: `${templateParkName} from ${template.title} template`
+        });
+      }
+    }
+
     const newTrip = {
       title: template.title,
       description: template.description,
-      parks: [], // Will be populated when user selects actual parks
+      parks: templateParks, // Pre-populated with parks!
       startDate: '',
       endDate: '',
       transportationMode: 'driving',
       isPublic: false,
-      templateId: template.id
+      templateId: template.id,
+      totalDistance: 0,
+      estimatedCost: parseInt(template.estimatedCost.replace('$', '').replace(',', '')) || 0
     };
+
     setActiveTrip(newTrip);
     setCurrentTab('my-trips');
-    showToast(`🌟 ${template.title} template loaded! Now add your dates and parks.`, 'success');
+    showToast(`🌟 ${template.title} template loaded with ${templateParks.length} parks! Just add your dates and you're ready to go!`, 'success');
+  } catch (error) {
+    console.error('Error creating trip from template:', error);
+    showToast('Failed to load template. Please try again.', 'error');
+  }
+};
+
+  // Fixed saveTrip function in TripPlanner.jsx
+
+  const cleanDataForFirebase = (data) => {
+    // Remove undefined values and clean the data
+    const cleaned = {};
+    
+    Object.keys(data).forEach(key => {
+      const value = data[key];
+      
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value)) {
+          // Clean arrays (like parks array)
+          cleaned[key] = value.map(item => {
+            if (typeof item === 'object' && item !== null) {
+              return cleanDataForFirebase(item);
+            }
+            return item;
+          });
+        } else if (typeof value === 'object' && value !== null) {
+          // Clean nested objects (like coordinates)
+          cleaned[key] = cleanDataForFirebase(value);
+        } else {
+          cleaned[key] = value;
+        }
+      }
+    });
+    
+    return cleaned;
   };
 
   const saveTrip = async (tripData) => {
@@ -154,35 +237,46 @@ const TripPlanner = () => {
         return newTrip;
       }
 
-      const tripToSave = {
-        ...tripData,
+      // Clean the data to remove undefined values
+      const cleanedTripData = cleanDataForFirebase({
+        title: tripData.title || '',
+        description: tripData.description || '',
+        parks: tripData.parks || [],
+        startDate: tripData.startDate || '',
+        endDate: tripData.endDate || '',
+        transportationMode: tripData.transportationMode || 'driving',
+        totalDistance: tripData.totalDistance || 0,
+        estimatedCost: tripData.estimatedCost || 0,
+        totalDuration: tripData.totalDuration || 0,
+        isPublic: tripData.isPublic || false,
+        templateId: tripData.templateId || null,
         userId: currentUser.uid,
         createdAt: new Date(),
         updatedAt: new Date()
-      };
+      });
 
       if (tripData.id) {
         // Update existing trip
         await updateDoc(doc(db, 'trips', tripData.id), {
-          ...tripToSave,
+          ...cleanedTripData,
           updatedAt: new Date()
         });
-        const updatedTrips = trips.map(t => t.id === tripData.id ? { ...tripToSave, id: tripData.id } : t);
+        const updatedTrips = trips.map(t => t.id === tripData.id ? { ...cleanedTripData, id: tripData.id } : t);
         setTrips(updatedTrips);
         showToast('✅ Trip updated successfully!', 'success');
       } else {
         // Create new trip
-        const docRef = await addDoc(collection(db, 'trips'), tripToSave);
-        const savedTrip = { id: docRef.id, ...tripToSave };
+        const docRef = await addDoc(collection(db, 'trips'), cleanedTripData);
+        const savedTrip = { id: docRef.id, ...cleanedTripData };
         setTrips([...trips, savedTrip]);
         showToast('✅ Trip saved successfully!', 'success');
       }
       
       setActiveTrip(null);
-      return tripToSave;
+      return cleanedTripData;
     } catch (error) {
-      console.error('Error saving trip:', error);
-      showToast('❌ Failed to save trip', 'error');
+      console.error('Save error:', error);
+      showToast('❌ Failed to save trip: ' + error.message, 'error');
       throw error;
     }
   };
@@ -218,6 +312,168 @@ const TripPlanner = () => {
     if (difficulty.toLowerCase().includes('moderate')) return 'text-yellow-600 bg-yellow-100';
     if (difficulty.toLowerCase().includes('advanced')) return 'text-red-600 bg-red-100';
     return 'text-blue-600 bg-blue-100';
+  };
+
+
+  const generateSmartSuggestions = () => {
+  if (trips.length === 0) return [];
+  
+  const suggestions = [];
+  
+  // Analyze user's trip patterns
+  const userParks = trips.flatMap(trip => trip.parks?.map(p => p.parkName) || []);
+  const userStates = [...new Set(trips.flatMap(trip => trip.parks?.map(p => p.state).filter(Boolean) || []))];
+  const avgTripCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
+  const avgTripDuration = trips.reduce((sum, trip) => sum + (trip.totalDuration || 0), 0) / trips.length;
+  const preferredTransport = trips.filter(t => t.transportationMode === 'driving').length > trips.filter(t => t.transportationMode === 'flying').length ? 'driving' : 'flying';
+  
+  // Suggestion 1: Complete park series
+  if (userStates.includes('Utah') && userParks.length >= 2) {
+    const utahParks = ['Arches', 'Bryce Canyon', 'Canyonlands', 'Capitol Reef', 'Zion'];
+    const visitedUtah = userParks.filter(park => utahParks.some(up => park.includes(up)));
+    const missingUtah = utahParks.filter(up => !userParks.some(park => park.includes(up)));
+    
+    if (missingUtah.length > 0 && missingUtah.length < 4) {
+      suggestions.push({
+        type: 'complete_series',
+        title: 'Complete Utah\'s Big 5',
+        description: `You've visited ${visitedUtah.length} Utah parks. Complete the collection!`,
+        actionText: 'Plan Utah Trip',
+        parks: missingUtah.map(park => `${park} National Park`),
+        estimatedDays: missingUtah.length * 2,
+        estimatedCost: Math.round(avgTripCost * (missingUtah.length / 3)),
+        confidence: 95,
+        icon: '🏜️',
+        reason: `Based on your ${visitedUtah.length} Utah park visits`
+      });
+    }
+  }
+  
+  // Suggestion 2: Similar regions
+  if (userStates.includes('California')) {
+    const californiaParks = userParks.filter(park => 
+      ['Yosemite', 'Sequoia', 'Kings Canyon', 'Death Valley', 'Joshua Tree'].some(cp => park.includes(cp))
+    );
+    
+    if (californiaParks.length >= 1 && !userParks.some(park => park.includes('Death Valley'))) {
+      suggestions.push({
+        type: 'region_expansion',
+        title: 'Desert Adventure Awaits',
+        description: 'Explore California\'s stunning desert landscapes',
+        actionText: 'Plan Desert Trip',
+        parks: ['Death Valley National Park', 'Joshua Tree National Park'],
+        estimatedDays: 4,
+        estimatedCost: Math.round(avgTripCost * 0.8),
+        confidence: 88,
+        icon: '🌵',
+        reason: 'Perfect addition to your California adventures'
+      });
+    }
+  }
+  
+  // Suggestion 3: Budget-based suggestions
+  if (avgTripCost > 3000) {
+    suggestions.push({
+      type: 'budget_optimization',
+      title: 'Budget-Friendly Adventure',
+      description: 'Great parks without breaking the bank',
+      actionText: 'Plan Budget Trip',
+      parks: ['Great Smoky Mountains NP', 'Hot Springs NP', 'Congaree NP'],
+      estimatedDays: 6,
+      estimatedCost: 1200,
+      confidence: 82,
+      icon: '💰',
+      reason: 'Mix it up with some affordable eastern parks'
+    });
+  }
+  
+  // Suggestion 4: Transportation-based
+  if (preferredTransport === 'driving' && !userParks.some(park => park.includes('Yellowstone'))) {
+    suggestions.push({
+      type: 'transport_optimized',
+      title: 'Ultimate Road Trip Destination',
+      description: 'Perfect for road trip enthusiasts like you',
+      actionText: 'Plan Road Trip',
+      parks: ['Yellowstone National Park', 'Grand Teton National Park'],
+      estimatedDays: Math.round(avgTripDuration),
+      estimatedCost: Math.round(avgTripCost),
+      confidence: 90,
+      icon: '🦌',
+      reason: 'Ideal for scenic driving adventures'
+    });
+  }
+  
+  // Suggestion 5: Seasonal recommendations
+  const currentMonth = new Date().getMonth();
+  if (currentMonth >= 2 && currentMonth <= 4) { // Spring
+    suggestions.push({
+      type: 'seasonal',
+      title: 'Perfect Spring Destinations',
+      description: 'Beautiful weather and fewer crowds',
+      actionText: 'Plan Spring Trip',
+      parks: ['Zion National Park', 'Arches National Park'],
+      estimatedDays: 5,
+      estimatedCost: Math.round(avgTripCost * 0.9),
+      confidence: 85,
+      icon: '🌸',
+      reason: 'Great weather for hiking right now'
+    });
+  }
+  
+  return suggestions.slice(0, 4); // Return top 4 suggestions
+};
+
+// Updated Smart Suggestions component
+const SmartSuggestionsTab = () => {
+  const suggestions = generateSmartSuggestions();
+  
+  const createTripFromSuggestion = (suggestion) => {
+    // Find actual parks in database
+    const suggestedParks = [];
+    
+    suggestion.parks.forEach(parkName => {
+      const matchingPark = allParks.find(park => 
+        park.name?.toLowerCase().includes(parkName.toLowerCase().split(' ')[0]) ||
+        park.fullName?.toLowerCase().includes(parkName.toLowerCase().split(' ')[0])
+      );
+      
+      if (matchingPark) {
+        let coordinates = { lat: 0, lng: 0 };
+        if (matchingPark.coordinates && matchingPark.coordinates.includes(',')) {
+          const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
+          if (!isNaN(lat) && !isNaN(lng)) {
+            coordinates = { lat, lng };
+          }
+        }
+
+        suggestedParks.push({
+          parkId: matchingPark.id,
+          parkName: matchingPark.name || matchingPark.fullName,
+          visitDate: '',
+          stayDuration: Math.ceil(suggestion.estimatedDays / suggestion.parks.length),
+          coordinates,
+          state: matchingPark.state,
+          description: matchingPark.description
+        });
+      }
+    });
+
+    const newTrip = {
+      title: suggestion.title,
+      description: suggestion.description,
+      parks: suggestedParks,
+      startDate: '',
+      endDate: '',
+      transportationMode: 'driving',
+      estimatedCost: suggestion.estimatedCost,
+      totalDuration: suggestion.estimatedDays,
+      isPublic: false,
+      suggestionType: suggestion.type
+    };
+
+    setActiveTrip(newTrip);
+    setCurrentTab('my-trips');
+    showToast(`🧠 Smart suggestion applied! ${suggestedParks.length} parks added based on your travel patterns.`, 'success');
   };
 
   if (loading) {
@@ -681,30 +937,107 @@ const TripPlanner = () => {
             {currentTab === 'suggestions' && (
               <FadeInWrapper delay={0.2}>
                 <div className="space-y-6 md:space-y-8">
-                  {trips.length === 0 ? (
-                    <div className="text-center py-12 md:py-20">
-                      <div className="text-4xl md:text-6xl mb-4">🧠</div>
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Create Your First Trip</h3>
-                      <p className="text-gray-600 mb-6">
-                        Our AI will analyze your preferences and suggest perfect parks for your next adventure.
-                      </p>
-                      <button
-                        onClick={createNewTrip}
-                        className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition min-h-[48px]"
-                      >
-                        Start Planning
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
-                        <div className="text-center mb-6 md:mb-8">
-                          <div className="text-4xl md:text-6xl mb-4">🧠</div>
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Smart Recommendations</h3>
+                  if (trips.length === 0) {
+                      return (
+                        <div className="text-center py-20">
+                          <div className="text-6xl mb-4">🧠</div>
+                          <h3 className="text-2xl font-bold text-gray-800 mb-4">Create Your First Trip</h3>
+                          <p className="text-gray-600 mb-6">
+                            Once you create a few trips, our AI will analyze your preferences and suggest personalized adventures.
+                          </p>
+                          <button
+                            onClick={createNewTrip}
+                            className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition min-h-[48px]"
+                          >
+                            Start Planning
+                          </button>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-8">
+                        <div className="text-center mb-8">
+                          <h3 className="text-2xl font-bold text-gray-800 mb-2">🧠 Personalized Trip Suggestions</h3>
                           <p className="text-gray-600">
-                            Based on your {trips.length} planned trip{trips.length !== 1 ? 's' : ''}, here are some intelligent suggestions
+                            Based on your {trips.length} trip{trips.length !== 1 ? 's' : ''} and travel patterns
                           </p>
                         </div>
+
+                        {suggestions.length === 0 ? (
+                          <div className="text-center py-12">
+                            <div className="text-6xl mb-4">🤔</div>
+                            <h4 className="text-xl font-semibold text-gray-600 mb-2">Need More Data</h4>
+                            <p className="text-gray-500 mb-6">
+                              Plan a few more trips so our AI can better understand your preferences and suggest amazing adventures!
+                            </p>
+                            <button
+                              onClick={createNewTrip}
+                              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition"
+                            >
+                              Plan Another Trip
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {suggestions.map((suggestion, index) => (
+                              <div key={index} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
+                                <div className="flex items-start justify-between mb-4">
+                                  <span className="text-4xl">{suggestion.icon}</span>
+                                  <div className="text-right">
+                                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                      {suggestion.confidence}% Match
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1 capitalize">{suggestion.type.replace('_', ' ')}</div>
+                                  </div>
+                                </div>
+                                
+                                <h4 className="text-xl font-bold text-gray-800 mb-2">{suggestion.title}</h4>
+                                <p className="text-gray-600 mb-4">{suggestion.description}</p>
+                                
+                                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                                  <div className="grid grid-cols-3 gap-4 text-center">
+                                    <div>
+                                      <div className="font-bold text-gray-800">{suggestion.parks.length}</div>
+                                      <div className="text-xs text-gray-500">Parks</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-bold text-gray-800">{suggestion.estimatedDays}</div>
+                                      <div className="text-xs text-gray-500">Days</div>
+                                    </div>
+                                    <div>
+                                      <div className="font-bold text-green-600">${suggestion.estimatedCost}</div>
+                                      <div className="text-xs text-gray-500">Budget</div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mb-4">
+                                  <h5 className="font-semibold text-gray-700 mb-2">Suggested Parks:</h5>
+                                  <div className="space-y-1">
+                                    {suggestion.parks.map((park, idx) => (
+                                      <div key={idx} className="text-sm text-gray-600">• {park}</div>
+                                    ))}
+                                  </div>
+                                </div>
+
+                                <div className="text-xs text-purple-700 bg-purple-100 px-3 py-2 rounded-lg mb-4">
+                                  🧠 {suggestion.reason}
+                                </div>
+                                
+                                <button
+                                  onClick={() => createTripFromSuggestion(suggestion)}
+                                  className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-medium flex items-center justify-center gap-2 min-h-[48px]"
+                                >
+                                  <span>✨</span> {suggestion.actionText}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  };
 
                         {/* Smart Recommendations */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
