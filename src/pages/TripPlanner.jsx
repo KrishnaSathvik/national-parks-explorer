@@ -19,6 +19,11 @@ const TripPlanner = () => {
   const [viewingTrip, setViewingTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('my-trips');
+  const [autoLoadPreferences, setAutoLoadPreferences] = useState({
+  enabled: true,
+  triggerOnFirstVisit: true,
+  lastRecommended: null
+});
 
   const tabs = [
     { id: 'my-trips', title: 'My Trips', icon: FaRoute, description: 'Your planned adventures' },
@@ -107,6 +112,25 @@ const TripPlanner = () => {
     }
   };
 
+  // Auto-load template when user visits templates tab
+useEffect(() => {
+  if (currentTab === 'templates' && autoLoadPreferences.enabled && trips.length > 0) {
+    const hasAutoLoaded = sessionStorage.getItem('hasAutoLoadedTemplate');
+    
+    if (!hasAutoLoaded && autoLoadPreferences.triggerOnFirstVisit) {
+      sessionStorage.setItem('hasAutoLoadedTemplate', 'true');
+      
+      setTimeout(() => {
+        const recommended = getSmartTemplateRecommendation();
+        if (recommended) {
+          showToast(`🎯 Auto-selected "${recommended.title}" based on your ${trips.length} planned trips!`, 'success');
+          createTripFromTemplate(recommended);
+        }
+      }, 2000);
+    }
+  }
+}, [currentTab, trips.length]);
+
   // Clean data for Firebase (remove undefined values)
   const cleanDataForFirebase = (data) => {
     const cleaned = {};
@@ -145,6 +169,35 @@ const TripPlanner = () => {
     });
     setCurrentTab('my-trips');
   };
+
+  const getSmartTemplateRecommendation = () => {
+  if (trips.length === 0) return null;
+  
+  // Analyze user's existing trips
+  const userStates = [...new Set(trips.flatMap(trip => 
+    trip.parks?.map(p => p.state).filter(Boolean) || []
+  ))];
+  
+  const avgCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
+  const hasUtahParks = userStates.includes('Utah');
+  const hasCaliforniaParks = userStates.includes('California');
+  
+  // Smart recommendation logic
+  if (hasUtahParks && !trips.some(t => t.parks?.length >= 4)) {
+    return tripTemplates.find(t => t.id === 'utah-big5');
+  }
+  
+  if (hasCaliforniaParks && avgCost > 2500) {
+    return tripTemplates.find(t => t.id === 'california-classics');
+  }
+  
+  if (avgCost < 2000) {
+    return tripTemplates.find(t => t.id === 'yellowstone-tetons');
+  }
+  
+  // Default to most popular
+  return tripTemplates.find(t => t.id === 'southwest-loop') || tripTemplates[0];
+};
 
   // Enhanced template function that auto-adds parks
   const createTripFromTemplate = async (template) => {
@@ -597,95 +650,176 @@ const TripPlanner = () => {
               </>
             )}
 
-            {/* Templates Tab */}
             {currentTab === 'templates' && (
               <FadeInWrapper delay={0.2}>
                 <div className="space-y-6 md:space-y-8">
                   <div className="text-center mb-6 md:mb-8">
                     <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">🌟 Trip Templates</h3>
-                    <p className="text-gray-600">Expert-designed adventures to inspire your next journey</p>
+                    <p className="text-gray-600">
+                      Expert-designed adventures {trips.length > 0 ? 'with smart auto-loading' : 'to inspire your journey'}
+                    </p>
                   </div>
 
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-                    {tripTemplates.map((template, index) => (
-                      <FadeInWrapper key={template.id} delay={index * 0.1}>
-                        <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300">
-                          
-                          <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-6 text-white">
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="text-3xl md:text-4xl mb-2">{template.image}</div>
-                              <div className="bg-white/20 px-3 py-1 rounded-full text-xs md:text-sm font-medium">
-                                {template.duration}
-                              </div>
-                            </div>
-                            
-                            <h4 className="text-lg md:text-xl font-bold mb-2">{template.title}</h4>
-                            <p className="text-white/90 text-sm md:text-base">{template.description}</p>
-                          </div>
-
-                          <div className="p-6">
-                            <div className="grid grid-cols-3 gap-4 mb-6">
-                              <div className="text-center">
-                                <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
-                                  {template.difficulty}
-                                </div>
-                                <div className="text-xs text-gray-500 mt-1">Difficulty</div>
-                              </div>
-                              
-                              <div className="text-center">
-                                <div className="font-bold text-gray-800">{template.parks.length}</div>
-                                <div className="text-xs text-gray-500">Parks</div>
-                              </div>
-                              
-                              <div className="text-center">
-                                <div className="font-bold text-green-600">{template.estimatedCost}</div>
-                                <div className="text-xs text-gray-500">Est. Cost</div>
-                              </div>
-                            </div>
-
-                            <div className="mb-6">
-                              <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
-                                <FaMapMarkerAlt className="text-pink-500" />
-                                Parks Included
-                              </h5>
-                              <div className="space-y-2">
-                                {template.parks.slice(0, 3).map((park, idx) => (
-                                  <div key={idx} className="text-sm text-gray-700">
-                                    • {park}
-                                  </div>
-                                ))}
-                                {template.parks.length > 3 && (
-                                  <div className="text-sm text-gray-500">
-                                    +{template.parks.length - 3} more parks...
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="mb-6">
-                              <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
-                                <FaStar className="text-yellow-500" />
-                                Must-See Highlights
-                              </h5>
-                              <div className="flex flex-wrap gap-2">
-                                {template.highlights.slice(0, 3).map((highlight, idx) => (
-                                  <span key={idx} className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">
-                                    {highlight}
-                                  </span>
-                                ))}
-                              </div>
-                            </div>
-
-                            <button
-                              onClick={() => createTripFromTemplate(template)}
-                              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 text-white py-3 px-6 rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-h-[48px]"
-                            >
-                              <FaStar /> Use This Template
-                            </button>
-                          </div>
+                  {/* Auto-Load Status Panel */}
+                  {trips.length > 0 && (
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200 mb-8">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-semibold text-blue-800 flex items-center gap-2">
+                            <span>🎯</span> Smart Template Recommendations
+                          </h4>
+                          <p className="text-sm text-blue-600">
+                            Auto-suggestions based on your {trips.length} planned trip{trips.length !== 1 ? 's' : ''}
+                          </p>
                         </div>
-                      </FadeInWrapper>
-                    ))}
+                        
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={autoLoadPreferences.enabled}
+                            onChange={(e) => setAutoLoadPreferences({
+                              ...autoLoadPreferences,
+                              enabled: e.target.checked
+                            })}
+                            className="sr-only peer"
+                          />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                      </div>
+                      
+                      {autoLoadPreferences.enabled && (
+                        <div className="mt-4 flex items-center gap-4">
+                          <button
+                            onClick={() => {
+                              const template = getSmartTemplateRecommendation();
+                              if (template) {
+                                showToast(`🧠 Recommended: ${template.title}`, 'info');
+                                createTripFromTemplate(template);
+                              }
+                            }}
+                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm"
+                          >
+                            Get Smart Recommendation
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              sessionStorage.removeItem('hasAutoLoadedTemplate');
+                              showToast('Reset! Auto-loading will trigger on next visit.', 'info');
+                            }}
+                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm"
+                          >
+                            Reset Auto-Load
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Enhanced Templates Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+                    {tripTemplates.map((template, index) => {
+                      const isRecommended = trips.length > 0 && 
+                        getSmartTemplateRecommendation()?.id === template.id;
+                        
+                      return (
+                        <FadeInWrapper key={template.id} delay={index * 0.1}>
+                          <div className={`group bg-white rounded-2xl overflow-hidden shadow-lg border transition-all duration-300 ${
+                            isRecommended 
+                              ? 'border-yellow-300 ring-2 ring-yellow-200 hover:shadow-2xl transform hover:scale-105' 
+                              : 'border-gray-100 hover:shadow-2xl'
+                          }`}>
+                            
+                            <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-6 text-white">
+                              {isRecommended && (
+                                <div className="absolute top-2 right-2 bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                                  🎯 Smart Pick
+                                </div>
+                              )}
+                              
+                              <div className="flex items-start justify-between mb-4">
+                                <div className="text-3xl md:text-4xl mb-2">{template.image}</div>
+                                <div className="bg-white/20 px-3 py-1 rounded-full text-xs md:text-sm font-medium">
+                                  {template.duration}
+                                </div>
+                              </div>
+                              
+                              <h4 className="text-lg md:text-xl font-bold mb-2">{template.title}</h4>
+                              <p className="text-white/90 text-sm md:text-base">{template.description}</p>
+                            </div>
+
+                            <div className="p-6">
+                              {/* Template Stats */}
+                              <div className="grid grid-cols-3 gap-4 mb-6">
+                                <div className="text-center">
+                                  <div className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(template.difficulty)}`}>
+                                    {template.difficulty}
+                                  </div>
+                                  <div className="text-xs text-gray-500 mt-1">Difficulty</div>
+                                </div>
+                                
+                                <div className="text-center">
+                                  <div className="font-bold text-gray-800">{template.parks.length}</div>
+                                  <div className="text-xs text-gray-500">Parks</div>
+                                </div>
+                                
+                                <div className="text-center">
+                                  <div className="font-bold text-green-600">{template.estimatedCost}</div>
+                                  <div className="text-xs text-gray-500">Est. Cost</div>
+                                </div>
+                              </div>
+
+                              {/* Parks List */}
+                              <div className="mb-6">
+                                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
+                                  <FaMapMarkerAlt className="text-pink-500" />
+                                  Parks Included
+                                </h5>
+                                <div className="space-y-2">
+                                  {template.parks.slice(0, 3).map((park, idx) => (
+                                    <div key={idx} className="text-sm text-gray-700">
+                                      • {park}
+                                    </div>
+                                  ))}
+                                  {template.parks.length > 3 && (
+                                    <div className="text-sm text-gray-500">
+                                      +{template.parks.length - 3} more parks...
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Highlights */}
+                              <div className="mb-6">
+                                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2 text-sm md:text-base">
+                                  <FaStar className="text-yellow-500" />
+                                  Must-See Highlights
+                                </h5>
+                                <div className="flex flex-wrap gap-2">
+                                  {template.highlights.slice(0, 3).map((highlight, idx) => (
+                                    <span key={idx} className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-medium">
+                                      {highlight}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Enhanced Action Button */}
+                              <button
+                                onClick={() => createTripFromTemplate(template)}
+                                className={`w-full py-3 px-6 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 min-h-[48px] ${
+                                  isRecommended
+                                    ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-yellow-900 hover:from-yellow-500 hover:to-orange-500'
+                                    : 'bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600'
+                                }`}
+                              >
+                                <FaStar /> {isRecommended ? 'Use Smart Pick' : 'Use This Template'}
+                              </button>
+                            </div>
+                          </div>
+                        </FadeInWrapper>
+                      );
+                    })}
                   </div>
                 </div>
               </FadeInWrapper>
