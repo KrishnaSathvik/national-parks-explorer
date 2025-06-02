@@ -1,4 +1,4 @@
-// src/pages/TripPlanner.jsx - Fixed version that builds properly
+// src/pages/TripPlanner.jsx - Enhanced version with all integrated features
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -19,12 +19,23 @@ const TripPlanner = () => {
   const [viewingTrip, setViewingTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('my-trips');
+  
+  // Auto-loading preferences and state
   const [autoLoadPreferences, setAutoLoadPreferences] = useState({
-  enabled: true,
-  triggerOnFirstVisit: true,
-  lastRecommended: null
-});
+    enabled: true,
+    triggerOnFirstVisit: true,
+    lastRecommended: null,
+    showVisualIndicators: true
+  });
 
+  const [autoLoadingState, setAutoLoadingState] = useState({
+    isLoading: false,
+    hasTriggered: false,
+    recommendedTemplate: null,
+    showRecommendationBanner: false
+  });
+
+  // Tab configuration
   const tabs = [
     { id: 'my-trips', title: 'My Trips', icon: FaRoute, description: 'Your planned adventures' },
     { id: 'templates', title: 'Templates', icon: FaStar, description: 'Pre-made trip ideas' },
@@ -80,10 +91,59 @@ const TripPlanner = () => {
     }
   ];
 
+  // Initialize data on component mount
   useEffect(() => {
     fetchData();
   }, [currentUser]);
 
+  // Enhanced auto-loading effect for smart recommendations
+  useEffect(() => {
+    if (currentTab === 'templates' && autoLoadPreferences.enabled) {
+      const hasAutoLoadedToday = localStorage.getItem('lastAutoLoadDate') === new Date().toDateString();
+      
+      if (!hasAutoLoadedToday && !autoLoadingState.hasTriggered) {
+        setAutoLoadingState(prev => ({ ...prev, isLoading: true, hasTriggered: true }));
+        
+        // Store today's date to prevent multiple auto-loads per day
+        localStorage.setItem('lastAutoLoadDate', new Date().toDateString());
+        
+        setTimeout(() => {
+          const recommended = getSmartTemplateRecommendation();
+          
+          if (recommended) {
+            setAutoLoadingState(prev => ({
+              ...prev,
+              isLoading: false,
+              recommendedTemplate: recommended,
+              showRecommendationBanner: true
+            }));
+            
+            setAutoLoadPreferences(prev => ({
+              ...prev,
+              lastRecommended: recommended.id
+            }));
+            
+            // Show prominent notification
+            const message = trips.length > 0 
+              ? `🎯 Based on your ${trips.length} trips, we recommend "${recommended.title}"!`
+              : `🌟 Welcome! We've selected "${recommended.title}" as a great starting point!`;
+              
+            showToast(message, 'success');
+            
+            // Auto-scroll to recommended template after a delay
+            setTimeout(() => {
+              const templateElement = document.getElementById(`template-${recommended.id}`);
+              if (templateElement) {
+                templateElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 1000);
+          }
+        }, 2000); // 2 second delay for better UX
+      }
+    }
+  }, [currentTab, trips.length]);
+
+  // Fetch data from Firebase and localStorage
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -112,24 +172,77 @@ const TripPlanner = () => {
     }
   };
 
-  // Auto-load template when user visits templates tab
-useEffect(() => {
-  if (currentTab === 'templates' && autoLoadPreferences.enabled && trips.length > 0) {
-    const hasAutoLoaded = sessionStorage.getItem('hasAutoLoadedTemplate');
+  // Normalize state names for better matching
+  const normalizeState = (state) => {
+    if (!state) return '';
     
-    if (!hasAutoLoaded && autoLoadPreferences.triggerOnFirstVisit) {
-      sessionStorage.setItem('hasAutoLoadedTemplate', 'true');
-      
-      setTimeout(() => {
-        const recommended = getSmartTemplateRecommendation();
-        if (recommended) {
-          showToast(`🎯 Auto-selected "${recommended.title}" based on your ${trips.length} planned trips!`, 'success');
-          createTripFromTemplate(recommended);
-        }
-      }, 2000);
+    const stateMap = {
+      'UT': 'Utah',
+      'CA': 'California', 
+      'AZ': 'Arizona',
+      'WY': 'Wyoming',
+      'CO': 'Colorado',
+      'NV': 'Nevada',
+      'UTAH': 'Utah',
+      'CALIFORNIA': 'California',
+      'ARIZONA': 'Arizona'
+    };
+    
+    const normalized = stateMap[state.toUpperCase()] || state;
+    return normalized;
+  };
+
+  // Enhanced smart recommendation function
+  const getSmartTemplateRecommendation = () => {
+    // Always return a recommendation, even for new users
+    if (trips.length === 0) {
+      return tripTemplates.find(t => t.id === 'southwest-loop') || tripTemplates[0];
     }
-  }
-}, [currentTab, trips.length]);
+    
+    // Analyze user's existing trips with better state matching
+    const userStates = [...new Set(trips.flatMap(trip => 
+      trip.parks?.map(p => normalizeState(p.state)).filter(Boolean) || []
+    ))];
+    
+    const userParks = trips.flatMap(trip => trip.parks?.map(p => p.parkName) || []);
+    const avgCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
+    
+    console.log('🎯 Auto-recommendation analysis:', { userStates, userParks, avgCost });
+    
+    // Enhanced matching logic
+    const hasUtahParks = userStates.some(state => state.toLowerCase().includes('utah'));
+    const hasCaliforniaParks = userStates.some(state => state.toLowerCase().includes('california'));
+    const hasArizonaParks = userStates.some(state => state.toLowerCase().includes('arizona'));
+    const hasSouthwestParks = hasUtahParks || hasArizonaParks || userParks.some(park => 
+      ['Grand Canyon', 'Zion', 'Bryce', 'Arches'].some(sw => park.includes(sw))
+    );
+    
+    // Smart recommendation logic with scoring
+    let recommendations = [];
+    
+    if (hasSouthwestParks && trips.some(t => t.parks?.length >= 3)) {
+      recommendations.push({ template: tripTemplates.find(t => t.id === 'southwest-loop'), score: 95 });
+    }
+    
+    if (hasUtahParks && userParks.filter(p => ['Zion', 'Bryce', 'Arches', 'Capitol', 'Canyonlands'].some(up => p.includes(up))).length >= 2) {
+      recommendations.push({ template: tripTemplates.find(t => t.id === 'utah-big5'), score: 90 });
+    }
+    
+    if (hasCaliforniaParks && avgCost > 2500) {
+      recommendations.push({ template: tripTemplates.find(t => t.id === 'california-classics'), score: 85 });
+    }
+    
+    if (avgCost < 2000) {
+      recommendations.push({ template: tripTemplates.find(t => t.id === 'yellowstone-tetons'), score: 80 });
+    }
+    
+    // Return highest scoring recommendation
+    const bestRecommendation = recommendations.sort((a, b) => b.score - a.score)[0];
+    const recommended = bestRecommendation?.template || tripTemplates.find(t => t.id === 'southwest-loop');
+    
+    console.log('🎯 Recommended template:', recommended?.title);
+    return recommended;
+  };
 
   // Clean data for Firebase (remove undefined values)
   const cleanDataForFirebase = (data) => {
@@ -157,6 +270,7 @@ useEffect(() => {
     return cleaned;
   };
 
+  // Create new trip function
   const createNewTrip = () => {
     setActiveTrip({
       title: '',
@@ -169,35 +283,6 @@ useEffect(() => {
     });
     setCurrentTab('my-trips');
   };
-
-  const getSmartTemplateRecommendation = () => {
-  if (trips.length === 0) return null;
-  
-  // Analyze user's existing trips
-  const userStates = [...new Set(trips.flatMap(trip => 
-    trip.parks?.map(p => p.state).filter(Boolean) || []
-  ))];
-  
-  const avgCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
-  const hasUtahParks = userStates.includes('Utah');
-  const hasCaliforniaParks = userStates.includes('California');
-  
-  // Smart recommendation logic
-  if (hasUtahParks && !trips.some(t => t.parks?.length >= 4)) {
-    return tripTemplates.find(t => t.id === 'utah-big5');
-  }
-  
-  if (hasCaliforniaParks && avgCost > 2500) {
-    return tripTemplates.find(t => t.id === 'california-classics');
-  }
-  
-  if (avgCost < 2000) {
-    return tripTemplates.find(t => t.id === 'yellowstone-tetons');
-  }
-  
-  // Default to most popular
-  return tripTemplates.find(t => t.id === 'southwest-loop') || tripTemplates[0];
-};
 
   // Enhanced template function that auto-adds parks
   const createTripFromTemplate = async (template) => {
@@ -322,12 +407,14 @@ useEffect(() => {
     }
   };
 
+  // Edit trip function
   const editTrip = (trip) => {
     setActiveTrip(trip);
     setViewingTrip(null);
     setCurrentTab('my-trips');
   };
 
+  // Delete trip function
   const deleteTrip = async (tripId) => {
     try {
       if (!currentUser) {
@@ -437,6 +524,7 @@ useEffect(() => {
     return suggestions.slice(0, 4);
   };
 
+  // Create trip from suggestion
   const createTripFromSuggestion = (suggestion) => {
     const suggestedParks = [];
     
@@ -485,6 +573,7 @@ useEffect(() => {
     showToast(`🧠 Smart suggestion applied! ${suggestedParks.length} parks added based on your travel patterns.`, 'success');
   };
 
+  // Get difficulty color for templates
   const getDifficultyColor = (difficulty) => {
     if (difficulty.toLowerCase().includes('easy')) return 'text-green-600 bg-green-100';
     if (difficulty.toLowerCase().includes('moderate')) return 'text-yellow-600 bg-yellow-100';
@@ -492,6 +581,87 @@ useEffect(() => {
     return 'text-blue-600 bg-blue-100';
   };
 
+  // Recommendation Banner Component
+  const RecommendationBanner = () => {
+    if (!autoLoadingState.showRecommendationBanner || !autoLoadingState.recommendedTemplate) {
+      return null;
+    }
+    
+    const template = autoLoadingState.recommendedTemplate;
+    const reason = trips.length > 0 
+      ? `Based on your ${trips.length} planned trips and travel patterns`
+      : 'Perfect for first-time national park adventurers';
+
+    return (
+      <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-red-50 border-2 border-yellow-300 rounded-2xl p-6 mb-8 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-yellow-100/20 to-orange-100/20 animate-pulse"></div>
+        
+        <div className="relative z-10">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl text-white animate-bounce">
+                <span className="text-2xl">🎯</span>
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-yellow-800 mb-1">
+                  Smart Recommendation: {template.title}
+                </h3>
+                <p className="text-yellow-700 text-sm">{reason}</p>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setAutoLoadingState(prev => ({ ...prev, showRecommendationBanner: false }))}
+              className="text-yellow-600 hover:text-yellow-800 p-1 rounded-full hover:bg-yellow-200 transition"
+            >
+              ✕
+            </button>
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            <div className="flex items-center gap-2 text-sm">
+              <span className="bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full font-medium">
+                {template.duration}
+              </span>
+              <span className="bg-green-200 text-green-800 px-2 py-1 rounded-full font-medium">
+                {template.estimatedCost}
+              </span>
+              <span className="bg-blue-200 text-blue-800 px-2 py-1 rounded-full font-medium">
+                {template.parks.length} parks
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                createTripFromTemplate(template);
+                setAutoLoadingState(prev => ({ ...prev, showRecommendationBanner: false }));
+              }}
+              className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition font-medium flex items-center gap-2 shadow-lg"
+            >
+              <span>✨</span> Use This Recommendation
+            </button>
+            
+            <button
+              onClick={() => {
+                document.getElementById(`template-${template.id}`)?.scrollIntoView({ 
+                  behavior: 'smooth', 
+                  block: 'center' 
+                });
+              }}
+              className="bg-white text-yellow-700 border-2 border-yellow-300 px-6 py-3 rounded-xl hover:bg-yellow-50 transition font-medium"
+            >
+              View Details
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -704,7 +874,7 @@ useEffect(() => {
                           
                           <button
                             onClick={() => {
-                              sessionStorage.removeItem('hasAutoLoadedTemplate');
+                              localStorage.removeItem('lastAutoLoadDate');
                               showToast('Reset! Auto-loading will trigger on next visit.', 'info');
                             }}
                             className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm"
@@ -716,6 +886,9 @@ useEffect(() => {
                     </div>
                   )}
 
+                  {/* Recommendation Banner */}
+                  <RecommendationBanner />
+
                   {/* Enhanced Templates Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
                     {tripTemplates.map((template, index) => {
@@ -724,11 +897,14 @@ useEffect(() => {
                         
                       return (
                         <FadeInWrapper key={template.id} delay={index * 0.1}>
-                          <div className={`group bg-white rounded-2xl overflow-hidden shadow-lg border transition-all duration-300 ${
-                            isRecommended 
-                              ? 'border-yellow-300 ring-2 ring-yellow-200 hover:shadow-2xl transform hover:scale-105' 
-                              : 'border-gray-100 hover:shadow-2xl'
-                          }`}>
+                          <div 
+                            id={`template-${template.id}`}
+                            className={`group bg-white rounded-2xl overflow-hidden shadow-lg border transition-all duration-300 ${
+                              isRecommended 
+                                ? 'border-yellow-300 ring-2 ring-yellow-200 hover:shadow-2xl transform hover:scale-105' 
+                                : 'border-gray-100 hover:shadow-2xl'
+                            }`}
+                          >
                             
                             <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-6 text-white">
                               {isRecommended && (
@@ -1166,7 +1342,9 @@ useEffect(() => {
                 </div>
               </FadeInWrapper>
             )}
-          </div>
+
+
+             </div>
         </div>
       </div>
 
