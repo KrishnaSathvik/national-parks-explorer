@@ -345,32 +345,53 @@ export class TripAnalytics {
   }
 
   /**
-   * Analyzes overall trip efficiency metrics
-   * @param {Array} trips - User's trips
-   * @returns {Object} Efficiency analysis
-   */
-  static analyzeEfficiency(trips) {
-    let totalDistance = 0;
-    let totalCost = 0;
-    let totalDuration = 0;
-    let totalParks = 0;
+     * Analyzes overall trip efficiency metrics
+     * @param {Array} trips - User's trips
+     * @returns {Object} Efficiency analysis
+     */
+    static analyzeEfficiency(trips) {
+      let totalDistance = 0;
+      let totalCost = 0;
+      let totalDuration = 0;
+      let totalParks = 0;
 
-    trips.forEach(trip => {
-      totalDistance += trip.totalDistance || 0;
-      totalCost += trip.estimatedCost || 0;
-      totalDuration += trip.totalDuration || 0;
-      totalParks += trip.parks?.length || 0;
-    });
+      trips.forEach(trip => {
+        totalDistance += trip.totalDistance || 0;
+        totalCost += trip.estimatedCost || 0;
+        totalDuration += trip.totalDuration || 0;
+        totalParks += trip.parks?.length || 0;
+      });
 
-    return {
-      costPerDay: totalDuration > 0 ? Math.round(totalCost / totalDuration) : 0,
-      costPerPark: totalParks > 0 ? Math.round(totalCost / totalParks) : 0,
-      milesPerDay: totalDuration > 0 ? Math.round(totalDistance / totalDuration) : 0,
-      parksPerTrip: trips.length > 0 ? Math.round((totalParks / trips.length) * 10) / 10 : 0,
-      efficiencyScore: this.calculateEfficiencyScore(trips),
-      recommendations: this.generateEfficiencyRecommendations(trips)
-    };
-  }
+      const costPerDay = totalDuration > 0 ? Math.round(totalCost / totalDuration) : 0;
+      const costPerPark = totalParks > 0 ? Math.round(totalCost / totalParks) : 0;
+      const milesPerDay = totalDuration > 0 ? Math.round(totalDistance / totalDuration) : 0;
+      const parksPerTrip = trips.length > 0 ? Math.round((totalParks / trips.length) * 10) / 10 : 0;
+      const efficiencyScore = this.calculateEfficiencyScore(trips);
+
+      // Generate recommendations directly here instead of calling separate method
+      const recommendations = [];
+      
+      if (costPerDay > 250) {
+        recommendations.push('Consider longer trips to reduce daily costs');
+      }
+      
+      if (milesPerDay > 300) {
+        recommendations.push('Plan shorter driving days for better enjoyment');
+      }
+      
+      if (parksPerTrip < 2) {
+        recommendations.push('Combine nearby parks in single trips for better efficiency');
+      }
+
+      return {
+        costPerDay,
+        costPerPark,
+        milesPerDay,
+        parksPerTrip,
+        efficiencyScore,
+        recommendations
+      };
+    }
 
   // === COST ANALYSIS METHODS ===
 
