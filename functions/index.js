@@ -25,19 +25,35 @@ const db = admin.firestore();
 
 const app = express();
 
-// ✅ CORS middleware
+// Replace your CORS configuration in index.js with this:
+
 const corsHandler = cors({
   origin: [
     "https://www.nationalparksexplorerusa.com",
     "https://national-parks-explorer.vercel.app",
-    "http://localhost:5173"
+    "https://national-parks-explor-git-5ffdad-shadowdevils-projects-ae938de8.vercel.app", // Add your current deploy URL
+    "http://localhost:5173",
+    "http://localhost:3000"
   ],
   methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
-  maxAge: 86400
+  maxAge: 86400,
+  optionsSuccessStatus: 200
 });
+
 app.use(corsHandler);
-app.options("*", corsHandler);
+
+// Explicit OPTIONS handler for preflight requests
+app.options("*", (req, res) => {
+  res.set({
+    'Access-Control-Allow-Origin': req.headers.origin || '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400'
+  });
+  res.status(204).send('');
+});
 
 // 🧭 Live NPS Events Proxy Endpoint
 app.get("/", async (req, res) => {
@@ -115,8 +131,22 @@ exports.cacheNPSEvents = onRequest({ secrets: [NPS_API_KEY] }, (req, res) => {
   });
 });
 
-// 🔔 Send Welcome Push
+// Update your sendWelcomePush function to handle CORS explicitly:
 exports.sendWelcomePush = onRequest({ secrets: [FCM_API_KEY] }, (req, res) => {
+  // Set CORS headers manually for this endpoint
+  res.set({
+    'Access-Control-Allow-Origin': req.headers.origin || '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400'
+  });
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    res.status(204).send('');
+    return;
+  }
+
   corsHandler(req, res, async () => {
     const { token } = req.body;
     if (!token) return res.status(400).send("Missing FCM token");
@@ -126,7 +156,7 @@ exports.sendWelcomePush = onRequest({ secrets: [FCM_API_KEY] }, (req, res) => {
         to: token,
         notification: {
           title: "🎉 Welcome to National Parks Explorer!",
-          body: "You’ll now receive park updates and alerts.",
+          body: "You'll now receive park updates and alerts.",
           icon: "/icons/icon-192x192.png"
         }
       }, {

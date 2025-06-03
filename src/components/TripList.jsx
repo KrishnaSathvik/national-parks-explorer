@@ -326,74 +326,62 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
               />
             </div>
 
-            {/* Controls */}
-            <div className="flex items-center gap-4">
-              {/* Analytics Button */}
-              <button
-                onClick={() => setShowAnalytics(true)}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition text-sm font-medium flex items-center gap-2"
+            {/* Filter */}
+            <div className="flex items-center gap-2">
+              <FaFilter className="text-gray-500" />
+              <select
+                value={filterBy}
+                onChange={(e) => setFilterBy(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
               >
-                <FaChartBar />
-                Analytics
+                <option value="all">All Trips</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="past">Past Trips</option>
+                <option value="road-trip">Road Trips</option>
+                <option value="flights">Flight Trips</option>
+                <option value="budget">Budget (&lt;$2k)</option>
+                <option value="luxury">Luxury ($5k+)</option>
+              </select>
+            </div>
+
+            {/* Sort */}
+            <div className="flex items-center gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
+              >
+                <option value="created">Created Date</option>
+                <option value="date">Trip Date</option>
+                <option value="cost">Cost</option>
+                <option value="parks">Parks Count</option>
+                <option value="duration">Duration</option>
+                <option value="title">Title</option>
+              </select>
+              
+              <button
+                onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+                className="p-2 text-gray-500 hover:text-pink-600 transition"
+                title={`Sort ${sortOrder === 'desc' ? 'ascending' : 'descending'}`}
+              >
+                {sortOrder === 'desc' ? <FaSortAmountDown /> : <FaSortAmountUp />}
               </button>
+            </div>
 
-              {/* Filter */}
-              <div className="flex items-center gap-2">
-                <FaFilter className="text-gray-500" />
-                <select
-                  value={filterBy}
-                  onChange={(e) => setFilterBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
-                >
-                  <option value="all">All Trips</option>
-                  <option value="upcoming">Upcoming</option>
-                  <option value="past">Past Trips</option>
-                  <option value="road-trip">Road Trips</option>
-                  <option value="flights">Flight Trips</option>
-                  <option value="budget">Budget (&lt;$2k)</option>
-                  <option value="luxury">Luxury ($5k+)</option>
-                </select>
-              </div>
-
-              {/* Sort */}
-              <div className="flex items-center gap-2">
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
-                >
-                  <option value="created">Created Date</option>
-                  <option value="date">Trip Date</option>
-                  <option value="cost">Cost</option>
-                  <option value="parks">Parks Count</option>
-                  <option value="duration">Duration</option>
-                  <option value="title">Title</option>
-                </select>
-                
-                <button
-                  onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-                  className="p-2 text-gray-500 hover:text-pink-600 transition"
-                  title={`Sort ${sortOrder === 'desc' ? 'ascending' : 'descending'}`}
-                >
-                  {sortOrder === 'desc' ? <FaSortAmountDown /> : <FaSortAmountUp />}
-                </button>
-              </div>
-
-              {/* View Mode Toggle */}
-              <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-pink-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  Grid
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 text-sm ${viewMode === 'list' ? 'bg-pink-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
-                >
-                  List
-                </button>
-              </div>
+            {/* View Mode Toggle */}
+            <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-2 text-sm ${viewMode === 'grid' ? 'bg-pink-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >
+                Grid
+              </button>
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-3 py-2 text-sm ${viewMode === 'list' ? 'bg-pink-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+              >
+                List
+              </button>
             </div>
           </div>
           

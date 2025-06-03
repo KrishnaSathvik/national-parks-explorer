@@ -37,13 +37,40 @@ export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
 export const db = getFirestore(app);
 export const messaging = getMessaging(app);
-export const analytics = getAnalytics(app); // ✅ Fix: export analytics
+export const analytics = getAnalytics(app);
 
-// ✅ Request Notification Permission + Store FCM Token
+// ✅ Enhanced FCM Token Request with Service Worker Check
 export const requestNotificationPermission = async () => {
   try {
+    // Check if service worker is supported
+    if (!('serviceWorker' in navigator)) {
+      console.warn("⚠️ Service Worker not supported");
+      return;
+    }
+
+    // Check if service worker is ready
+    const registration = await navigator.serviceWorker.ready;
+    if (!registration || !registration.active) {
+      console.warn("⚠️ Service Worker not active yet, retrying...");
+      // Wait a bit and try again
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const retryRegistration = await navigator.serviceWorker.ready;
+      if (!retryRegistration || !retryRegistration.active) {
+        throw new Error("Service Worker not ready after retry");
+      }
+    }
+
+    // Request notification permission
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.warn("⚠️ Notification permission denied");
+      return;
+    }
+
+    // Get FCM token with service worker registration
     const token = await getToken(messaging, {
-      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY
+      vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+      serviceWorkerRegistration: registration
     });
 
     if (!token) {
@@ -93,21 +120,52 @@ export const requestNotificationPermission = async () => {
       console.log("📦 Token saved to anonymousTokens/", anonId);
     }
 
-    // ✅ Send welcome push via secure Cloud Function
-    await fetch("https://us-central1-national-parks-explorer-7bc55.cloudfunctions.net/sendWelcomePush", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ token })
-    });
+    // ✅ Send welcome push via secure Cloud Function with retry
+    try {
+      const response = await fetch("https://us-central1-national-parks-explorer-7bc55.cloudfunctions.net/sendWelcomePush", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ token })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      console.log("✅ Welcome push sent successfully");
+    } catch (fetchError) {
+      console.error("❌ Welcome push failed:", fetchError.message);
+      // Don't throw here - token is still saved successfully
+    }
+
+    return token;
 
   } catch (err) {
     console.error("❌ Error getting or saving FCM token:", err);
+    return null;
   }
 };
 
-// ✅ Live push notification handling
+// ✅ Live push notification handling with error handling
 onMessage(messaging, (payload) => {
   console.log("🔔 Foreground Notification Received:", payload);
+  
+  try {
+    if (payload?.notification) {
+      const { title, body } = payload.notification;
+      
+      // Show browser notification if permission is granted
+      if (Notification.permission === 'granted') {
+        new Notification(title, {
+          body,
+          icon: '/icons/icon-192x192.png',
+          badge: '/icons/icon-72x72.png'
+        });
+      }
+    }
+  } catch (notificationError) {
+    console.error("❌ Error showing foreground notification:", notificationError);
+  }
 });

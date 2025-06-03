@@ -18,11 +18,11 @@ import {
   doc,
   getDoc,
   updateDoc,
+  setDoc,
   serverTimestamp
 } from "firebase/firestore";
-import { getToken } from "firebase/messaging";
 import { requestNotificationPermission } from "../firebase";
-import { auth, db, messaging } from "../firebase"; // ✅ Ensure messaging is exported
+import { auth, db } from "../firebase";
 
 // Create Auth context
 const AuthContext = createContext();
@@ -60,47 +60,61 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-    useEffect(() => {
-      if (currentUser) {
-        requestNotificationPermission();
-      }
-    }, [currentUser]);
-
-  // 🔔 Auto-enable push notifications on login
+  // ✅ Register Service Worker on app load
   useEffect(() => {
-    const enableNotifications = async () => {
-      if (
-        currentUser &&
-        typeof window !== "undefined" &&
-        "Notification" in window
-      ) {
-        const permission = await Notification.requestPermission();
-
-        if (permission === "granted") {
-          try {
-            const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-            const token = await getToken(messaging, {
-              vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
-              serviceWorkerRegistration: registration,
-            });
-
-            if (token) {
-              await updateDoc(doc(db, "users", currentUser.uid), {
-                fcmToken: token,
-                tokenUpdatedAt: serverTimestamp(),
-              });
-              console.log("✅ FCM token saved to Firestore:", token);
-            }
-          } catch (err) {
-            console.error("❌ Error getting FCM token:", err);
-          }
-        } else {
-          console.log("🔕 Notifications permission denied.");
+    const registerServiceWorker = async () => {
+      if ('serviceWorker' in navigator) {
+        try {
+          const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+            scope: '/'
+          });
+          console.log('✅ Service Worker registered:', registration);
+          
+          // Wait for service worker to be ready
+          await navigator.serviceWorker.ready;
+          console.log('✅ Service Worker is ready');
+          
+        } catch (error) {
+          console.error('❌ Service Worker registration failed:', error);
         }
       }
     };
 
-    enableNotifications();
+    registerServiceWorker();
+  }, []);
+
+  // 🔔 Enhanced notification setup for logged-in users
+  useEffect(() => {
+    const setupNotifications = async () => {
+      if (currentUser && typeof window !== "undefined" && "Notification" in window) {
+        try {
+          // Small delay to ensure service worker is fully ready
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          const token = await requestNotificationPermission();
+          
+          if (token) {
+            // Update user document with FCM token
+            try {
+              const userRef = doc(db, "users", currentUser.uid);
+              await updateDoc(userRef, {
+                fcmToken: token,
+                tokenUpdatedAt: serverTimestamp(),
+              });
+              console.log("✅ FCM token saved to user document");
+            } catch (updateError) {
+              console.error("❌ Error updating user with FCM token:", updateError);
+            }
+          }
+        } catch (err) {
+          console.error("❌ Error setting up notifications:", err);
+        }
+      }
+    };
+
+    if (currentUser) {
+      setupNotifications();
+    }
   }, [currentUser]);
 
   // Auth methods
@@ -108,10 +122,12 @@ export const AuthProvider = ({ children }) => {
     (email, password) => createUserWithEmailAndPassword(auth, email, password),
     []
   );
+  
   const login = useCallback(
     (email, password) => signInWithEmailAndPassword(auth, email, password),
     []
   );
+  
   const logout = useCallback(() => signOut(auth), []);
   
   const loginWithGoogle = useCallback(async () => {
@@ -122,19 +138,21 @@ export const AuthProvider = ({ children }) => {
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
-      await updateDoc(userRef, {
+      // Create new user document
+      await setDoc(userRef, {
         email: result.user.email,
         displayName: result.user.displayName || "",
         createdAt: serverTimestamp(),
         role: "user",
-      }).catch(async () => {
-        // fallback to setDoc if doc doesn't exist
-        await setDoc(userRef, {
-          email: result.user.email,
-          displayName: result.user.displayName || "",
-          createdAt: serverTimestamp(),
-          role: "user",
-        });
+        favoriteParks: [],
+        favoriteEvents: [],
+      });
+    } else {
+      // Update existing user
+      await updateDoc(userRef, {
+        email: result.user.email,
+        displayName: result.user.displayName || "",
+        lastLoginAt: serverTimestamp(),
       });
     }
 

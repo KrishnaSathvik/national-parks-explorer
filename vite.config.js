@@ -14,6 +14,8 @@ export default defineConfig({
       strategies: 'injectManifest',
       srcDir: 'src',
       filename: 'enhanced-sw.js',
+      // ✅ FIX: Generate manifest.webmanifest instead of manifest.json
+      manifestFilename: 'manifest.webmanifest',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         cleanupOutdatedCaches: true,
@@ -97,39 +99,39 @@ export default defineConfig({
         categories: ['travel', 'lifestyle', 'productivity'],
         icons: [
           {
-            src: 'icons/icon-192x192.png',
+            src: '/icons/icon-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: 'icons/icon-512x512.png',
+            src: '/icons/icon-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
           },
           // Add more icon sizes for better compatibility
           {
-            src: 'icons/icon-72x72.png',
+            src: '/icons/icon-72x72.png',
             sizes: '72x72',
             type: 'image/png'
           },
           {
-            src: 'icons/icon-144x144.png',
+            src: '/icons/icon-144x144.png',
             sizes: '144x144',
             type: 'image/png'
           }
         ],
         screenshots: [
           {
-            src: 'screenshots/screen1.png',
+            src: '/screenshots/screen1.png',
             sizes: '1080x1920',
             type: 'image/png',
             form_factor: 'narrow',
             label: 'Mobile trip planning interface'
           },
           {
-            src: 'screenshots/screen2.png',
+            src: '/screenshots/screen2.png',
             sizes: '1920x1080',
             type: 'image/png',
             form_factor: 'wide',
@@ -143,14 +145,14 @@ export default defineConfig({
             short_name: 'New Trip',
             description: 'Start planning a new trip',
             url: '/trips/new',
-            icons: [{ src: 'icons/icon-192x192.png', sizes: '192x192' }]
+            icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }]
           },
           {
             name: 'Analytics',
             short_name: 'Analytics',
             description: 'View travel insights',
             url: '/analytics',
-            icons: [{ src: 'icons/icon-192x192.png', sizes: '192x192' }]
+            icons: [{ src: '/icons/icon-192x192.png', sizes: '192x192' }]
           }
         ]
       },

@@ -95,6 +95,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       if (tripData.startDate && tripData.endDate && new Date(tripData.startDate) >= new Date(tripData.endDate)) {
         newErrors.endDate = 'End date must be after start date';
       }
+      if (!tripData.transportationMode) newErrors.transportationMode = 'Please select transportation method';
     }
     
     if (step === 2) {
@@ -294,7 +295,14 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
   // Navigation functions
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setCurrentStep(Math.min(currentStep + 1, 3));
+      if (currentStep < 3) {
+        setCurrentStep(currentStep + 1);
+        // Clear any remaining errors when moving forward
+        setErrors({});
+        showToast(`Step ${currentStep + 1} completed!`, 'success');
+      }
+    } else {
+      showToast('Please fix the errors before continuing', 'error');
     }
   };
 
@@ -415,6 +423,32 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
 
                   {/* Date Inputs */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-3">
+                        Start Date *
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="date"
+                          value={tripData.startDate}
+                          onChange={(e) => {
+                            setTripData({...tripData, startDate: e.target.value});
+                            if (errors.startDate) setErrors({...errors, startDate: ''});
+                          }}
+                          min={new Date().toISOString().split('T')[0]}
+                          className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white min-h-[48px] ${
+                            errors.startDate 
+                              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
+                              : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
+                          }`}
+                        />
+                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+                      </div>
+                      {errors.startDate && (
+                        <p className="mt-2 text-sm text-red-600">{errors.startDate}</p>
+                      )}
+                    </div>
+                    
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
                         End Date *

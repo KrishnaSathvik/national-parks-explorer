@@ -17,7 +17,8 @@ const Signup = () => {
 
   const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  // ✨ Email/Password Signup
+  // In your handleSubmit function, replace the error handling section with this:
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -43,6 +44,7 @@ const Signup = () => {
         role: "user",
         favoriteParks: [],
         favoriteEvents: [],
+        createdAt: serverTimestamp(),
       });
 
       showToast("🎉 Account created successfully!", "success");
@@ -51,18 +53,47 @@ const Signup = () => {
       console.error("Firebase Signup Error:", err);
       let message = "❌ Signup failed. Please try again.";
 
-      if (err.code === "auth/email-already-in-use") {
-        message = "📧 Email already in use. Try logging in.";
-      } else if (err.code === "auth/invalid-email") {
-        message = "⚠️ Invalid email address format.";
-      } else if (err.code === "auth/weak-password") {
-        message = "🔒 Password should be at least 6 characters.";
-      } else if (err.code === "auth/operation-not-allowed") {
-        message = "❌ Email/Password sign-up is not enabled in Firebase.";
+      // Better error handling for common Firebase auth errors
+      switch (err.code) {
+        case "auth/email-already-in-use":
+          message = "📧 This email is already registered. Try logging in instead.";
+          setError(message);
+          showToast(message, "warning");
+          // Auto-redirect to login after 2 seconds
+          setTimeout(() => {
+            navigate("/login");
+          }, 2000);
+          break;
+          
+        case "auth/invalid-email":
+          message = "⚠️ Please enter a valid email address.";
+          break;
+          
+        case "auth/weak-password":
+          message = "🔒 Password should be at least 6 characters long.";
+          break;
+          
+        case "auth/operation-not-allowed":
+          message = "❌ Email/Password signup is not enabled. Please contact support.";
+          break;
+          
+        case "auth/network-request-failed":
+          message = "🌐 Network error. Please check your connection and try again.";
+          break;
+          
+        case "auth/too-many-requests":
+          message = "⏳ Too many signup attempts. Please wait a moment and try again.";
+          break;
+          
+        default:
+          message = "❌ Signup failed. Please try again.";
+          console.error("Unhandled auth error:", err.code, err.message);
       }
 
-      setError(message);
-      showToast(message, "error");
+      if (err.code !== "auth/email-already-in-use") {
+        setError(message);
+        showToast(message, "error");
+      }
     } finally {
       setLoading(false);
     }
