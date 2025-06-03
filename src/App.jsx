@@ -176,6 +176,7 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/integrations" element={<AppIntegration />} />
 
               {/* ✅ Redirect root path to /signup for unauthenticated users */}
               <Route
@@ -205,14 +206,6 @@ function App() {
                 element={
                   <PrivateRoute>
                     <MapPage />
-                  </PrivateRoute>
-                }
-              />
-              <Route
-                path="/integrations"
-                element={
-                  <PrivateRoute>
-                    <AppIntegration />
                   </PrivateRoute>
                 }
               />
