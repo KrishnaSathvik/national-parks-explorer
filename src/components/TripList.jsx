@@ -144,21 +144,60 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
   const renderQuickInsights = () => {
     if (trips.length === 0) return null;
 
-    // Safe fallback for build issues
+    // Enhanced error handling for analytics
     let insights;
     try {
       insights = TripAnalytics.generateInsights(trips);
     } catch (error) {
-      console.warn('Analytics generation failed:', error);
+      console.error('Analytics generation failed:', error);
+      // Return safe fallback data structure that matches expected format
       insights = {
         personalPreferences: {
           avgDuration: 0,
           avgBudget: 0,
           topRegions: [],
-          transportationSplit: { driving: 0, flying: 0 }
+          favoriteSeasons: [],
+          topParkTypes: [],
+          transportationSplit: { driving: 0, flying: 0 },
+          budgetRange: { min: 0, max: 0, median: 0 }
         },
-        efficiency: { efficiencyScore: 0 },
-        recommendations: []
+        benchmarkComparisons: {
+          costComparison: { status: 'error' },
+          durationComparison: { status: 'error' },
+          popularityComparison: { status: 'error' },
+          efficiencyComparison: { status: 'error' }
+        },
+        recommendations: [],
+        trendAnalysis: {
+          tripFrequency: { data: [], trend: 'insufficient data', peakMonths: [] },
+          costEvolution: { data: [], trend: 'insufficient data', recommendation: null },
+          parkPopularity: []
+        },
+        costOptimization: {
+          breakdown: {
+            accommodation: { amount: 0, percentage: 0 },
+            transportation: { amount: 0, percentage: 0 },
+            food: { amount: 0, percentage: 0 },
+            fees: { amount: 0, percentage: 0 }
+          },
+          efficiency: {},
+          optimizationOpportunities: [],
+          budgetRecommendations: []
+        },
+        travelPatterns: {
+          tripStyles: { relaxed: 0, balanced: 0, intensive: 0 },
+          routeEfficiency: 0,
+          timingPatterns: { leadTime: [], duration: [], seasonalPreference: {} },
+          groupSizePatterns: { averageGroupSize: 2, soloTrips: 0, familyTrips: 0, friendTrips: 0 }
+        },
+        efficiency: { 
+          efficiencyScore: 0,
+          costPerDay: 0,
+          costPerPark: 0,
+          milesPerDay: 0,
+          parksPerTrip: 0,
+          recommendations: []
+        }
       };
     }
         

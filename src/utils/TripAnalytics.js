@@ -6,6 +6,160 @@ export class TripAnalytics {
    * @param {Array} allTrips - Global trip data for benchmarking (optional)
    * @returns {Object} Complete analytics insights
    */
+  
+  static compareToBenchmarks(userTrips, allTrips = []) {
+    if (userTrips.length === 0) {
+      return {
+        costComparison: { status: 'insufficient data' },
+        durationComparison: { status: 'insufficient data' },
+        popularityComparison: { status: 'insufficient data' },
+        efficiencyComparison: { status: 'insufficient data' }
+      };
+    }
+
+    // Calculate user averages
+    const userAvgs = this.calculateUserAverages(userTrips);
+    
+    // If no benchmark data available, return user data only
+    if (allTrips.length === 0) {
+      return {
+        costComparison: {
+          userAverage: userAvgs.avgCost,
+          benchmarkAverage: null,
+          status: 'no benchmark data',
+          percentile: null
+        },
+        durationComparison: {
+          userAverage: userAvgs.avgDuration,
+          benchmarkAverage: null,
+          status: 'no benchmark data',
+          percentile: null
+        },
+        popularityComparison: {
+          userTopParks: userAvgs.topParks,
+          benchmarkTopParks: [],
+          status: 'no benchmark data'
+        },
+        efficiencyComparison: {
+          userScore: userAvgs.efficiencyScore,
+          benchmarkScore: null,
+          status: 'no benchmark data'
+        }
+      };
+    }
+
+    // Calculate benchmark averages
+    const benchmarkAvgs = this.calculateUserAverages(allTrips);
+    
+    return {
+      costComparison: {
+        userAverage: userAvgs.avgCost,
+        benchmarkAverage: benchmarkAvgs.avgCost,
+        percentile: this.calculatePercentile(userAvgs.avgCost, allTrips.map(t => t.estimatedCost || 0)),
+        status: userAvgs.avgCost > benchmarkAvgs.avgCost ? 'above average' : 'below average',
+        difference: Math.abs(userAvgs.avgCost - benchmarkAvgs.avgCost),
+        percentageDiff: Math.round(((userAvgs.avgCost - benchmarkAvgs.avgCost) / benchmarkAvgs.avgCost) * 100)
+      },
+      durationComparison: {
+        userAverage: userAvgs.avgDuration,
+        benchmarkAverage: benchmarkAvgs.avgDuration,
+        percentile: this.calculatePercentile(userAvgs.avgDuration, allTrips.map(t => t.totalDuration || 0)),
+        status: userAvgs.avgDuration > benchmarkAvgs.avgDuration ? 'longer trips' : 'shorter trips',
+        difference: Math.abs(userAvgs.avgDuration - benchmarkAvgs.avgDuration)
+      },
+      popularityComparison: {
+        userTopParks: userAvgs.topParks,
+        benchmarkTopParks: benchmarkAvgs.topParks,
+        uniqueParks: this.findUniqueParks(userAvgs.topParks, benchmarkAvgs.topParks),
+        status: 'analyzed'
+      },
+      efficiencyComparison: {
+        userScore: userAvgs.efficiencyScore,
+        benchmarkScore: benchmarkAvgs.efficiencyScore,
+        percentile: this.calculatePercentile(userAvgs.efficiencyScore, allTrips.map(t => this.calculateSingleTripEfficiency(t))),
+        status: userAvgs.efficiencyScore > benchmarkAvgs.efficiencyScore ? 'above average' : 'below average'
+      }
+    };
+  }
+
+  /**
+   * Helper method to calculate user averages for benchmarking
+   */
+  static calculateUserAverages(trips) {
+    if (trips.length === 0) return {};
+
+    const totalCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0);
+    const totalDuration = trips.reduce((sum, trip) => sum + (trip.totalDuration || 0), 0);
+    
+    // Get top parks
+    const parkCounts = {};
+    trips.forEach(trip => {
+      trip.parks?.forEach(park => {
+        parkCounts[park.parkName] = (parkCounts[park.parkName] || 0) + 1;
+      });
+    });
+    
+    const topParks = Object.entries(parkCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }));
+
+    return {
+      avgCost: Math.round(totalCost / trips.length),
+      avgDuration: Math.round((totalDuration / trips.length) * 10) / 10,
+      topParks,
+      efficiencyScore: this.calculateEfficiencyScore(trips)
+    };
+  }
+
+  /**
+   * Calculate percentile ranking
+   */
+  static calculatePercentile(value, allValues) {
+    if (allValues.length === 0) return null;
+    
+    const validValues = allValues.filter(v => v > 0);
+    if (validValues.length === 0) return null;
+    
+    const sorted = [...validValues].sort((a, b) => a - b);
+    const rank = sorted.findIndex(v => v >= value);
+    
+    if (rank === -1) return 100; // Value is higher than all others
+    
+    return Math.round((rank / sorted.length) * 100);
+  }
+
+  /**
+   * Find parks unique to user compared to benchmark
+   */
+  static findUniqueParks(userParks, benchmarkParks) {
+    const benchmarkParkNames = new Set(benchmarkParks.map(p => p.name));
+    return userParks.filter(park => !benchmarkParkNames.has(park.name));
+  }
+
+  /**
+   * Calculate efficiency score for a single trip
+   */
+  static calculateSingleTripEfficiency(trip) {
+    let score = 50; // Base score
+    
+    const costPerDay = (trip.estimatedCost || 0) / (trip.totalDuration || 7);
+    if (costPerDay < 200) score += 20;
+    else if (costPerDay < 300) score += 10;
+    
+    const parksCount = trip.parks?.length || 0;
+    if (parksCount >= 5) score += 15;
+    else if (parksCount >= 3) score += 10;
+    else if (parksCount >= 2) score += 5;
+    
+    const milesPerPark = parksCount > 0 ? (trip.totalDistance || 0) / parksCount : 0;
+    if (milesPerPark < 100) score += 15;
+    else if (milesPerPark < 200) score += 10;
+    else if (milesPerPark < 300) score += 5;
+    
+    return Math.min(100, score);
+  }
+
   static generateInsights(userTrips, allTrips = []) {
     if (!userTrips || userTrips.length === 0) {
       return this.getEmptyInsights();

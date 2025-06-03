@@ -99,14 +99,51 @@ const AnalyticsDashboard = ({ trips, onClose }) => {
     return trips.filter(trip => new Date(trip.createdAt || trip.startDate) >= cutoff);
   }, [trips, timeRange]);
 
-  // Generate insights when trips or time range changes
+  // Around line 89-95 in AnalyticsDashboard.jsx, replace the useEffect:
+
   useEffect(() => {
     setLoading(true);
     const timer = setTimeout(() => {
-      const analyticsData = TripAnalytics.generateInsights(filteredTrips);
-      setInsights(analyticsData);
+      try {
+        const analyticsData = TripAnalytics.generateInsights(filteredTrips);
+        setInsights(analyticsData);
+      } catch (error) {
+        console.error('Analytics generation failed in dashboard:', error);
+        // Set safe fallback insights
+        setInsights({
+          personalPreferences: {
+            avgDuration: 0,
+            avgBudget: 0,
+            topRegions: [],
+            favoriteSeasons: [],
+            topParkTypes: [],
+            transportationSplit: { driving: 0, flying: 0 },
+            budgetRange: { min: 0, max: 0, median: 0 }
+          },
+          benchmarkComparisons: {
+            costComparison: { status: 'error' },
+            durationComparison: { status: 'error' },
+            popularityComparison: { status: 'error' },
+            efficiencyComparison: { status: 'error' }
+          },
+          recommendations: [],
+          trendAnalysis: {
+            tripFrequency: { data: [], trend: 'insufficient data', peakMonths: [] },
+            costEvolution: { data: [], trend: 'insufficient data', recommendation: null },
+            parkPopularity: []
+          },
+          efficiency: { 
+            efficiencyScore: 0,
+            costPerDay: 0,
+            costPerPark: 0,
+            milesPerDay: 0,
+            parksPerTrip: 0,
+            recommendations: []
+          }
+        });
+      }
       setLoading(false);
-    }, 500); // Simulate processing time
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [filteredTrips]);
