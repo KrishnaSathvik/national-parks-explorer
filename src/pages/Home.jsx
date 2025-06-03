@@ -390,7 +390,6 @@
     const [searchParams, setSearchParams] = useSearchParams();
     const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
     const [viewMode, setViewMode] = useState('grid');
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [searchResults, setSearchResults] = useState([]);
     const [showSearchDropdown, setShowSearchDropdown] = useState(false);
 
@@ -552,27 +551,6 @@
       
       const matchesState = selectedState === "All" || state.includes(selectedState.toLowerCase());
       const matchesSeason = selectedSeason === "All" || season === selectedSeason.toLowerCase();
-
-      // Advanced filters
-      const matchesActivities = filters.activities.length === 0 || 
-        filters.activities.some(activity => description.includes(activity.toLowerCase()));
-      
-      const matchesFeatures = filters.features.length === 0 ||
-        filters.features.some(feature => description.includes(feature.toLowerCase()));
-
-      const matchesFeeRange = !filters.feeRange || 
-        (filters.feeRange === 'Free' && (!p.entryFee || p.entryFee === 0)) ||
-        (filters.feeRange === 'Under $15' && p.entryFee && p.entryFee < 15) ||
-        (filters.feeRange === '$15-30' && p.entryFee && p.entryFee >= 15 && p.entryFee <= 30) ||
-        (filters.feeRange === 'Over $30' && p.entryFee && p.entryFee > 30);
-
-      return matchesSearch && matchesState && matchesSeason && matchesActivities && matchesFeatures && matchesFeeRange;
-    });
-
-    const indexLast = currentPage * parksPerPage;
-    const indexFirst = indexLast - parksPerPage;
-    const currentParks = filtered.slice(indexFirst, indexLast);
-    const totalPages = Math.ceil(filtered.length / parksPerPage);
 
     // ===== STATS CALCULATIONS =====
     const stats = {
@@ -736,18 +714,6 @@
                 <p className="text-gray-600">Find your perfect adventure</p>
               </div>
             </div>
-            
-            <button
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-                showAdvancedFilters 
-                  ? 'bg-pink-500 text-white' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <FaFilter />
-              <span className="hidden md:inline">Advanced Filters</span>
-            </button>
           </div>
 
           {/* Enhanced Search Bar */}
@@ -1105,25 +1071,7 @@
                 onActionClick={handleQuickAction}
                 currentUser={currentUser}
               />
-            </div>
-
-            {/* Main Content Area */}
-            <div className="p-6 md:p-8">
-              {/* Enhanced Search & Filters */}
-              {renderEnhancedSearch()}
-              
-              {/* Advanced Filters Sidebar */}
-              <div className="flex gap-8">
-                {showAdvancedFilters && (
-                  <div className="w-80 flex-shrink-0 hidden lg:block">
-                    <FilterSidebar 
-                      onFilterChange={handleFilterChange}
-                      filters={filters}
-                      parks={parks}
-                    />
-                  </div>
-                )}
-                
+            </div>    
                 {/* Parks Content */}
                 <div className="flex-1">
                   {renderParkContent()}
