@@ -44,7 +44,9 @@ import {
   FaTh,
   FaGlobe,
   FaFire,
-  FaPlus
+  FaPlus,
+  FaClock,
+  FaMoneyBillWave
 } from "react-icons/fa";
 
 // Fix Leaflet icons
@@ -54,188 +56,6 @@ L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
-
-// ===== SMART RECOMMENDATIONS COMPONENT =====
-const SmartRecommendations = ({ parks, favorites, currentUser, onParkSelect }) => {
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate AI processing
-    setTimeout(() => {
-      const recs = generateSmartRecommendations(parks, favorites);
-      setRecommendations(recs);
-      setLoading(false);
-    }, 1000);
-  }, [parks, favorites]);
-
-  const generateSmartRecommendations = (parks, favorites) => {
-    if (!currentUser) {
-      // For non-logged in users, show popular parks
-      return parks
-        .filter(park => ['Yellowstone', 'Yosemite', 'Grand Canyon', 'Zion'].some(popular => 
-          park.name?.includes(popular)
-        ))
-        .slice(0, 4)
-        .map(park => ({
-          ...park,
-          reason: 'Popular choice for first-time visitors',
-          confidence: 95
-        }));
-    }
-
-    if (favorites.length === 0) {
-      // New users - recommend beginner-friendly parks
-      return parks
-        .filter(park => park.bestSeason === 'Summer' || park.bestSeason === 'Spring')
-        .slice(0, 4)
-        .map(park => ({
-          ...park,
-          reason: 'Perfect for your first national park adventure',
-          confidence: 90
-        }));
-    }
-
-    // Users with favorites - find similar parks
-    const favoriteParks = parks.filter(park => favorites.includes(park.id));
-    const favoriteStates = [...new Set(favoriteParks.flatMap(park => 
-      park.state?.split(',').map(s => s.trim()) || []
-    ))];
-
-    return parks
-      .filter(park => !favorites.includes(park.id))
-      .filter(park => favoriteStates.some(state => park.state?.includes(state)))
-      .slice(0, 4)
-      .map(park => ({
-        ...park,
-        reason: `Similar to your favorites in ${favoriteStates[0]}`,
-        confidence: 85
-      }));
-  };
-
-  if (loading) {
-    return (
-      <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 mb-8">
-        <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {[1,2,3,4].map(i => (
-              <div key={i} className="h-32 bg-gray-200 rounded-xl"></div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <FadeInWrapper delay={0.3}>
-      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100 mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl text-white">
-            <FaBrain className="text-xl" />
-          </div>
-          <div>
-            <h3 className="text-xl md:text-2xl font-bold text-gray-800">
-              🧠 Smart Recommendations for You
-            </h3>
-            <p className="text-gray-600">
-              {currentUser ? 'Based on your favorites and preferences' : 'Popular parks for beginners'}
-            </p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {recommendations.map((park, index) => (
-            <FadeInWrapper key={park.id} delay={index * 0.1}>
-              <div 
-                className="group bg-gradient-to-br from-white to-purple-50 rounded-xl border border-purple-100 hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer"
-                onClick={() => onParkSelect(park)}
-              >
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <span className="text-2xl">🏞️</span>
-                    <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold">
-                      {park.confidence}% Match
-                    </div>
-                  </div>
-                  
-                  <h4 className="font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors line-clamp-2">
-                    {park.name}
-                  </h4>
-                  
-                  <div className="text-sm text-gray-600 mb-3">
-                    📍 {park.state}
-                  </div>
-                  
-                  <div className="text-xs text-purple-700 bg-purple-100 px-3 py-2 rounded-lg">
-                    🧠 {park.reason}
-                  </div>
-                </div>
-              </div>
-            </FadeInWrapper>
-          ))}
-        </div>
-      </div>
-    </FadeInWrapper>
-  );
-};
-
-// ===== SEASONAL INSIGHTS COMPONENT =====
-const SeasonalInsights = ({ parks, currentSeason }) => {
-  const getSeasonIcon = (season) => {
-    switch(season?.toLowerCase()) {
-      case 'spring': return <FaLeaf className="text-green-500" />;
-      case 'summer': return <FaSun className="text-yellow-500" />;
-      case 'fall': return <span className="text-orange-500">🍂</span>;
-      case 'winter': return <FaSnowflake className="text-blue-500" />;
-      default: return <FaStar className="text-purple-500" />;
-    }
-  };
-
-  const getSeasonalParks = (season) => {
-    return parks
-      .filter(park => park.bestSeason?.toLowerCase() === season.toLowerCase())
-      .slice(0, 6);
-  };
-
-  const currentSeasonParks = getSeasonalParks(currentSeason);
-
-  return (
-    <FadeInWrapper delay={0.4}>
-      <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-6 md:p-8 border border-green-200 mb-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="bg-gradient-to-r from-green-500 to-blue-500 p-3 rounded-xl text-white">
-            {getSeasonIcon(currentSeason)}
-          </div>
-          <div>
-            <h3 className="text-xl md:text-2xl font-bold text-green-800">
-              🌱 Best Parks for {currentSeason}
-            </h3>
-            <p className="text-green-700">Perfect timing for your next adventure</p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {currentSeasonParks.map((park, index) => (
-            <FadeInWrapper key={park.id} delay={index * 0.1}>
-              <div className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-xl">🏞️</span>
-                  <h4 className="font-semibold text-gray-800">{park.name}</h4>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">📍 {park.state}</p>
-                <p className="text-sm text-green-700">
-                  Perfect for {currentSeason.toLowerCase()} activities and weather
-                </p>
-              </div>
-            </FadeInWrapper>
-          ))}
-        </div>
-      </div>
-    </FadeInWrapper>
-  );
-};
 
 // ===== QUICK ACTIONS PANEL =====
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
@@ -299,7 +119,6 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
 // ===== ENHANCED FILTER SIDEBAR =====
 const FilterSidebar = ({ onFilterChange, filters, parks }) => {
   const activities = ['Hiking', 'Wildlife', 'Photography', 'Camping', 'Water Sports', 'Rock Climbing'];
-  const difficulties = ['Easy', 'Moderate', 'Challenging', 'Extreme'];
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 sticky top-4">
@@ -337,7 +156,7 @@ const FilterSidebar = ({ onFilterChange, filters, parks }) => {
       {/* Entry Fee Range */}
       <div className="mb-6">
         <h5 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <FaDollarSign className="text-yellow-500" />
+          <FaMoneyBillWave className="text-yellow-500" />
           Entry Fee
         </h5>
         <div className="space-y-2">
@@ -405,16 +224,39 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => (
 );
 
 // ===== ENHANCED PARK CARD =====
-const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage }) => {
+const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip }) => {
   const navigate = useNavigate();
   
   const getActivityIcons = (park) => {
     const icons = [];
-    if (park.description?.toLowerCase().includes('hiking')) icons.push('🥾');
-    if (park.description?.toLowerCase().includes('wildlife')) icons.push('🦌');
-    if (park.description?.toLowerCase().includes('water')) icons.push('🌊');
-    if (park.description?.toLowerCase().includes('mountain')) icons.push('⛰️');
+    const desc = park.description?.toLowerCase() || '';
+    const highlight = park.highlight?.toLowerCase() || '';
+    
+    if (desc.includes('hiking') || highlight.includes('trail')) icons.push('🥾');
+    if (desc.includes('wildlife') || highlight.includes('wildlife')) icons.push('🦌');
+    if (desc.includes('water') || highlight.includes('lake') || highlight.includes('river')) icons.push('🌊');
+    if (desc.includes('mountain') || highlight.includes('peak')) icons.push('⛰️');
+    if (desc.includes('scenic') || highlight.includes('scenic')) icons.push('📸');
+    
     return icons.slice(0, 3);
+  };
+
+  const formatHighlight = (highlight) => {
+    if (!highlight) return 'Scenic views and natural beauty';
+    
+    // Capitalize first letter and ensure it ends with a descriptive phrase
+    const formatted = highlight.charAt(0).toUpperCase() + highlight.slice(1);
+    
+    if (formatted.length < 20) {
+      return `${formatted} - Perfect for exploration`;
+    }
+    
+    return formatted;
+  };
+
+  const formatHours = (hours) => {
+    if (!hours) return '24 hours (typical)';
+    return hours;
   };
 
   return (
@@ -443,12 +285,12 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
           <button 
             onClick={(e) => {
               e.stopPropagation();
-              // Add to trip planner
+              onPlanTrip(park);
             }}
             className="bg-white/20 backdrop-blur-sm p-2 rounded-lg hover:bg-white/30 transition text-white"
-            title="Add to Trip"
+            title="Add to Trip Planner"
           >
-            <FaPlus />
+            <FaRoute />
           </button>
         </div>
 
@@ -475,21 +317,23 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
             {park.bestSeason === 'Summer' && '🌞'}
             {park.bestSeason === 'Fall' && '🍂'}
             {park.bestSeason === 'Winter' && '❄️'}
-            {park.bestSeason}
+            Best: {park.bestSeason}
           </div>
         )}
       </div>
       
       {/* Enhanced content */}
       <div className="p-6">
-        {/* Activity tags */}
-        <div className="flex gap-2 mb-3">
-          {getActivityIcons(park).map((icon, index) => (
-            <span key={index} className="text-lg">{icon}</span>
-          ))}
+        {/* Activity tags and entry fee */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex gap-2">
+            {getActivityIcons(park).map((icon, index) => (
+              <span key={index} className="text-lg">{icon}</span>
+            ))}
+          </div>
           {park.entryFee && (
-            <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium ml-auto">
-              ${park.entryFee}
+            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+              Entry: ${park.entryFee}
             </span>
           )}
         </div>
@@ -504,12 +348,18 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
           <span>{park.state}</span>
         </div>
         
-        {/* Highlight or description */}
-        {park.highlight && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-            {park.highlight}
-          </p>
-        )}
+        {/* Park info */}
+        <div className="space-y-2 mb-4">
+          {/* Highlight */}
+          <div className="text-sm text-gray-600">
+            <span className="font-medium text-purple-600">🎯 Highlight:</span> {formatHighlight(park.highlight)}
+          </div>
+          
+          {/* Hours */}
+          <div className="text-sm text-gray-600">
+            <span className="font-medium text-blue-600">🕒 Hours:</span> {formatHours(park.hours)}
+          </div>
+        </div>
         
         {/* Action buttons */}
         <div className="flex gap-2">
@@ -520,9 +370,7 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
             <FaEye /> Explore
           </button>
           <button
-            onClick={() => {
-              // Add to trip planner logic
-            }}
+            onClick={() => onPlanTrip(park)}
             className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2"
           >
             <FaRoute /> Plan Trip
@@ -560,7 +408,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const { currentUser, userRole, logout } = useAuth();
   const isMobile = useIsMobile();
 
-  const parksPerPage = 12; // Increased from 9
+  const parksPerPage = 12;
 
   // ===== FUZZY SEARCH SETUP =====
   const fuse = useMemo(() => new Fuse(parks, {
@@ -660,21 +508,25 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         navigate('/trip-planner');
         break;
       case 'favorites':
-        // Filter to show only favorites
-        setSearch('');
-        // You could add a favorites filter here
         showToast('Showing your favorite parks', 'info');
+        // You can implement a favorite filter here
         break;
       case 'analytics':
-        // Navigate to analytics or show modal
         showToast('Analytics feature coming soon!', 'info');
         break;
       case 'map':
         setViewMode('map');
+        showToast('Switched to map view', 'info');
         break;
       default:
         break;
     }
+  };
+
+  const handlePlanTrip = (park) => {
+    // Navigate to trip planner with pre-selected park
+    navigate('/trip-planner', { state: { selectedPark: park } });
+    showToast(`Added ${park.name} to trip planner!`, 'success');
   };
 
   // ===== COMPUTED VALUES =====
@@ -684,7 +536,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   );
   const uniqueStates = useMemo(() => ["All", ...Array.from(new Set(allStates))], [allStates]);
   const seasons = ["All", "Spring", "Summer", "Fall", "Winter"];
-  const currentSeason = ["Spring", "Summer", "Fall", "Winter"][Math.floor(Math.random() * 4)]; // You could make this dynamic
 
   // Enhanced filtering logic
   const filtered = parks.filter((p) => {
@@ -728,7 +579,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     totalParks: parks.length,
     totalStates: uniqueStates.length - 1,
     userFavorites: favorites.length,
-    seasonalBest: parks.filter(p => p.bestSeason?.toLowerCase() === currentSeason.toLowerCase()).length
+    filteredParks: filtered.length
   };
 
   // ===== RENDER METHODS =====
@@ -751,25 +602,15 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
               </p>
             </div>
             
-            {!isMobile && (
+            {currentUser && (
               <div className="flex flex-col gap-3">
                 <Link
-                  to="/trip-planner"
-                  className="group inline-flex items-center gap-3 px-6 py-3 bg-white text-purple-600 rounded-2xl hover:bg-pink-50 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                  to="/account"
+                  className="group inline-flex items-center gap-3 px-6 py-3 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all duration-300 font-medium backdrop-blur-sm"
                 >
-                  <FaRoute className="group-hover:rotate-12 transition-transform" />
-                  Plan Your Adventure
+                  <FaUser />
+                  My Account
                 </Link>
-                
-                {currentUser && (
-                  <Link
-                    to="/account"
-                    className="group inline-flex items-center gap-3 px-6 py-3 bg-white/20 text-white rounded-2xl hover:bg-white/30 transition-all duration-300 font-medium backdrop-blur-sm"
-                  >
-                    <FaUser />
-                    My Account
-                  </Link>
-                )}
               </div>
             )}
           </div>
@@ -804,11 +645,11 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             description: currentUser ? 'Parks you love' : 'Sign in to save favorites'
           },
           { 
-            label: `${currentSeason} Best`, 
-            value: stats.seasonalBest, 
-            icon: currentSeason === 'Spring' ? '🌸' : currentSeason === 'Summer' ? '🌞' : currentSeason === 'Fall' ? '🍂' : '❄️', 
+            label: 'Filtered Results', 
+            value: stats.filteredParks, 
+            icon: '🔍', 
             color: 'from-green-500 to-emerald-500',
-            description: `Perfect for ${currentSeason.toLowerCase()}`
+            description: 'Matching your search'
           }
         ].map((stat, index) => (
           <FadeInWrapper key={stat.label} delay={index * 0.1}>
@@ -837,15 +678,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       >
         <FaCalendarAlt /> Park Events
       </Link>
-      
-      {!isMobile && (
-        <Link
-          to="/trip-planner"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          <FaRoute /> Trip Planner
-        </Link>
-      )}
       
       <Link
         to="/blog"
@@ -1129,12 +961,20 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                         )}
                         {park.entryFee && (
                           <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                            ${park.entryFee}
+                            Entry: ${park.entryFee}
+                          </span>
+                        )}
+                        {park.hours && (
+                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                            <FaClock className="inline mr-1" />
+                            {park.hours}
                           </span>
                         )}
                       </div>
                       {park.highlight && (
-                        <p className="text-gray-600 text-sm line-clamp-2">{park.highlight}</p>
+                        <p className="text-gray-600 text-sm line-clamp-2">
+                          <span className="font-medium text-purple-600">Highlight:</span> {park.highlight}
+                        </p>
                       )}
                     </div>
                     <div className="flex flex-col gap-2 flex-shrink-0">
@@ -1144,6 +984,13 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                       >
                         <FaEye className="inline mr-2" />
                         View
+                      </button>
+                      <button
+                        onClick={() => handlePlanTrip(park)}
+                        className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition text-sm font-medium"
+                      >
+                        <FaRoute className="inline mr-2" />
+                        Plan Trip
                       </button>
                       {currentUser && (
                         <button
@@ -1171,6 +1018,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                     onToggleFavorite={toggleFavorite}
                     currentUser={currentUser}
                     currentPage={currentPage}
+                    onPlanTrip={handlePlanTrip}
                   />
                 )}
               </FadeInWrapper>
@@ -1258,20 +1106,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
               favorites={favorites} 
               onActionClick={handleQuickAction}
               currentUser={currentUser}
-            />
-            
-            {/* Smart Recommendations */}
-            <SmartRecommendations 
-              parks={parks}
-              favorites={favorites}
-              currentUser={currentUser}
-              onParkSelect={(park) => navigate(`/park/${park.slug}?page=${currentPage}`)}
-            />
-            
-            {/* Seasonal Insights */}
-            <SeasonalInsights 
-              parks={parks}
-              currentSeason={currentSeason}
             />
           </div>
 
