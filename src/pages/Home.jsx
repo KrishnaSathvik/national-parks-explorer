@@ -57,6 +57,66 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
 });
 
+
+// ===== QUICK ACTIONS PANEL =====
+const QuickActions = ({ favorites, onActionClick, currentUser }) => {
+  const actions = [
+    {
+      id: 'plan-trip',
+      icon: '🎯',
+      title: 'Plan Trip',
+      description: 'Create custom itinerary',
+      color: 'from-pink-500 to-rose-500',
+      action: () => onActionClick('trip-planner')
+    },
+    {
+      id: 'favorites',
+      icon: '❤️',
+      title: 'My Favorites',
+      description: `${favorites.length} saved parks`,
+      color: 'from-red-500 to-pink-500',
+      action: () => onActionClick('favorites')
+    },
+    {
+      id: 'analytics',
+      icon: '📊',
+      title: 'Analytics',
+      description: 'Your travel insights',
+      color: 'from-purple-500 to-indigo-500',
+      action: () => onActionClick('analytics')
+    },
+    {
+      id: 'explore',
+      icon: '🗺️',
+      title: 'Explore Map',
+      description: 'Interactive discovery',
+      color: 'from-blue-500 to-cyan-500',
+      action: () => onActionClick('map')
+    }
+  ];
+
+  return (
+    <FadeInWrapper delay={0.2}>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {actions.map((action, index) => (
+          <FadeInWrapper key={action.id} delay={index * 0.1}>
+            <button 
+              onClick={action.action}
+              className="group bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105"
+            >
+              <div className="text-2xl md:text-3xl mb-2 group-hover:scale-110 transition-transform">
+                {action.icon}
+              </div>
+              <div className="font-semibold text-gray-800 text-sm md:text-base">{action.title}</div>
+              <div className="text-xs md:text-sm text-gray-600 mt-1">{action.description}</div>
+            </button>
+          </FadeInWrapper>
+        ))}
+      </div>
+    </FadeInWrapper>
+  );
+};
+
 // ===== ENHANCED FILTER SIDEBAR =====
 const FilterSidebar = ({ onFilterChange, filters, parks }) => {
   const activities = ['Hiking', 'Wildlife', 'Photography', 'Camping', 'Water Sports', 'Rock Climbing'];
