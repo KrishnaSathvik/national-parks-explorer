@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import FadeInWrapper from './FadeInWrapper';
+import AnalyticsDashboard from './AnalyticsDashboard';
+import { TripAnalytics } from '../utils/TripAnalytics';
 import { 
   FaEdit, 
   FaTrash, 
@@ -16,7 +18,10 @@ import {
   FaCar,
   FaPlane,
   FaSearch,
-  FaStar
+  FaStar,
+  FaChartBar,
+  FaTimes,
+  FaBrain
 } from 'react-icons/fa';
 
 const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
@@ -24,7 +29,8 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
   const [sortOrder, setSortOrder] = useState('desc');
   const [filterBy, setFilterBy] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // grid or list
+  const [viewMode, setViewMode] = useState('grid');
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const handleDeleteTrip = (tripId, tripTitle) => {
     if (window.confirm(`Are you sure you want to delete "${tripTitle}"?`)) {
@@ -135,6 +141,70 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
 
   const processedTrips = filteredAndSortedTrips();
 
+  // Quick Insights Panel
+  const renderQuickInsights = () => {
+    if (trips.length === 0) return null;
+
+    const insights = TripAnalytics.generateInsights(trips);
+    
+    return (
+      <FadeInWrapper delay={0.05}>
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border border-purple-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-3 rounded-xl text-white">
+                <FaChartBar className="text-xl" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-purple-800">Travel Insights</h3>
+                <p className="text-purple-600 text-sm">Quick overview of your travel patterns</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowAnalytics(true)}
+              className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition text-sm font-medium flex items-center gap-2"
+            >
+              <FaChartBar />
+              View Full Analytics
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="text-center p-4 bg-white/70 rounded-xl">
+              <div className="text-2xl font-bold text-purple-600">{insights.personalPreferences.avgDuration}</div>
+              <div className="text-purple-700 text-sm">Avg Trip Days</div>
+            </div>
+            <div className="text-center p-4 bg-white/70 rounded-xl">
+              <div className="text-2xl font-bold text-purple-600">${insights.personalPreferences.avgBudget}</div>
+              <div className="text-purple-700 text-sm">Avg Budget</div>
+            </div>
+            <div className="text-center p-4 bg-white/70 rounded-xl">
+              <div className="text-2xl font-bold text-purple-600">{insights.personalPreferences.topRegions[0]?.region || 'Various'}</div>
+              <div className="text-purple-700 text-sm">Favorite Region</div>
+            </div>
+            <div className="text-center p-4 bg-white/70 rounded-xl">
+              <div className="text-2xl font-bold text-purple-600">{insights.efficiency.efficiencyScore}/100</div>
+              <div className="text-purple-700 text-sm">Efficiency Score</div>
+            </div>
+          </div>
+          
+          {/* Quick Recommendations */}
+          {insights.recommendations.length > 0 && (
+            <div className="mt-4 p-4 bg-white/70 rounded-xl">
+              <div className="text-sm font-medium text-purple-700 mb-2 flex items-center gap-2">
+                <FaBrain className="text-purple-600" />
+                Top Recommendation:
+              </div>
+              <div className="text-purple-800 font-medium">{insights.recommendations[0].title}</div>
+              <div className="text-purple-600 text-sm mt-1">{insights.recommendations[0].description.substring(0, 120)}...</div>
+            </div>
+          )}
+        </div>
+      </FadeInWrapper>
+    );
+  };
+
+  // No trips state with enhanced features preview
   if (trips.length === 0) {
     return (
       <div className="text-center py-20">
@@ -183,6 +253,9 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
 
   return (
     <div className="space-y-6">
+      {/* Quick Insights Panel */}
+      {renderQuickInsights()}
+
       {/* Enhanced Controls Bar */}
       <FadeInWrapper delay={0.1}>
         <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
@@ -201,6 +274,15 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
 
             {/* Controls */}
             <div className="flex items-center gap-4">
+              {/* Analytics Button */}
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition text-sm font-medium flex items-center gap-2"
+              >
+                <FaChartBar />
+                Analytics
+              </button>
+
               {/* Filter */}
               <div className="flex items-center gap-2">
                 <FaFilter className="text-gray-500" />
@@ -307,7 +389,7 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
           {processedTrips.map((trip, index) => (
             <FadeInWrapper key={trip.id} delay={index * 0.1}>
               {viewMode === 'grid' ? (
-                // Grid View Card
+                // Grid View Card - Enhanced
                 <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                   
                   {/* Card Header with Gradient */}
@@ -351,7 +433,7 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
                     <div className="absolute -top-2 -left-2 w-16 h-16 bg-white/10 rounded-full blur-lg"></div>
                   </div>
 
-                  {/* Card Body */}
+                  {/* Card Body - Enhanced */}
                   <div className="p-6">
                     {/* Enhanced Stats Grid */}
                     <div className="grid grid-cols-3 gap-4 mb-6">
@@ -422,7 +504,7 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
                   </div>
                 </div>
               ) : (
-                // List View Card
+                // List View Card - Enhanced
                 <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
                   <div className="flex items-center gap-6">
                     {/* Trip Icon */}
@@ -491,6 +573,14 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
             </FadeInWrapper>
           ))}
         </div>
+      )}
+
+      {/* Analytics Dashboard Modal */}
+      {showAnalytics && (
+        <AnalyticsDashboard
+          trips={trips}
+          onClose={() => setShowAnalytics(false)}
+        />
       )}
     </div>
   );

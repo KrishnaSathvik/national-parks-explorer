@@ -11,6 +11,7 @@ import Favorites from "./pages/Favorites";
 import useIsMobile from "./hooks/useIsMobile";
 import { useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav"; // or adjust path if needed
+import AppIntegration from './components/AppIntegration';
 import {
   collection,
   getDocs,
@@ -175,6 +176,7 @@ function App() {
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/admin/login" element={<AdminLogin />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/integrations" component={AppIntegration} />
 
               {/* ✅ Redirect root path to /signup for unauthenticated users */}
               <Route

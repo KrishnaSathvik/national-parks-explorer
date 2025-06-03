@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
+import { TripOptimizer } from '../utils/TripOptimizer';
 import TripMap from './TripMap';
 import FadeInWrapper from './FadeInWrapper';
 import { 
@@ -20,7 +21,11 @@ import {
   FaChevronRight,
   FaSearch,
   FaPlus,
-  FaTrash
+  FaTrash,
+  FaMagic,
+  FaSort,
+  FaChartLine,
+  FaExclamationTriangle
 } from 'react-icons/fa';
 
 const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
@@ -32,6 +37,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
   const [parksLoading, setParksLoading] = useState(!allParks);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
+  const [routeAnalysis, setRouteAnalysis] = useState(null);
 
   // Park search state
   const [parkSearch, setParkSearch] = useState('');
@@ -51,6 +57,16 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       setParksLoading(false);
     }
   }, [allParks]);
+
+  // Analyze route whenever parks change
+  useEffect(() => {
+    if (tripData.parks.length >= 2) {
+      const analysis = TripOptimizer.analyzeRoute(tripData.parks);
+      setRouteAnalysis(analysis);
+    } else {
+      setRouteAnalysis(null);
+    }
+  }, [tripData.parks]);
 
   const fetchAllParks = async () => {
     try {
@@ -91,27 +107,24 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // FIXED: Single, accurate trip duration calculation
-  const calculateTripDuration = () => {
+  // Trip duration calculation
+  const calculateTripDuration = useCallback(() => {
     if (!tripData.startDate || !tripData.endDate) return 0;
     
     const start = new Date(tripData.startDate);
     const end = new Date(tripData.endDate);
     
-    // Reset time to avoid timezone issues
     start.setHours(0, 0, 0, 0);
     end.setHours(0, 0, 0, 0);
     
     const diffTime = end.getTime() - start.getTime();
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
     
-    // For trip planning: if you select Monday to Wednesday
-    // Monday (Day 1), Tuesday (Day 2), Wednesday (Day 3) = 3 days
     return Math.max(1, diffDays + 1);
-  };
+  }, [tripData.startDate, tripData.endDate]);
 
-  // ADDED: Missing calculateDistance function
-  const calculateDistance = (coord1, coord2) => {
+  // Distance calculation
+  const calculateDistance = useCallback((coord1, coord2) => {
     const R = 3959; // Earth's radius in miles
     const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
     const dLon = (coord2.lng - coord1.lng) * Math.PI / 180;
@@ -121,26 +134,13 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
-  };
+  }, []);
 
-  const calculateTotalDistance = () => {
-    if (tripData.parks.length < 2) return 0;
-    
-    let totalDistance = 0;
-    for (let i = 0; i < tripData.parks.length - 1; i++) {
-      const park1 = tripData.parks[i];
-      const park2 = tripData.parks[i + 1];
-      
-      if (park1.coordinates && park2.coordinates) {
-        const distance = calculateDistance(park1.coordinates, park2.coordinates);
-        totalDistance += distance;
-      }
-    }
-    
-    return Math.round(totalDistance);
-  };
+  const calculateTotalDistance = useCallback(() => {
+    return TripOptimizer.calculateTotalDistance(tripData.parks);
+  }, [tripData.parks]);
 
-  const calculateEstimatedCost = () => {
+  const calculateEstimatedCost = useCallback(() => {
     const duration = calculateTripDuration();
     const distance = calculateTotalDistance();
     const numParks = tripData.parks.length;
@@ -155,7 +155,73 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     };
     
     return Math.round(costs.accommodation + costs.transportation + costs.parkFees + costs.food);
-  };
+  }, [calculateTripDuration, calculateTotalDistance, tripData.parks.length, tripData.transportationMode]);
+
+  // Route optimization functions
+  const optimizeRoute = useCallback(() => {
+    if (tripData.parks.length < 3) {
+      showToast('Need at least 3 parks to optimize route', 'info');
+      return;
+    }
+
+    const currentDistance = calculateTotalDistance();
+    const optimizedParks = TripOptimizer.optimizeRoute(tripData.parks);
+    
+    setTripData({
+      ...tripData,
+      parks: optimizedParks
+    });
+
+    // Calculate savings after state update
+    setTimeout(() => {
+      const newDistance = TripOptimizer.calculateTotalDistance(optimizedParks);
+      const savings = currentDistance - newDistance;
+      
+      if (savings > 0) {
+        showToast(`Route optimized! Saved ${Math.round(savings)} miles`, 'success');
+      } else {
+        showToast('Route was already optimal!', 'info');
+      }
+    }, 100);
+  }, [tripData.parks, calculateTotalDistance, showToast]);
+
+  const sortParksByDate = useCallback(() => {
+    const parksWithDates = tripData.parks.filter(park => park.visitDate);
+    const parksWithoutDates = tripData.parks.filter(park => !park.visitDate);
+    
+    if (parksWithDates.length === 0) {
+      showToast('Add visit dates to parks for date-based sorting', 'info');
+      return;
+    }
+
+    const sortedParks = [
+      ...parksWithDates.sort((a, b) => new Date(a.visitDate) - new Date(b.visitDate)),
+      ...parksWithoutDates
+    ];
+
+    setTripData({
+      ...tripData,
+      parks: sortedParks
+    });
+
+    showToast('Parks sorted by visit dates!', 'success');
+  }, [tripData.parks, showToast]);
+
+  const getOptimizationPotential = useMemo(() => {
+    if (tripData.parks.length < 3) return null;
+    
+    const currentDistance = calculateTotalDistance();
+    const optimizedParks = TripOptimizer.optimizeRoute([...tripData.parks]);
+    const optimizedDistance = TripOptimizer.calculateTotalDistance(optimizedParks);
+    const savings = currentDistance - optimizedDistance;
+    
+    return {
+      currentDistance,
+      optimizedDistance,
+      savings: Math.max(0, savings),
+      canOptimize: savings > 10
+    };
+  }, [tripData.parks, calculateTotalDistance]);
 
   // Park management functions
   const parseCoordinates = (coordString) => {
@@ -171,7 +237,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       parkId: park.id,
       parkName: park.name || park.fullName,
       visitDate: '',
-      stayDuration: 2, // Default 2 days
+      stayDuration: 2,
       coordinates,
       state: park.state,
       description: park.description
@@ -222,7 +288,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
         park.fullName?.toLowerCase().includes(searchLower) ||
         park.state?.toLowerCase().includes(searchLower)
       )
-      .slice(0, 8); // Limit results for performance
+      .slice(0, 8);
   };
 
   // Navigation functions
@@ -267,7 +333,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       <FadeInWrapper delay={0.1}>
         <div className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Trip Builder</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Enhanced Trip Builder</h2>
             <div className="text-sm text-gray-500">Step {currentStep} of 3</div>
           </div>
           
@@ -349,32 +415,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
 
                   {/* Date Inputs */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-3">
-                        Start Date *
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={tripData.startDate}
-                          onChange={(e) => {
-                            setTripData({...tripData, startDate: e.target.value});
-                            if (errors.startDate) setErrors({...errors, startDate: ''});
-                          }}
-                          min={new Date().toISOString().split('T')[0]}
-                          className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white min-h-[48px] ${
-                            errors.startDate 
-                              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
-                              : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
-                          }`}
-                        />
-                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      </div>
-                      {errors.startDate && (
-                        <p className="mt-2 text-sm text-red-600">{errors.startDate}</p>
-                      )}
-                    </div>
-                    
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
                         End Date *
@@ -600,6 +640,112 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     </div>
                   )}
                 </div>
+
+                {/* Route Optimization Panel */}
+                {tripData.parks.length >= 2 && (
+                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
+                    <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
+                      <FaMagic className="text-purple-500" />
+                      Route Optimization
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {/* Current Route Stats */}
+                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-sm font-medium text-blue-700">Current Route</span>
+                          <span className="text-lg font-bold text-blue-800">
+                            {calculateTotalDistance()} miles
+                          </span>
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          Total driving distance between parks
+                        </div>
+                      </div>
+
+                      {/* Route Analysis */}
+                      {routeAnalysis && (
+                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
+                          <div className="flex items-center gap-2 mb-2">
+                            <FaChartLine className="text-orange-600" />
+                            <span className="text-sm font-medium text-orange-700">Route Analysis</span>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                            <div>
+                              <div className="font-bold text-orange-800">{routeAnalysis.averageDistance}</div>
+                              <div className="text-orange-600">Avg Distance</div>
+                            </div>
+                            <div>
+                              <div className="font-bold text-orange-800">{routeAnalysis.longestSegment}</div>
+                              <div className="text-orange-600">Longest Leg</div>
+                            </div>
+                            <div>
+                              <div className="font-bold text-orange-800">{routeAnalysis.shortestSegment}</div>
+                              <div className="text-orange-600">Shortest Leg</div>
+                            </div>
+                            <div>
+                              <div className="font-bold text-orange-800">{routeAnalysis.efficiency}</div>
+                              <div className="text-orange-600">Efficiency</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Optimization Suggestion */}
+                      {getOptimizationPotential?.canOptimize && (
+                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-sm font-medium text-green-700">Potential Savings</span>
+                            <span className="text-lg font-bold text-green-800">
+                              -{Math.round(getOptimizationPotential.savings)} miles
+                            </span>
+                          </div>
+                          <div className="text-xs text-green-600">
+                            Optimize route to reduce driving distance
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action Buttons */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button
+                          onClick={optimizeRoute}
+                          disabled={tripData.parks.length < 3}
+                          className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                        >
+                          <FaRoute />
+                          {tripData.parks.length < 3 ? 'Need 3+ Parks' : 'Optimize Route'}
+                        </button>
+                        
+                        <button
+                          onClick={sortParksByDate}
+                          className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
+                        >
+                          <FaSort />
+                          Sort by Dates
+                        </button>
+                      </div>
+
+                      {/* Optimization Tips */}
+                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
+                        <div className="flex items-start gap-3">
+                          <div className="text-yellow-600 text-xl">💡</div>
+                          <div>
+                            <div className="font-medium text-yellow-800 mb-1">Optimization Tips</div>
+                            <div className="text-yellow-700 text-sm space-y-1">
+                              <div>• Add more parks for better optimization</div>
+                              <div>• Set visit dates for chronological sorting</div>
+                              <div>• Consider your starting location when planning</div>
+                              {routeAnalysis?.recommendations?.map((rec, index) => (
+                                <div key={index}>• {rec}</div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </FadeInWrapper>
           )}
@@ -619,6 +765,18 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     <div className="text-center">
                       <div className="text-2xl md:text-3xl font-bold">${calculateEstimatedCost()}</div>
                       <div className="text-pink-200 text-sm">Budget</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl md:text-3xl font-bold">{calculateTotalDistance()}</div>
+                      <div className="text-pink-200 text-sm">Miles</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl md:text-3xl font-bold">{calculateTripDuration()}</div>
+                      <div className="text-pink-200 text-sm">Days</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-2xl md:text-3xl font-bold">{tripData.parks.length}</div>
+                      <div className="text-pink-200 text-sm">Parks</div>
                     </div>
                   </div>
                 </div>
@@ -739,10 +897,10 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                 transportationMode={tripData.transportationMode}
               />
               
-              {/* Quick Stats Panel */}
+              {/* Enhanced Quick Stats Panel */}
               {tripData.parks.length > 0 && (
                 <div className="mt-6 bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-                  <h4 className="font-semibold text-gray-800 mb-3">Quick Stats</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">Enhanced Stats</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Distance:</span>
@@ -763,6 +921,14 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                         {tripData.transportationMode}
                       </span>
                     </div>
+                    {routeAnalysis && (
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Route Efficiency:</span>
+                        <span className={`font-medium ${routeAnalysis.efficiency === 'Good' ? 'text-green-600' : 'text-yellow-600'}`}>
+                          {routeAnalysis.efficiency}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -808,4 +974,4 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
   );
 };
 
-export default TripBuilder; 
+export default TripBuilder;
