@@ -31,7 +31,8 @@ const AppIntegration = () => {
     // Simulate API calls to check each integration
     const services = ['database', 'api', 'notifications', 'analytics'];
     
-    for (const service of services) {
+    for (let i = 0; i < services.length; i++) {
+      const service = services[i];
       await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
       
       const isConnected = Math.random() > 0.2; // 80% chance of success
@@ -45,8 +46,10 @@ const AppIntegration = () => {
         }
       }));
       
-      addLog(`${service.charAt(0).toUpperCase() + service.slice(1)} ${isConnected ? 'connected' : 'connection failed'}`, 
-             isConnected ? 'success' : 'error');
+      const serviceName = service.charAt(0).toUpperCase() + service.slice(1);
+      const logMessage = `${serviceName} ${isConnected ? 'connected' : 'connection failed'}`;
+      const logType = isConnected ? 'success' : 'error';
+      addLog(logMessage, logType);
     }
     
     setIsLoading(false);
@@ -98,7 +101,9 @@ const AppIntegration = () => {
 
   const formatLastSync = (lastSync) => {
     if (!lastSync) return 'Never';
-    return `${Math.floor((new Date() - lastSync) / 1000 / 60)} min ago`;
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - lastSync.getTime()) / 1000 / 60);
+    return `${diffInMinutes} min ago`;
   };
 
   return (
@@ -176,7 +181,7 @@ const AppIntegration = () => {
           
           <div className="text-center p-4 bg-blue-50 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">
-              {Math.round(Object.values(integrations).filter(i => i.status === 'connected').length / 4 * 100)}%
+              {Math.round((Object.values(integrations).filter(i => i.status === 'connected').length / 4) * 100)}%
             </div>
             <div className="text-sm text-gray-600">System Uptime</div>
           </div>
