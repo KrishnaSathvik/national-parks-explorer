@@ -141,12 +141,27 @@ const TripList = ({ trips, onEditTrip, onDeleteTrip, onViewTrip }) => {
 
   const processedTrips = filteredAndSortedTrips();
 
-  // Quick Insights Panel
   const renderQuickInsights = () => {
     if (trips.length === 0) return null;
 
-    const insights = TripAnalytics.generateInsights(trips);
-    
+    // Safe fallback for build issues
+    let insights;
+    try {
+      insights = TripAnalytics.generateInsights(trips);
+    } catch (error) {
+      console.warn('Analytics generation failed:', error);
+      insights = {
+        personalPreferences: {
+          avgDuration: 0,
+          avgBudget: 0,
+          topRegions: [],
+          transportationSplit: { driving: 0, flying: 0 }
+        },
+        efficiency: { efficiencyScore: 0 },
+        recommendations: []
+      };
+    }
+        
     return (
       <FadeInWrapper delay={0.05}>
         <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 mb-6 border border-purple-200">

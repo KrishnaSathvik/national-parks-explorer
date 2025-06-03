@@ -20,8 +20,6 @@ import {
   FaCamera,
   FaHiking,
   FaCampground,
-  FaTrendingUp,
-  FaTrendingDown,
   FaEquals,
   FaLightbulb,
   FaExclamationCircle,
@@ -29,6 +27,7 @@ import {
   FaClock,
   FaGlobe
 } from 'react-icons/fa';
+import { MdTrendingUp, MdTrendingDown } from 'react-icons/md';
 import { 
   LineChart, 
   Line, 
@@ -60,7 +59,7 @@ const AnalyticsDashboard = ({ trips, onClose }) => {
   const tabs = [
     { id: 'overview', title: 'Overview', icon: FaChartBar },
     { id: 'preferences', title: 'Preferences', icon: FaHeart },
-    { id: 'trends', title: 'Trends', icon: FaTrendingUp },
+    { id: 'trends', title: 'Trends', icon: MdTrendingUp },
     { id: 'efficiency', title: 'Efficiency', icon: FaBrain },
     { id: 'recommendations', title: 'Insights', icon: FaLightbulb }
   ];
@@ -425,7 +424,7 @@ const AnalyticsDashboard = ({ trips, onClose }) => {
       <FadeInWrapper delay={0.1}>
         <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FaTrendingUp className="text-blue-500" />
+            <MdTrendingUp className="text-blue-500" />
             Trip Planning Frequency
             {insights.trendAnalysis.tripFrequency.trend !== 'insufficient data' && (
               <span className={`ml-2 text-xs px-2 py-1 rounded-full ${
@@ -573,7 +572,7 @@ const AnalyticsDashboard = ({ trips, onClose }) => {
                 <div className="text-2xl font-bold mb-1">{metric.value}</div>
                 <div className="text-sm opacity-90">{metric.label}</div>
                 <div className="text-xs opacity-70 mt-2">
-                  Target: {typeof metric.benchmark === 'number' && metric.benchmark < 100 ? '' : '}{metric.benchmark}{metric.label.includes('Miles') ? ' mi' : ''}
+                  Target: {`${metric.benchmark}${metric.label.includes('Miles') ? ' mi' : ''}`}
                 </div>
               </div>
             </FadeInWrapper>

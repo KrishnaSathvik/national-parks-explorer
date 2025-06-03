@@ -2,9 +2,10 @@
 import { precacheAndRoute, cleanupOutdatedCaches } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
-import { BackgroundSync } from 'workbox-background-sync';
+import { Queue as BackgroundSync } from 'workbox-background-sync';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+
 
 // App info
 const APP_VERSION = '__APP_VERSION__';
