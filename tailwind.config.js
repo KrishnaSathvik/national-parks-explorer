@@ -53,6 +53,14 @@ export default {
         },
       },
 
+      // ADD to the extend section:
+      spacing: {
+        'safe-top': 'env(safe-area-inset-top)',
+        'safe-bottom': 'env(safe-area-inset-bottom)',
+        'safe-left': 'env(safe-area-inset-left)',
+        'safe-right': 'env(safe-area-inset-right)',
+      },
+
       // 🎬 Animations
       animation: {
         'fade-in-up': 'fade-in-up 0.3s ease-out',

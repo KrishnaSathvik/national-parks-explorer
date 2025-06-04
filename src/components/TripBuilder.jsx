@@ -49,6 +49,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     { id: 3, title: 'Review & Save', icon: FaCheckCircle, description: 'Finalize your trip' }
   ];
 
+  // WITH THIS:
   useEffect(() => {
     if (!allParks || allParks.length === 0) {
       fetchAllParks();
@@ -56,7 +57,15 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       setParksData(allParks);
       setParksLoading(false);
     }
-  }, [allParks]);
+    
+    // If trip has preloaded parks, auto-advance to step 2
+    if (trip.parks && trip.parks.length > 0 && currentStep === 1) {
+      setTimeout(() => {
+        setCurrentStep(2);
+        showToast('🎯 Park added! Set your dates and preferences.', 'info');
+      }, 1000);
+    }
+  }, [allParks, trip.parks]);
 
   // Analyze route whenever parks change
   useEffect(() => {

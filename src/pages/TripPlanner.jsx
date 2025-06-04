@@ -8,10 +8,12 @@ import TripBuilder from '../components/TripBuilder';
 import TripList from '../components/TripList';
 import TripViewer from '../components/TripViewer';
 import FadeInWrapper from '../components/FadeInWrapper';
+import { useLocation } from 'react-router-dom';
 import { FaPlus, FaRoute, FaCalendarAlt, FaChartBar, FaStar, FaBrain, FaMapMarkerAlt, FaDollarSign } from 'react-icons/fa';
 
 const TripPlanner = () => {
   const { currentUser } = useAuth();
+  const location = useLocation();
   const { showToast } = useToast();
   const [trips, setTrips] = useState([]);
   const [allParks, setAllParks] = useState([]);
@@ -95,6 +97,16 @@ const TripPlanner = () => {
   useEffect(() => {
     fetchData();
   }, [currentUser]);
+
+  // ADD THIS after existing useEffect for fetchData:
+    useEffect(() => {
+      if (location.state?.preloadedTrip) {
+        setActiveTrip(location.state.preloadedTrip);
+        setCurrentTab('my-trips');
+        // Clear the state to prevent reloading on refresh
+        window.history.replaceState({}, document.title);
+      }
+    }, [location.state]);
 
   // Enhanced auto-loading effect for smart recommendations
   useEffect(() => {

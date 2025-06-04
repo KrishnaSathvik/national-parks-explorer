@@ -11,6 +11,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import SkeletonLoader from "../components/SkeletonLoader";
 import Fuse from 'fuse.js';
 import { debounce } from 'lodash';
+import { createTripFromPark } from '../utils/tripPlannerHelpers';
 
 import {
   FaCalendarAlt,
@@ -60,6 +61,7 @@ L.Icon.Default.mergeOptions({
 
 // Update the QuickActions component in Home.jsx
 
+// Fixed QuickActions component
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
   const actions = [
     {
@@ -98,7 +100,7 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
 
   return (
     <FadeInWrapper delay={0.2}>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6 mb-6 md:mb-8">
         {actions.map((action, index) => (
           <FadeInWrapper key={action.id} delay={index * 0.1}>
             <button 
@@ -225,7 +227,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => (
   </div>
 );
 
-// ===== ENHANCED PARK CARD =====
+// Fixed EnhancedParkCard component section with proper closing brace
 const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip }) => {
   const navigate = useNavigate();
   
@@ -273,7 +275,7 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
         
         {/* Quick action buttons */}
-        <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
           <button 
             onClick={(e) => {
               e.stopPropagation();
@@ -283,16 +285,6 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
             title="View Details"
           >
             <FaEye />
-          </button>
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              onPlanTrip(park);
-            }}
-            className="bg-white/20 backdrop-blur-sm p-2 rounded-lg hover:bg-white/30 transition text-white"
-            title="Add to Trip Planner"
-          >
-            <FaRoute />
           </button>
         </div>
 
@@ -325,7 +317,7 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
       </div>
       
       {/* Enhanced content */}
-      <div className="p-6">
+      <div className="p-4 md:p-6">        
         {/* Activity tags and entry fee */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex gap-2">
@@ -333,15 +325,13 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
               <span key={index} className="text-lg">{icon}</span>
             ))}
           </div>
-          {park.entryFee && (
-            <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-              Entry: ${park.entryFee}
-            </span>
-          )}
+          <div className="text-sm text-green-600 mb-2">
+            Entry: {park.entryFee && park.entryFee > 0 ? `${park.entryFee}` : 'Free'}
+          </div>
         </div>
         
         {/* Park name and state */}
-        <h3 className="text-lg font-bold text-gray-800 mb-2 group-hover:text-pink-600 transition-colors line-clamp-2">
+        <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2 group-hover:text-pink-600 transition-colors line-clamp-2">
           {park.name}
         </h3>
         
@@ -367,15 +357,15 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
         <div className="flex gap-2">
           <button
             onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2"
+            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2.5 md:py-2 px-3 md:px-4 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 min-h-[44px]"
           >
-            <FaEye /> Explore
+            <FaEye /> <span className="hidden sm:inline">Explore</span>
           </button>
           <button
             onClick={() => onPlanTrip(park)}
-            className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-4 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2"
+            className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2.5 md:py-2 px-3 md:px-4 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 min-h-[44px]"
           >
-            <FaRoute /> Plan Trip
+            <FaRoute /> <span className="hidden sm:inline">Plan Trip</span>
           </button>
         </div>
       </div>
@@ -541,9 +531,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   };
 
   const handlePlanTrip = (park) => {
-    // Navigate to trip planner with pre-selected park
-    navigate('/trip-planner', { state: { selectedPark: park } });
-    showToast(`Added ${park.name} to trip planner!`, 'success');
+    createTripFromPark(park, navigate, showToast);
   };
 
   // ===== COMPUTED VALUES =====
@@ -611,10 +599,10 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         <FadeInWrapper delay={0.1}>
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
             <div>
-              <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4">
+              <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-extrabold mb-4">
                 🌍 National Parks Explorer
               </h1>
-              <p className="text-lg md:text-xl text-purple-100 max-w-2xl">
+              <p className="text-base md:text-lg lg:text-xl text-purple-100 max-w-2xl">
                 Explore {parks.length} magnificent national parks with interactive maps, smart recommendations, and personalized insights.
               </p>
             </div>
@@ -679,19 +667,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
   const renderNavigationLinks = () => (
     <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm font-medium mb-6">
-      <Link
-        to="/seasonal"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
-      >
-        <FaLeaf /> Seasonal Guide
-      </Link>
-      
-      <Link
-        to="/recommendations"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow-md"
-      >
-        <FaBrain /> AI Recommendations
-      </Link>
       
       <Link
         to="/calendar"
@@ -788,12 +763,12 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
           <div className="relative">
             <input
               type="text"
-              placeholder="Search parks by name, state, features, or activities..."
+              placeholder="Search parks by name, state, features..."
               value={search}
               onChange={handleSearchChange}
               onFocus={() => setShowSearchDropdown(search.length > 0)}
               onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-              className="w-full p-4 pl-12 pr-12 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
+              className="w-full p-3 md:p-4 pl-10 md:pl-12 pr-10 md:pr-12 border-2 border-gray-200 rounded-xl text-sm md:text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
             />
             <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
             {search && (
@@ -942,7 +917,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     
     return (
       <FadeInWrapper delay={0.6}>
-        <div className={isListView ? "space-y-6" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}>
+        <div className={isListView ? "space-y-4 md:space-y-6" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"}>
           {parks.length === 0 ? (
             Array.from({ length: 9 }).map((_, i) => (
               <div key={i} className="animate-pulse bg-gray-200 rounded-xl h-48 w-full shadow-sm" />
@@ -990,11 +965,9 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
                             Best: {park.bestSeason}
                           </span>
                         )}
-                        {park.entryFee && (
-                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                            Entry: ${park.entryFee}
-                          </span>
-                        )}
+                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
+                          Entry: {park.entryFee && park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
+                        </span>
                         {park.hours && (
                           <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
                             <FaClock className="inline mr-1" />

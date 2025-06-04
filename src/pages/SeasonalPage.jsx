@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import FadeInWrapper from '../components/FadeInWrapper';
+import { getSeasonalParkInfo } from '../data/seasonalParkData';
 import {
   FaLeaf,
   FaSun,
@@ -127,13 +128,84 @@ const SEASONS = [
 // ===== SEASONAL PARK CARD =====
 const SeasonalParkCard = ({ park, season, onView, onPlanTrip, onToggleFavorite, isFavorite, currentUser, index }) => {
   const getSeasonalActivity = (park, season) => {
-    const activities = {
-      spring: ['🌸 Wildflower viewing', '🥾 Spring hiking', '📸 Nature photography'],
-      summer: ['🏕️ Camping', '🚣 Water activities', '🌄 Sunrise viewing'],
-      fall: ['🍂 Fall foliage', '📷 Photography', '🥾 Cool weather hiking'],
-      winter: ['❄️ Snow activities', '🔥 Winter lodges', '🦅 Wildlife viewing']
+    const parkName = park.name?.toLowerCase() || '';
+
+    {/* Enhanced park-specific seasonal info */}
+    {(() => {
+      const seasonalInfo = getSeasonalParkInfo(park.name, season.id);
+      if (seasonalInfo) {
+        return (
+          <div className={`bg-gradient-to-r ${season.secondaryColor} p-4 rounded-xl mb-4`}>
+            <div className="font-medium text-sm mb-2 text-gray-700">
+              🌟 Why {park.name} shines in {season.name}:
+            </div>
+            <div className="text-xs text-gray-600 mb-3">
+              {seasonalInfo.whyFamous}
+            </div>
+            <div className="space-y-2">
+              <div className="text-xs">
+                <span className="font-medium text-purple-600">🎯 Must-do:</span>
+                <div className="mt-1 space-y-1">
+                  {seasonalInfo.uniqueActivities.slice(0, 2).map((activity, idx) => (
+                    <div key={idx} className="flex items-center gap-2">
+                      <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
+                      <span>{activity}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      }
+      return null;
+    })()}
+    
+    // Park-specific seasonal activities
+    const parkSpecific = {
+      spring: {
+        'yellowstone': ['🌋 Geyser viewing (active season)', '🦌 Wildlife awakening', '🌸 Early wildflowers'],
+        'yosemite': ['💧 Waterfall peak flow', '🌸 Valley wildflowers', '🥾 Mist Trail hiking'],
+        'grand canyon': ['🌅 Perfect sunrise views', '🌡️ Ideal temperatures', '🥾 Rim trail walks'],
+        'zion': ['🌊 Virgin River wading', '🌸 Wildflower blooms', '🥾 Angels Landing prep'],
+        'bryce canyon': ['🌨️ Snow contrast beauty', '🌸 High elevation blooms', '📸 Clear air photography'],
+        'default': ['🌸 Wildflower viewing', '🥾 Spring hiking', '📸 Nature photography']
+      },
+      summer: {
+        'yellowstone': ['🌋 All geysers active', '🚗 Full road access', '⛺ Prime camping'],
+        'yosemite': ['🧗 Rock climbing season', '🥾 High country access', '🏊 Swimming holes'],
+        'grand canyon': ['🌅 Early morning hikes', '🚁 Helicopter tours', '🌙 Star gazing'],
+        'glacier': ['🏔️ Going-to-Sun Road', '🥾 Alpine hiking', '🌸 Wildflower peak'],
+        'default': ['🏕️ Camping', '🚣 Water activities', '🌄 Sunrise viewing']
+      },
+      fall: {
+        'great smoky mountains': ['🍂 Peak fall colors', '🦌 Elk bugling', '🥾 Cool hiking'],
+        'yosemite': ['🍂 Valley floor colors', '📸 Perfect lighting', '🥾 Comfortable temps'],
+        'grand canyon': ['🌅 Clear sky viewing', '🥾 Ideal hiking weather', '🍂 Desert colors'],
+        'zion': ['🍂 Cottonwood colors', '🥾 Perfect hiking temps', '🌊 River activities'],
+        'default': ['🍂 Fall foliage', '📷 Photography', '🥾 Cool weather hiking']
+      },
+      winter: {
+        'yellowstone': ['❄️ Snow landscapes', '🌋 Steaming geysers', '🦅 Winter wildlife'],
+        'grand canyon': ['❄️ Snow-dusted rim', '🥾 Peaceful hiking', '🔥 Cozy lodges'],
+        'yosemite': ['❄️ Snow photography', '⛷️ Cross-country skiing', '🏔️ Alpine beauty'],
+        'death valley': ['🌡️ Perfect temperatures', '🌸 Desert blooms', '🥾 Prime hiking'],
+        'default': ['❄️ Snow activities', '🔥 Winter lodges', '🦅 Wildlife viewing']
+      }
     };
-    return activities[season.id] || activities.spring;
+
+    const seasonKey = season.id;
+    const activities = parkSpecific[seasonKey];
+    
+    // Try to find park-specific activities
+    for (const [key, value] of Object.entries(activities)) {
+      if (key !== 'default' && parkName.includes(key.replace(' ', ''))) {
+        return value;
+      }
+    }
+    
+    // Return default activities for the season
+    return activities.default;
   };
 
   return (
@@ -218,6 +290,47 @@ const SeasonalParkCard = ({ park, season, onView, onPlanTrip, onToggleFavorite, 
               </div>
             )}
           </div>
+          {/* Season-specific why it's famous */}
+          <div className="text-sm text-gray-600 mb-3">
+            <span className="font-medium text-purple-600">🌟 {season.name} Fame:</span>
+            {(() => {
+              const parkName = park.name?.toLowerCase() || '';
+              const whyFamous = {
+                spring: {
+                  'yellowstone': 'Wildlife emerges and geysers are most active',
+                  'yosemite': 'Waterfalls at peak flow from snowmelt',
+                  'grand canyon': 'Perfect weather for rim exploration',
+                  'default': 'Mild weather and blooming wildflowers'
+                },
+                summer: {
+                  'yellowstone': 'All roads open, full park access',
+                  'glacier': 'Going-to-Sun Road fully accessible',
+                  'yosemite': 'High country hiking and climbing',
+                  'default': 'Peak season with full amenities'
+                },
+                fall: {
+                  'great smoky mountains': 'Best fall foliage in the country',
+                  'yosemite': 'Incredible photography lighting',
+                  'grand canyon': 'Crystal clear views and perfect temps',
+                  'default': 'Beautiful autumn colors and cool weather'
+                },
+                winter: {
+                  'yellowstone': 'Magical winter wonderland with steaming features',
+                  'grand canyon': 'Rare snow creates stunning contrasts',
+                  'death valley': 'Perfect temperatures and possible wildflowers',
+                  'default': 'Peaceful solitude and winter beauty'
+                }
+              };
+              
+              const seasonFame = whyFamous[season.id];
+              for (const [key, value] of Object.entries(seasonFame)) {
+                if (key !== 'default' && parkName.includes(key.replace(' ', ''))) {
+                  return value;
+                }
+              }
+              return seasonFame.default;
+            })()}
+          </div>
 
           {/* Seasonal activities */}
           <div className={`bg-gradient-to-r ${season.secondaryColor} p-4 rounded-xl mb-6`}>
@@ -288,19 +401,19 @@ const SeasonControlPanel = ({ currentSeason, isAutoRotating, onToggleAutoRotate,
         {/* Controls */}
         <div className="flex items-center gap-4">
           {/* Season selector */}
-          <div className="flex gap-2">
+          <div className="flex gap-1 md:gap-2">
             {SEASONS.map(season => (
               <button
                 key={season.id}
                 onClick={() => onSeasonChange(season)}
-                className={`p-2 rounded-lg transition-all duration-200 ${
+                className={`p-1.5 md:p-2 rounded-lg transition-all duration-200 ${
                   currentSeason.id === season.id
-                    ? `bg-gradient-to-r ${season.primaryColor} text-white shadow-lg transform scale-110`
+                    ? `bg-gradient-to-r ${season.primaryColor} text-white shadow-lg transform scale-105 md:scale-110`
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                 }`}
                 title={season.name}
               >
-                <span className="text-lg">{season.emoji}</span>
+                <span className="text-base md:text-lg">{season.emoji}</span>
               </button>
             ))}
           </div>
@@ -475,8 +588,8 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
 
   return (
     <div key={key} className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
+      <div className="max-w-7xl mx-auto px-3 md:px-4 py-4 md:py-6">
+        <div className="bg-white/80 backdrop-blur-xl rounded-2xl md:rounded-3xl shadow-xl overflow-hidden">
           
           {/* Dynamic Hero Section */}
           <div className={`relative bg-gradient-to-r ${currentSeason.primaryColor} p-8 text-white overflow-hidden`}>
@@ -520,10 +633,10 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
                   <div className="text-6xl md:text-8xl mb-4 animate-pulse">
                     {currentSeason.emoji}
                   </div>
-                  <h1 className="text-4xl md:text-6xl font-extrabold mb-4">
+                  <h1 className="text-2xl md:text-4xl lg:text-6xl font-extrabold mb-4">
                     {currentSeason.name} National Parks
                   </h1>
-                  <p className="text-xl md:text-2xl text-white/90 max-w-3xl mx-auto mb-6">
+                  <p className="text-base md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto mb-6">
                     {currentSeason.description}
                   </p>
                   <div className="text-lg font-medium bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full inline-block">
@@ -547,7 +660,7 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
 
             {/* Stats Cards */}
             <FadeInWrapper delay={0.2}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6 mb-6 md:mb-8">
                 {[
                   { 
                     label: `${currentSeason.name} Parks`, 
@@ -612,7 +725,7 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
                   </div>
                 </FadeInWrapper>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
                   {seasonalParks.map((park, index) => (
                     <SeasonalParkCard
                       key={park.id}
