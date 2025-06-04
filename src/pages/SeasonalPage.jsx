@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import FadeInWrapper from '../components/FadeInWrapper';
-import { getSeasonalParkInfo } from '../data/seasonalParkData';
 import {
   FaLeaf,
   FaSun,
@@ -30,7 +29,8 @@ import {
   FaMagic,
   FaGlobe,
   FaArrowRight,
-  FaStar
+  FaStar,
+  FaArrowLeft
 } from 'react-icons/fa';
 
 // ===== SEASONAL DATA =====
@@ -125,257 +125,224 @@ const SEASONS = [
   }
 ];
 
-// ===== SEASONAL PARK CARD =====
-const SeasonalParkCard = ({ park, season, onView, onPlanTrip, onToggleFavorite, isFavorite, currentUser, index }) => {
-  const getSeasonalActivity = (park, season) => {
-    const parkName = park.name?.toLowerCase() || '';
-
-    {/* Enhanced park-specific seasonal info */}
-    {(() => {
-      const seasonalInfo = getSeasonalParkInfo(park.name, season.id);
-      if (seasonalInfo) {
-        return (
-          <div className={`bg-gradient-to-r ${season.secondaryColor} p-4 rounded-xl mb-4`}>
-            <div className="font-medium text-sm mb-2 text-gray-700">
-              🌟 Why {park.name} shines in {season.name}:
-            </div>
-            <div className="text-xs text-gray-600 mb-3">
-              {seasonalInfo.whyFamous}
-            </div>
-            <div className="space-y-2">
-              <div className="text-xs">
-                <span className="font-medium text-purple-600">🎯 Must-do:</span>
-                <div className="mt-1 space-y-1">
-                  {seasonalInfo.uniqueActivities.slice(0, 2).map((activity, idx) => (
-                    <div key={idx} className="flex items-center gap-2">
-                      <div className="w-1 h-1 bg-purple-400 rounded-full"></div>
-                      <span>{activity}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+// ===== SEASONAL PARK DATA =====
+const getSeasonalParkInfo = (parkName, season) => {
+  const seasonalData = {
+    'Yellowstone National Park': {
+      spring: { 
+        whyFamous: 'Wildlife emerges from winter hibernation and geysers are most active in mild weather',
+        uniqueActivities: ['Bear and wolf watching', 'Geyser photography', 'Early wildflower hikes', 'Bison calving season']
+      },
+      summer: { 
+        whyFamous: 'All roads open providing full park access with peak wildlife activity and extended daylight',
+        uniqueActivities: ['Backcountry camping', 'Grand Loop Road tour', 'Fishing in pristine lakes', 'Ranger programs']
+      },
+      fall: { 
+        whyFamous: 'Elk bugling season creates magical soundscapes while autumn colors paint the landscape',
+        uniqueActivities: ['Elk photography', 'Fall foliage drives', 'Cooler hiking weather', 'Thermal feature viewing']
+      },
+      winter: { 
+        whyFamous: 'Magical winter wonderland with steaming geysers creating dramatic contrasts against snow',
+        uniqueActivities: ['Snowcoach tours', 'Cross-country skiing', 'Winter wildlife tracking', 'Ice photography']
       }
-      return null;
-    })()}
-    
-    // Park-specific seasonal activities
-    const parkSpecific = {
-      spring: {
-        'yellowstone': ['🌋 Geyser viewing (active season)', '🦌 Wildlife awakening', '🌸 Early wildflowers'],
-        'yosemite': ['💧 Waterfall peak flow', '🌸 Valley wildflowers', '🥾 Mist Trail hiking'],
-        'grand canyon': ['🌅 Perfect sunrise views', '🌡️ Ideal temperatures', '🥾 Rim trail walks'],
-        'zion': ['🌊 Virgin River wading', '🌸 Wildflower blooms', '🥾 Angels Landing prep'],
-        'bryce canyon': ['🌨️ Snow contrast beauty', '🌸 High elevation blooms', '📸 Clear air photography'],
-        'default': ['🌸 Wildflower viewing', '🥾 Spring hiking', '📸 Nature photography']
+    },
+    'Yosemite National Park': {
+      spring: { 
+        whyFamous: 'Waterfalls reach peak flow from snowmelt while wildflowers carpet the valley floor',
+        uniqueActivities: ['Waterfall photography', 'Valley wildflower walks', 'Mist Trail hiking', 'Rock climbing prep']
       },
-      summer: {
-        'yellowstone': ['🌋 All geysers active', '🚗 Full road access', '⛺ Prime camping'],
-        'yosemite': ['🧗 Rock climbing season', '🥾 High country access', '🏊 Swimming holes'],
-        'grand canyon': ['🌅 Early morning hikes', '🚁 Helicopter tours', '🌙 Star gazing'],
-        'glacier': ['🏔️ Going-to-Sun Road', '🥾 Alpine hiking', '🌸 Wildflower peak'],
-        'default': ['🏕️ Camping', '🚣 Water activities', '🌄 Sunrise viewing']
+      summer: { 
+        whyFamous: 'High country becomes accessible for alpine adventures and rock climbing reaches its peak',
+        uniqueActivities: ['Half Dome permits', 'High Sierra camps', 'Rock climbing courses', 'Backcountry permits']
       },
-      fall: {
-        'great smoky mountains': ['🍂 Peak fall colors', '🦌 Elk bugling', '🥾 Cool hiking'],
-        'yosemite': ['🍂 Valley floor colors', '📸 Perfect lighting', '🥾 Comfortable temps'],
-        'grand canyon': ['🌅 Clear sky viewing', '🥾 Ideal hiking weather', '🍂 Desert colors'],
-        'zion': ['🍂 Cottonwood colors', '🥾 Perfect hiking temps', '🌊 River activities'],
-        'default': ['🍂 Fall foliage', '📷 Photography', '🥾 Cool weather hiking']
+      fall: { 
+        whyFamous: 'Perfect weather combines with stunning autumn colors and crystal-clear mountain air',
+        uniqueActivities: ['Fall color photography', 'Comfortable valley hikes', 'Clear granite views', 'Peaceful camping']
       },
-      winter: {
-        'yellowstone': ['❄️ Snow landscapes', '🌋 Steaming geysers', '🦅 Winter wildlife'],
-        'grand canyon': ['❄️ Snow-dusted rim', '🥾 Peaceful hiking', '🔥 Cozy lodges'],
-        'yosemite': ['❄️ Snow photography', '⛷️ Cross-country skiing', '🏔️ Alpine beauty'],
-        'death valley': ['🌡️ Perfect temperatures', '🌸 Desert blooms', '🥾 Prime hiking'],
-        'default': ['❄️ Snow activities', '🔥 Winter lodges', '🦅 Wildlife viewing']
+      winter: { 
+        whyFamous: 'Snow-covered granite domes create a pristine winter landscape perfect for photography',
+        uniqueActivities: ['Winter photography workshops', 'Snowshoeing adventures', 'Cozy lodge stays', 'Ice skating']
       }
-    };
-
-    const seasonKey = season.id;
-    const activities = parkSpecific[seasonKey];
-    
-    // Try to find park-specific activities
-    for (const [key, value] of Object.entries(activities)) {
-      if (key !== 'default' && parkName.includes(key.replace(' ', ''))) {
-        return value;
+    },
+    'Grand Canyon National Park': {
+      spring: { 
+        whyFamous: 'Perfect hiking weather with mild temperatures ideal for rim and inner canyon exploration',
+        uniqueActivities: ['South Rim walks', 'Desert wildflower viewing', 'Perfect sunrise viewing', 'Comfortable camping']
+      },
+      summer: { 
+        whyFamous: 'Extended daylight hours maximize viewing time despite challenging heat conditions',
+        uniqueActivities: ['Early morning hikes', 'Helicopter tours', 'River rafting', 'Sunset photography']
+      },
+      fall: { 
+        whyFamous: 'Ideal temperatures create perfect conditions with crystal clear views and comfortable hiking',
+        uniqueActivities: ['Rim-to-rim hikes', 'Fall color photography', 'Comfortable camping', 'Clear stargazing']
+      },
+      winter: { 
+        whyFamous: 'Rare snow creates stunning contrasts between white snow and red rocks with peaceful solitude',
+        uniqueActivities: ['Snow photography', 'Peaceful rim walks', 'Winter wildlife viewing', 'Cozy lodge visits']
+      }
+    },
+    'Zion National Park': {
+      spring: { 
+        whyFamous: 'River levels are perfect for wading while desert wildflowers create colorful displays',
+        uniqueActivities: ['Virgin River wading', 'Wildflower photography', 'Angels Landing prep', 'Canyon photography']
+      },
+      summer: { 
+        whyFamous: 'Peak adventure season with all trails open despite intense heat requiring early starts',
+        uniqueActivities: ['The Narrows wading', 'Early morning hikes', 'Shuttle system tours', 'Photography workshops']
+      },
+      fall: { 
+        whyFamous: 'Cottonwood trees turn golden while perfect temperatures make hiking incredibly comfortable',
+        uniqueActivities: ['Fall foliage walks', 'Comfortable long hikes', 'Perfect photography light', 'River activities']
+      },
+      winter: { 
+        whyFamous: 'Mild winter weather provides peaceful exploration with occasional snow-dusted red rocks',
+        uniqueActivities: ['Peaceful hiking', 'Winter photography', 'Comfortable camping', 'Solitude experiences']
+      }
+    },
+    'Bryce Canyon National Park': {
+      spring: { 
+        whyFamous: 'Snow contrasts beautifully with red hoodoos while high elevation wildflowers begin blooming',
+        uniqueActivities: ['Hoodoo photography', 'Spring wildflowers', 'Clear air photography', 'Comfortable rim walks']
+      },
+      summer: { 
+        whyFamous: 'Perfect temperatures at high elevation provide relief from desert heat with extended daylight',
+        uniqueActivities: ['Sunrise Point viewing', 'Cool hiking weather', 'Star gazing programs', 'Photography workshops']
+      },
+      fall: { 
+        whyFamous: 'Autumn colors complement the red rocks while crisp air creates incredible visibility',
+        uniqueActivities: ['Fall color photography', 'Perfect hiking weather', 'Clear sunrise viewing', 'Comfortable camping']
+      },
+      winter: { 
+        whyFamous: 'Snow-covered hoodoos create a magical winter landscape with incredible photographic opportunities',
+        uniqueActivities: ['Snow photography', 'Winter hiking', 'Snowshoeing trails', 'Peaceful winter visits']
       }
     }
-    
-    // Return default activities for the season
-    return activities.default;
+  };
+  
+  return seasonalData[parkName]?.[season] || { 
+    whyFamous: `Perfect ${season} destination with ideal weather and seasonal activities`,
+    uniqueActivities: ['Seasonal hiking', 'Photography opportunities', 'Wildlife viewing', 'Scenic exploration']
+  };
+};
+
+// ===== SEASONAL PARK CARD (LIST FORMAT) =====
+const SeasonalParkCard = ({ park, season, onView, onPlanTrip, onToggleFavorite, isFavorite, currentUser, index }) => {
+  const seasonalInfo = getSeasonalParkInfo(park.name, season.id);
+  
+  const getSeasonalActivity = (park, season) => {
+    return seasonalInfo.uniqueActivities || [
+      `${season.name} hiking`,
+      `${season.name} photography`,
+      `${season.name} wildlife viewing`,
+      `${season.name} scenic drives`
+    ];
   };
 
   return (
-    <FadeInWrapper delay={index * 0.15}>
-      <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:rotate-1">
-        {/* Seasonal Header */}
-        <div className={`bg-gradient-to-br ${season.primaryColor} p-6 text-white relative overflow-hidden`}>
-          <div className="absolute inset-0 bg-black/10"></div>
-          
-          {/* Animated background elements */}
-          <div className="absolute inset-0">
-            {season.id === 'spring' && (
-              <>
-                <div className="absolute top-2 right-4 text-2xl animate-bounce delay-300">🌸</div>
-                <div className="absolute top-8 right-12 text-lg animate-bounce delay-700">🦋</div>
-              </>
-            )}
-            {season.id === 'summer' && (
-              <>
-                <div className="absolute top-2 right-4 text-2xl animate-pulse">☀️</div>
-                <div className="absolute top-8 right-12 text-lg animate-pulse delay-500">🌞</div>
-              </>
-            )}
-            {season.id === 'fall' && (
-              <>
-                <div className="absolute top-2 right-4 text-2xl animate-bounce">🍂</div>
-                <div className="absolute top-8 right-12 text-lg animate-bounce delay-300">🍁</div>
-              </>
-            )}
-            {season.id === 'winter' && (
-              <>
-                <div className="absolute top-2 right-4 text-2xl animate-bounce">❄️</div>
-                <div className="absolute top-8 right-12 text-lg animate-bounce delay-200">✨</div>
-              </>
-            )}
+    <FadeInWrapper delay={index * 0.1}>
+      <div className="group bg-white rounded-xl border border-gray-100 hover:shadow-lg transition-all duration-300 p-6 mb-4">
+        {/* Header with season badge */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="text-3xl animate-pulse">{season.emoji}</div>
+            <div>
+              <h3 className="text-xl font-bold text-gray-800 group-hover:text-purple-600 transition-colors">
+                {park.name}
+              </h3>
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <FaMapMarkerAlt className="text-pink-500" />
+                <span>{park.state}</span>
+                {park.entryFee && (
+                  <>
+                    <span>•</span>
+                    <span className="text-green-600 font-medium">
+                      Entry: ${park.entryFee}
+                    </span>
+                  </>
+                )}
+              </div>
+            </div>
           </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h3 className="text-xl font-bold mb-1 group-hover:scale-105 transition-transform duration-300">
-                  {park.name}
-                </h3>
-                <div className="flex items-center gap-2 text-sm opacity-90">
-                  <FaMapMarkerAlt />
-                  <span>{park.state}</span>
-                </div>
-              </div>
-              
-              {/* Seasonal badge */}
-              <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-                Perfect for {season.name}
-              </div>
-            </div>
-            
-            {/* Season-specific tag */}
-            <div className="flex items-center gap-2 text-sm bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full w-fit">
-              <span className="text-lg">{season.emoji}</span>
-              <span>Best in {season.name}</span>
-            </div>
+          <div className={`bg-gradient-to-r ${season.primaryColor} text-white px-4 py-2 rounded-full text-sm font-medium shadow-lg`}>
+            Perfect for {season.name}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {/* Park info */}
-          <div className="space-y-3 mb-6">
-            {park.entryFee && (
-              <div className="flex items-center gap-2 text-sm">
-                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                  Entry: ${park.entryFee}
-                </span>
-                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-                  {season.avgTemperature}
-                </span>
-              </div>
-            )}
-            
-            {park.highlight && (
-              <div className="text-sm text-gray-600">
-                <span className="font-medium text-purple-600">🎯 {season.name} Highlight:</span> {park.highlight}
-              </div>
-            )}
+        {/* Seasonal info */}
+        <div className={`bg-gradient-to-r ${season.secondaryColor} p-5 rounded-xl mb-4 border-l-4 ${season.primaryColor.replace('from-', 'border-').split(' ')[0]}`}>
+          <div className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <span className="text-lg">🌟</span>
+            Why {park.name} shines in {season.name}:
           </div>
-          {/* Season-specific why it's famous */}
-          <div className="text-sm text-gray-600 mb-3">
-            <span className="font-medium text-purple-600">🌟 {season.name} Fame:</span>
-            {(() => {
-              const parkName = park.name?.toLowerCase() || '';
-              const whyFamous = {
-                spring: {
-                  'yellowstone': 'Wildlife emerges and geysers are most active',
-                  'yosemite': 'Waterfalls at peak flow from snowmelt',
-                  'grand canyon': 'Perfect weather for rim exploration',
-                  'default': 'Mild weather and blooming wildflowers'
-                },
-                summer: {
-                  'yellowstone': 'All roads open, full park access',
-                  'glacier': 'Going-to-Sun Road fully accessible',
-                  'yosemite': 'High country hiking and climbing',
-                  'default': 'Peak season with full amenities'
-                },
-                fall: {
-                  'great smoky mountains': 'Best fall foliage in the country',
-                  'yosemite': 'Incredible photography lighting',
-                  'grand canyon': 'Crystal clear views and perfect temps',
-                  'default': 'Beautiful autumn colors and cool weather'
-                },
-                winter: {
-                  'yellowstone': 'Magical winter wonderland with steaming features',
-                  'grand canyon': 'Rare snow creates stunning contrasts',
-                  'death valley': 'Perfect temperatures and possible wildflowers',
-                  'default': 'Peaceful solitude and winter beauty'
-                }
-              };
-              
-              const seasonFame = whyFamous[season.id];
-              for (const [key, value] of Object.entries(seasonFame)) {
-                if (key !== 'default' && parkName.includes(key.replace(' ', ''))) {
-                  return value;
-                }
-              }
-              return seasonFame.default;
-            })()}
+          <div className="text-gray-700 mb-4 leading-relaxed">
+            {seasonalInfo.whyFamous}
           </div>
-
-          {/* Seasonal activities */}
-          <div className={`bg-gradient-to-r ${season.secondaryColor} p-4 rounded-xl mb-6`}>
-            <div className="font-medium text-sm mb-2 text-gray-700">Perfect {season.name} Activities:</div>
-            <div className="space-y-1">
-              {getSeasonalActivity(park, season).slice(0, 2).map((activity, idx) => (
-                <div key={idx} className="text-xs text-gray-600 flex items-center gap-2">
-                  <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+          
+          {/* Must-do activities */}
+          <div className="space-y-2">
+            <div className="font-medium text-purple-700 flex items-center gap-2">
+              <span>🎯</span>
+              Must-do {season.name} activities:
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {getSeasonalActivity(park, season).slice(0, 4).map((activity, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="w-2 h-2 bg-purple-400 rounded-full flex-shrink-0"></div>
                   <span>{activity}</span>
                 </div>
               ))}
             </div>
           </div>
+        </div>
 
-          {/* Action buttons */}
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <button
-                onClick={() => onView(park)}
-                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2 transform hover:scale-105"
-              >
-                <FaEye /> Explore
-              </button>
-              <button
-                onClick={() => onPlanTrip(park)}
-                className={`flex-1 bg-gradient-to-r ${season.primaryColor} text-white py-2 px-4 rounded-lg transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2 transform hover:scale-105`}
-              >
-                <FaRoute /> Plan {season.name} Trip
-              </button>
-            </div>
-            
-            {currentUser && (
-              <button
-                onClick={() => onToggleFavorite(park.id)}
-                className={`w-full py-2 px-4 rounded-lg transition-all duration-200 font-medium text-sm flex items-center justify-center gap-2 ${
-                  isFavorite
-                    ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <FaHeart />
-                {isFavorite ? 'Saved to Favorites' : 'Save to Favorites'}
-              </button>
-            )}
+        {/* Additional park info */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+          <div className="bg-gray-50 p-3 rounded-lg text-center">
+            <div className="text-2xl mb-1">{season.weatherIcon}</div>
+            <div className="text-xs font-medium text-gray-700">Temperature</div>
+            <div className="text-sm text-gray-600">{season.avgTemperature}</div>
           </div>
+          <div className="bg-gray-50 p-3 rounded-lg text-center">
+            <div className="text-2xl mb-1">👥</div>
+            <div className="text-xs font-medium text-gray-700">Crowd Level</div>
+            <div className="text-sm text-gray-600">{season.crowdLevel}</div>
+          </div>
+          {park.bestSeason && (
+            <div className="bg-gray-50 p-3 rounded-lg text-center">
+              <div className="text-2xl mb-1">⭐</div>
+              <div className="text-xs font-medium text-gray-700">Best Season</div>
+              <div className="text-sm text-gray-600">{park.bestSeason}</div>
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex gap-3">
+          <button
+            onClick={() => onView(park)}
+            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <FaEye /> Explore Park
+          </button>
+          <button
+            onClick={() => onPlanTrip(park)}
+            className={`flex-1 bg-gradient-to-r ${season.primaryColor} text-white py-3 px-4 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105`}
+          >
+            <FaRoute /> Plan {season.name} Trip
+          </button>
+          {currentUser && (
+            <button
+              onClick={() => onToggleFavorite(park.id)}
+              className={`px-4 py-3 rounded-xl transition-all duration-200 font-medium flex items-center justify-center gap-2 ${
+                isFavorite
+                  ? 'bg-red-100 text-red-600 hover:bg-red-200'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <FaHeart />
+            </button>
+          )}
         </div>
       </div>
     </FadeInWrapper>
@@ -629,19 +596,31 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
             
             <div className="relative z-10">
               <FadeInWrapper delay={0.1}>
-                <div className="text-center">
-                  <div className="text-6xl md:text-8xl mb-4 animate-pulse">
-                    {currentSeason.emoji}
+                <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+                  <div className="text-center lg:text-left">
+                    <div className="text-6xl md:text-8xl mb-4 animate-pulse">
+                      {currentSeason.emoji}
+                    </div>
+                    <h1 className="text-2xl md:text-4xl lg:text-6xl font-extrabold mb-4">
+                      {currentSeason.name} National Parks
+                    </h1>
+                    <p className="text-base md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto lg:mx-0 mb-6">
+                      {currentSeason.description}
+                    </p>
+                    <div className="text-lg font-medium bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full inline-block">
+                      {currentSeason.tagline}
+                    </div>
                   </div>
-                  <h1 className="text-2xl md:text-4xl lg:text-6xl font-extrabold mb-4">
-                    {currentSeason.name} National Parks
-                  </h1>
-                  <p className="text-base md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto mb-6">
-                    {currentSeason.description}
-                  </p>
-                  <div className="text-lg font-medium bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full inline-block">
-                    {currentSeason.tagline}
-                  </div>
+                  
+                  {/* Back to Explore Button */}
+                  <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-xl hover:bg-white/30 transition-all duration-200 border border-white/30"
+                  >
+                    <FaArrowLeft />
+                    <span className="hidden md:inline">Back to Explore</span>
+                    <span className="md:hidden">Back</span>
+                  </Link>
                 </div>
               </FadeInWrapper>
             </div>
@@ -711,7 +690,7 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
             {/* Seasonal Insights Panel */}
             <SeasonalInsightsPanel season={currentSeason} parksCount={seasonalParks.length} />
 
-            {/* Parks Grid */}
+            {/* Parks List */}
             {seasonalParks.length > 0 ? (
               <div className="space-y-6">
                 <FadeInWrapper delay={0.4}>
@@ -725,7 +704,7 @@ const SeasonalPage = ({ parks, favorites, toggleFavorite }) => {
                   </div>
                 </FadeInWrapper>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+                <div className="space-y-4">
                   {seasonalParks.map((park, index) => (
                     <SeasonalParkCard
                       key={park.id}

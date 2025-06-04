@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import FadeInWrapper from '../components/FadeInWrapper';
@@ -28,7 +28,8 @@ import {
   FaLightbulb,
   FaTarget,
   FaMagic,
-  FaRocket
+  FaRocket,
+  FaArrowLeft
 } from 'react-icons/fa';
 
 // ===== RECOMMENDATION ENGINE =====
@@ -341,31 +342,26 @@ const RecommendationCategories = ({ recommendations, onCategorySelect, activeCat
   );
 };
 
-// ===== RECOMMENDATION CARD =====
+// ===== SIMPLIFIED RECOMMENDATION CARD =====
 const RecommendationCard = ({ recommendation, onView, onPlanTrip, onToggleFavorite, isFavorite, currentUser }) => {
-  const [showDetails, setShowDetails] = useState(false);
-
   return (
     <FadeInWrapper delay={Math.random() * 0.5}>
       <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-        {/* Header with confidence and category */}
-        <div className={`bg-gradient-to-r ${recommendation.color} p-4 text-white relative overflow-hidden`}>
+        {/* Simplified header with confidence and category */}
+        <div className={`bg-gradient-to-r ${recommendation.color} p-6 text-white relative overflow-hidden`}>
           <div className="absolute inset-0 bg-black/10"></div>
           <div className="relative z-10">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">{recommendation.icon}</span>
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl">{recommendation.icon}</span>
                 <div>
-                  <div className="font-semibold text-sm">{recommendation.category}</div>
-                  <div className="text-xs opacity-90">{recommendation.recommendationType}</div>
+                  <div className="font-bold text-lg">{recommendation.category}</div>
+                  <div className="text-sm opacity-90">{recommendation.confidence}% Match</div>
                 </div>
-              </div>
-              <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold">
-                {recommendation.confidence}% Match
               </div>
             </div>
             
-            <h3 className="text-lg font-bold mb-2 line-clamp-1">
+            <h3 className="text-xl font-bold mb-2 line-clamp-2">
               {recommendation.name}
             </h3>
             
@@ -376,45 +372,38 @@ const RecommendationCard = ({ recommendation, onView, onPlanTrip, onToggleFavori
           </div>
         </div>
 
-        {/* Content */}
+        {/* Simplified content */}
         <div className="p-6">
-          {/* AI Reason */}
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl mb-4 border border-purple-200">
-            <div className="flex items-start gap-3">
-              <FaBrain className="text-purple-600 mt-1 flex-shrink-0" />
-              <div>
-                <div className="font-medium text-purple-800 text-sm mb-1">AI Insight</div>
-                <div className="text-purple-700 text-sm">{recommendation.reason}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Park Details */}
-          <div className="space-y-2 mb-4">
+          {/* Basic park info */}
+          <div className="space-y-3 mb-6">
             {recommendation.entryFee && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
                   Entry: ${recommendation.entryFee}
                 </span>
-              </div>
-            )}
-            
-            {recommendation.bestSeason && (
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs font-medium">
-                  Best: {recommendation.bestSeason}
-                </span>
+                {recommendation.bestSeason && (
+                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+                    Best: {recommendation.bestSeason}
+                  </span>
+                )}
               </div>
             )}
             
             {recommendation.highlight && (
               <div className="text-sm text-gray-600">
-                <span className="font-medium text-purple-600">Highlight:</span> {recommendation.highlight}
+                <span className="font-medium text-purple-600">🎯 Highlight:</span> {recommendation.highlight}
               </div>
             )}
+
+            {/* Simple reason display */}
+            <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+              <div className="text-sm text-purple-700">
+                <span className="font-medium">Why recommended:</span> {recommendation.reason}
+              </div>
+            </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action buttons */}
           <div className="space-y-3">
             <div className="flex gap-2">
               <button
@@ -514,8 +503,7 @@ const RecommendationsPage = ({ parks, favorites, toggleFavorite }) => {
     categories: [...new Set(recommendations.map(r => r.category))].length,
     avgConfidence: recommendations.length > 0 
       ? Math.round(recommendations.reduce((sum, r) => sum + r.confidence, 0) / recommendations.length)
-      : 0,
-    personalizedCount: recommendations.filter(r => r.recommendationType === 'similar-users' || r.recommendationType === 'content-based').length
+      : 0
   };
 
   return (
@@ -547,16 +535,26 @@ const RecommendationsPage = ({ parks, favorites, toggleFavorite }) => {
                       <FaSync className={`${refreshing ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-300`} />
                       {refreshing ? 'Refreshing...' : 'Refresh AI'}
                     </button>
+                    
+                    {/* Back to Explore Button */}
+                    <Link
+                      to="/"
+                      className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-xl hover:bg-white/30 transition-all duration-200 border border-white/30"
+                    >
+                      <FaArrowLeft />
+                      <span className="hidden md:inline">Back to Explore</span>
+                      <span className="md:hidden">Back</span>
+                    </Link>
                   </div>
                 </div>
               </FadeInWrapper>
             </div>
           </div>
 
-          {/* Stats Dashboard */}
+          {/* Simplified Stats Dashboard */}
           <div className="p-8">
             <FadeInWrapper delay={0.2}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {[
                   { 
                     label: 'AI Recommendations', 
@@ -578,13 +576,6 @@ const RecommendationsPage = ({ parks, favorites, toggleFavorite }) => {
                     icon: '✨', 
                     color: 'from-green-500 to-emerald-500',
                     description: 'AI accuracy score'
-                  },
-                  { 
-                    label: 'Personalized', 
-                    value: stats.personalizedCount, 
-                    icon: '👤', 
-                    color: 'from-orange-500 to-red-500',
-                    description: 'Based on your taste'
                   }
                 ].map((stat, index) => (
                   <FadeInWrapper key={stat.label} delay={index * 0.1}>
@@ -663,7 +654,7 @@ const RecommendationsPage = ({ parks, favorites, toggleFavorite }) => {
                   </FadeInWrapper>
                 )}
 
-                {/* AI Insights Panel */}
+                {/* Simplified AI Insights Panel */}
                 <FadeInWrapper delay={0.6}>
                   <div className="mt-12 bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-200">
                     <div className="flex items-center gap-3 mb-6">
@@ -676,23 +667,51 @@ const RecommendationsPage = ({ parks, favorites, toggleFavorite }) => {
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="bg-white p-6 rounded-xl shadow-sm">
                         <div className="text-3xl mb-3">🔍</div>
                         <h4 className="font-semibold text-purple-800 mb-2">Content Analysis</h4>
-                        <p className="text-sm text-purple-600">Analyzes park features, activities, and characteristics you enjoy</p>
+                        <p className="text-sm text-purple-600">Analyzes park features, activities, and characteristics you enjoy to find similar destinations</p>
                       </div>
                       
                       <div className="bg-white p-6 rounded-xl shadow-sm">
                         <div className="text-3xl mb-3">👥</div>
                         <h4 className="font-semibold text-purple-800 mb-2">Collaborative Filtering</h4>
-                        <p className="text-sm text-purple-600">Finds parks loved by users with similar preferences to yours</p>
+                        <p className="text-sm text-purple-600">Finds parks loved by users with similar preferences and travel patterns</p>
                       </div>
+                    </div>
+                  </div>
+                </FadeInWrapper>
+
+                {/* Call to Action */}
+                <FadeInWrapper delay={0.7}>
+                  <div className="mt-12 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-2xl p-8 text-white text-center relative overflow-hidden">
+                    <div className="absolute inset-0 bg-black/10"></div>
+                    
+                    <div className="relative z-10">
+                      <h2 className="text-3xl font-bold mb-4">
+                        Ready to Explore These Recommendations?
+                      </h2>
+                      <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+                        Start planning your next adventure with AI-powered park suggestions!
+                      </p>
                       
-                      <div className="bg-white p-6 rounded-xl shadow-sm">
-                        <div className="text-3xl mb-3">🌍</div>
-                        <h4 className="font-semibold text-purple-800 mb-2">Geographic Intelligence</h4>
-                        <p className="text-sm text-purple-600">Considers location, climate, and seasonal factors for perfect timing</p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button
+                          onClick={() => navigate('/trip-planner')}
+                          className="inline-flex items-center gap-2 bg-white text-gray-800 px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-200 font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+                        >
+                          <FaRoute />
+                          Plan Your Trip
+                        </button>
+                        
+                        <button
+                          onClick={() => navigate('/seasonal')}
+                          className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-xl hover:bg-white/30 transition-all duration-200 font-bold text-lg border-2 border-white/30 hover:border-white/50"
+                        >
+                          <FaCalendarAlt />
+                          Seasonal Guide
+                        </button>
                       </div>
                     </div>
                   </div>

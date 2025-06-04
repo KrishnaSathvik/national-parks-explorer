@@ -85,14 +85,6 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
       color: 'from-purple-500 to-indigo-500',
       action: () => onActionClick('recommendations')
     },
-    {
-      id: 'favorites',
-      icon: '❤️',
-      title: 'My Favorites',
-      description: `${favorites.length} saved parks`,
-      color: 'from-red-500 to-pink-500',
-      action: () => onActionClick('favorites')
-    }
   ];
 
   return (
@@ -506,15 +498,6 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         navigate('/recommendations');
         showToast('🧠 AI recommendations loading...', 'info');
         break;
-      case 'favorites':
-        if (favorites.length === 0) {
-          showToast('❤️ Start favoriting parks to build your collection!', 'info');
-        } else {
-          showToast('Showing your favorite parks', 'info');
-          // Filter current view to show only favorites
-          // You can implement this by updating the filtered array
-        }
-        break;
       case 'analytics':
         showToast('Analytics feature coming soon!', 'info');
         break;
@@ -611,7 +594,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
   const renderStatsCards = () => (
     <FadeInWrapper delay={0.2}>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {[
           { 
             label: 'Total Parks', 

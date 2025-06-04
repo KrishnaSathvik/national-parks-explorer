@@ -9,6 +9,7 @@ import TripList from '../components/TripList';
 import TripViewer from '../components/TripViewer';
 import FadeInWrapper from '../components/FadeInWrapper';
 import { useLocation } from 'react-router-dom';
+import { Link } from "react-router-dom";
 import { FaPlus, FaRoute, FaCalendarAlt, FaChartBar, FaStar, FaBrain, FaMapMarkerAlt, FaDollarSign } from 'react-icons/fa';
 
 const TripPlanner = () => {
@@ -712,6 +713,15 @@ const TripPlanner = () => {
                       Plan your perfect national parks adventure with smart tools and beautiful visualizations.
                     </p>
                   </div>
+                  <div className="flex flex-col gap-3">
+                  <Link
+                    to="/"
+                    className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-4 py-2 rounded-xl hover:bg-white/30 transition-all duration-200 border border-white/30"
+                  >
+                    <FaArrowLeft />
+                    <span className="hidden md:inline">Back to Explore</span>
+                    <span className="md:hidden">Back</span>
+                  </Link>
                   {(currentTab === 'my-trips' && !activeTrip) && (
                     <button 
                       onClick={createNewTrip}
@@ -722,6 +732,7 @@ const TripPlanner = () => {
                       <span className="sm:hidden">New Trip</span>
                     </button>
                   )}
+                </div>
                 </div>
               </FadeInWrapper>
             </div>
