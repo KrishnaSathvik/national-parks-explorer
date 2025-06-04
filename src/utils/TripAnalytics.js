@@ -7,19 +7,28 @@ export class TripAnalytics {
    * @returns {Object} Complete analytics insights
    */
   static generateInsights(userTrips, allTrips = []) {
-    if (!userTrips || userTrips.length === 0) {
+    // Validate and sanitize input data
+    const validUserTrips = this.validateAndSanitizeTrips(userTrips);
+    const validAllTrips = this.validateAndSanitizeTrips(allTrips);
+    
+    if (validUserTrips.length === 0) {
       return this.getEmptyInsights();
     }
-
-    return {
-      personalPreferences: this.analyzePersonalPreferences(userTrips),
-      benchmarkComparisons: this.compareToBenchmarks(userTrips, allTrips),
-      recommendations: this.generateRecommendations(userTrips),
-      trendAnalysis: this.analyzeTrends(userTrips),
-      costOptimization: this.analyzeCostPatterns(userTrips),
-      travelPatterns: this.analyzeTravelPatterns(userTrips),
-      efficiency: this.analyzeEfficiency(userTrips)
-    };
+    
+    try {
+      return {
+        personalPreferences: this.analyzePersonalPreferences(validUserTrips),
+        benchmarkComparisons: this.compareToBenchmarks(validUserTrips, validAllTrips),
+        recommendations: this.generateRecommendations(validUserTrips),
+        trendAnalysis: this.analyzeTrends(validUserTrips),
+        costOptimization: this.analyzeCostPatterns(validUserTrips),
+        travelPatterns: this.analyzeTravelPatterns(validUserTrips),
+        efficiency: this.analyzeEfficiency(validUserTrips)
+      };
+    } catch (error) {
+      console.error('Error generating insights:', error);
+      return this.getEmptyInsights();
+    }
   }
 
   /**
@@ -28,6 +37,11 @@ export class TripAnalytics {
    * @returns {Object} Personal preference data
    */
   static analyzePersonalPreferences(trips) {
+    // Validate input
+    if (!Array.isArray(trips) || trips.length === 0) {
+      return this.getEmptyPreferences();
+    }
+
     const preferences = {
       favoriteRegions: {},
       preferredDuration: [],
@@ -38,25 +52,32 @@ export class TripAnalytics {
     };
 
     trips.forEach(trip => {
-      // Analyze regions
-      trip.parks?.forEach(park => {
-        const region = this.getRegion(park.state);
-        preferences.favoriteRegions[region] = (preferences.favoriteRegions[region] || 0) + 1;
-        
-        // Analyze park types
-        const parkType = this.getParkType(park.parkName);
-        preferences.parkTypes[parkType] = (preferences.parkTypes[parkType] || 0) + 1;
-      });
-
-      // Analyze duration patterns
-      if (trip.totalDuration || trip.startDate && trip.endDate) {
-        const duration = trip.totalDuration || this.calculateDuration(trip.startDate, trip.endDate);
-        preferences.preferredDuration.push(duration);
+      // Validate trip structure
+      if (!trip || typeof trip !== 'object') return;
+      
+      // Analyze regions - with better validation
+      if (Array.isArray(trip.parks)) {
+        trip.parks.forEach(park => {
+          if (!park || typeof park !== 'object') return;
+          const region = this.getRegion(park.state);
+          preferences.favoriteRegions[region] = (preferences.favoriteRegions[region] || 0) + 1;
+          
+          // Analyze park types
+          const parkType = this.getParkType(park.parkName);
+          preferences.parkTypes[parkType] = (preferences.parkTypes[parkType] || 0) + 1;
+        });
       }
 
-      // Analyze budget patterns
-      if (trip.estimatedCost) {
-        preferences.budgetRange.push(trip.estimatedCost);
+      // Analyze duration patterns with validation
+      const tripDuration = this.extractValidDuration(trip);
+      if (tripDuration > 0) {
+        preferences.preferredDuration.push(tripDuration);
+      }
+
+      // Analyze budget patterns with validation
+      const cost = Number(trip.estimatedCost);
+      if (cost && !isNaN(cost) && cost > 0) {
+        preferences.budgetRange.push(cost);
       }
 
       // Analyze seasonality
@@ -65,9 +86,13 @@ export class TripAnalytics {
         preferences.seasonality[season]++;
       }
 
-      // Analyze transportation
-      if (trip.transportationMode) {
-        preferences.transportationPreference[trip.transportationMode]++;
+      // Analyze transportation with validation
+      const mode = trip.transportationMode;
+      if (mode === 'driving' || mode === 'flying') {
+        preferences.transportationPreference[mode]++;
+      } else {
+        // Default to driving if mode is undefined or invalid
+        preferences.transportationPreference.driving++;
       }
     });
 
@@ -345,53 +370,66 @@ export class TripAnalytics {
   }
 
   /**
-     * Analyzes overall trip efficiency metrics
-     * @param {Array} trips - User's trips
-     * @returns {Object} Efficiency analysis
-     */
-    static analyzeEfficiency(trips) {
-      let totalDistance = 0;
-      let totalCost = 0;
-      let totalDuration = 0;
-      let totalParks = 0;
-
-      trips.forEach(trip => {
-        totalDistance += trip.totalDistance || 0;
-        totalCost += trip.estimatedCost || 0;
-        totalDuration += trip.totalDuration || 0;
-        totalParks += trip.parks?.length || 0;
-      });
-
-      const costPerDay = totalDuration > 0 ? Math.round(totalCost / totalDuration) : 0;
-      const costPerPark = totalParks > 0 ? Math.round(totalCost / totalParks) : 0;
-      const milesPerDay = totalDuration > 0 ? Math.round(totalDistance / totalDuration) : 0;
-      const parksPerTrip = trips.length > 0 ? Math.round((totalParks / trips.length) * 10) / 10 : 0;
-      const efficiencyScore = this.calculateEfficiencyScore(trips);
-
-      // Generate recommendations directly here instead of calling separate method
-      const recommendations = [];
-      
-      if (costPerDay > 250) {
-        recommendations.push('Consider longer trips to reduce daily costs');
-      }
-      
-      if (milesPerDay > 300) {
-        recommendations.push('Plan shorter driving days for better enjoyment');
-      }
-      
-      if (parksPerTrip < 2) {
-        recommendations.push('Combine nearby parks in single trips for better efficiency');
-      }
-
+   * Analyzes overall trip efficiency metrics
+   * @param {Array} trips - User's trips
+   * @returns {Object} Efficiency analysis
+   */
+  static analyzeEfficiency(trips) {
+    if (!Array.isArray(trips) || trips.length === 0) {
       return {
-        costPerDay,
-        costPerPark,
-        milesPerDay,
-        parksPerTrip,
-        efficiencyScore,
-        recommendations
+        costPerDay: 0,
+        costPerPark: 0,
+        milesPerDay: 0,
+        parksPerTrip: 0,
+        efficiencyScore: 0,
+        recommendations: ['Add trips to analyze efficiency']
       };
     }
+
+    let totalDistance = 0;
+    let totalCost = 0;
+    let totalDuration = 0;
+    let totalParks = 0;
+
+    trips.forEach(trip => {
+      if (!trip || typeof trip !== 'object') return;
+      
+      totalDistance += Number(trip.totalDistance) || 0;
+      totalCost += Number(trip.estimatedCost) || 0;
+      totalDuration += this.extractValidDuration(trip);
+      totalParks += (Array.isArray(trip.parks) ? trip.parks.length : 0);
+    });
+
+    const costPerDay = totalDuration > 0 ? Math.round(totalCost / totalDuration) : 0;
+    const costPerPark = totalParks > 0 ? Math.round(totalCost / totalParks) : 0;
+    const milesPerDay = totalDuration > 0 ? Math.round(totalDistance / totalDuration) : 0;
+    const parksPerTrip = trips.length > 0 ? Math.round((totalParks / trips.length) * 10) / 10 : 0;
+    const efficiencyScore = this.calculateEfficiencyScore(trips);
+
+    // Generate recommendations directly here instead of calling separate method
+    const recommendations = [];
+    
+    if (costPerDay > 250) {
+      recommendations.push('Consider longer trips to reduce daily costs');
+    }
+    
+    if (milesPerDay > 300) {
+      recommendations.push('Plan shorter driving days for better enjoyment');
+    }
+    
+    if (parksPerTrip < 2) {
+      recommendations.push('Combine nearby parks in single trips for better efficiency');
+    }
+
+    return {
+      costPerDay,
+      costPerPark,
+      milesPerDay,
+      parksPerTrip,
+      efficiencyScore,
+      recommendations
+    };
+  }
 
   // === COST ANALYSIS METHODS ===
 
@@ -419,7 +457,7 @@ export class TripAnalytics {
     trips.forEach(trip => {
       totalCost += trip.estimatedCost || 0;
       totalMiles += trip.totalDistance || 0;
-      totalDays += trip.totalDuration || 0;
+      totalDays += this.extractValidDuration(trip);
       totalParks += trip.parks?.length || 0;
     });
 
@@ -530,7 +568,7 @@ export class TripAnalytics {
     const styles = { relaxed: 0, balanced: 0, intensive: 0 };
     
     trips.forEach(trip => {
-      const duration = trip.totalDuration || 7;
+      const duration = this.extractValidDuration(trip) || 7;
       const parksCount = trip.parks?.length || 0;
       const parksPerDay = parksCount / duration;
       
@@ -604,8 +642,9 @@ export class TripAnalytics {
       }
       
       // Duration patterns
-      if (trip.totalDuration) {
-        patterns.duration.push(trip.totalDuration);
+      const duration = this.extractValidDuration(trip);
+      if (duration > 0) {
+        patterns.duration.push(duration);
       }
       
       // Seasonal preferences
@@ -654,16 +693,33 @@ export class TripAnalytics {
    * Helper method to calculate user averages for benchmarking
    */
   static calculateUserAverages(trips) {
-    if (trips.length === 0) return { avgCost: 0, avgDuration: 0, topParks: [], efficiencyScore: 0 };
+    if (!Array.isArray(trips) || trips.length === 0) {
+      return { avgCost: 0, avgDuration: 0, topParks: [], efficiencyScore: 0 };
+    }
 
-    const totalCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0);
-    const totalDuration = trips.reduce((sum, trip) => sum + (trip.totalDuration || 0), 0);
+    const totalCost = trips.reduce((sum, trip) => {
+      const cost = Number(trip.estimatedCost) || 0;
+      return sum + cost;
+    }, 0);
     
-    // Get top parks
+    const totalDuration = trips.reduce((sum, trip) => {
+      const duration = this.extractValidDuration(trip);
+      return sum + duration;
+    }, 0);
+    
+    // Get top parks with validation
     const parkCounts = {};
     trips.forEach(trip => {
-      trip.parks?.forEach(park => {
-        parkCounts[park.parkName] = (parkCounts[park.parkName] || 0) + 1;
+      if (!trip || !Array.isArray(trip.parks)) return;
+      
+      trip.parks.forEach(park => {
+        if (!park || typeof park !== 'object') return;
+        
+        const parkName = park.parkName || park.name;
+        if (parkName && typeof parkName === 'string' && parkName.trim()) {
+          const cleanName = parkName.trim();
+          parkCounts[cleanName] = (parkCounts[cleanName] || 0) + 1;
+        }
       });
     });
     
@@ -711,7 +767,7 @@ export class TripAnalytics {
   static calculateSingleTripEfficiency(trip) {
     let score = 50; // Base score
     
-    const costPerDay = (trip.estimatedCost || 0) / (trip.totalDuration || 7);
+    const costPerDay = (trip.estimatedCost || 0) / (this.extractValidDuration(trip) || 7);
     if (costPerDay < 200) score += 20;
     else if (costPerDay < 300) score += 10;
     
@@ -782,10 +838,81 @@ export class TripAnalytics {
 
   static calculateDuration(startDate, endDate) {
     if (!startDate || !endDate) return 0;
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const diffTime = Math.abs(end - start);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    
+    try {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      // Validate dates
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return 0;
+      }
+      
+      // Ensure end is after start
+      if (end <= start) return 1;
+      
+      const diffTime = end.getTime() - start.getTime();
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    } catch (error) {
+      console.warn('Error calculating duration:', error);
+      return 0;
+    }
+  }
+
+  static getEmptyPreferences() {
+    return {
+      topRegions: [],
+      avgDuration: 0,
+      avgBudget: 0,
+      budgetRange: { min: 0, max: 0, median: 0 },
+      favoriteSeasons: [],
+      topParkTypes: [],
+      transportationSplit: { driving: 0, flying: 0 }
+    };
+  }
+  
+  static validateAndSanitizeTrips(trips) {
+    if (!Array.isArray(trips)) return [];
+    
+    return trips
+      .filter(trip => trip && typeof trip === 'object' && trip.id)
+      .map(trip => ({
+        ...trip,
+        estimatedCost: Number(trip.estimatedCost) || 0,
+        totalDistance: Number(trip.totalDistance) || 0,
+        parks: Array.isArray(trip.parks) ? trip.parks : [],
+        title: trip.title || 'Untitled Trip',
+        transportationMode: trip.transportationMode || 'driving'
+      }));
+  }
+
+  static extractValidDuration(trip) {
+    // Try totalDuration first
+    if (trip.totalDuration && !isNaN(Number(trip.totalDuration))) {
+      return Number(trip.totalDuration);
+    }
+    
+    // Try calculating from dates
+    if (trip.startDate && trip.endDate) {
+      try {
+        const duration = this.calculateDuration(trip.startDate, trip.endDate);
+        return duration > 0 ? duration : 0;
+      } catch (error) {
+        console.warn('Error calculating duration from dates:', error);
+        return 0;
+      }
+    }
+    
+    // Try summing park durations
+    if (Array.isArray(trip.parks)) {
+      const parkDaysTotal = trip.parks.reduce((sum, park) => {
+        const days = Number(park.stayDuration) || 0;
+        return sum + days;
+      }, 0);
+      return parkDaysTotal > 0 ? parkDaysTotal : 0;
+    }
+    
+    return 0;
   }
 
   static calculateMedian(numbers) {
@@ -842,9 +969,13 @@ export class TripAnalytics {
   static analyzePopularityTrends(trips) {
     const parkCounts = {};
     trips.forEach(trip => {
-      trip.parks?.forEach(park => {
-        parkCounts[park.parkName] = (parkCounts[park.parkName] || 0) + 1;
-      });
+      if (Array.isArray(trip.parks)) {
+        trip.parks.forEach(park => {
+          if (park && park.parkName) {
+            parkCounts[park.parkName] = (parkCounts[park.parkName] || 0) + 1;
+          }
+        });
+      }
     });
     
     return Object.entries(parkCounts)
@@ -864,7 +995,7 @@ export class TripAnalytics {
     let totalFees = 0;
 
     trips.forEach(trip => {
-      const duration = trip.totalDuration || 7;
+      const duration = this.extractValidDuration(trip) || 7;
       const distance = trip.totalDistance || 0;
       const parks = trip.parks?.length || 0;
       
@@ -894,15 +1025,20 @@ export class TripAnalytics {
   }
 
   static calculateEfficiencyScore(trips) {
-    if (trips.length === 0) return 0;
+    if (!Array.isArray(trips) || trips.length === 0) return 0;
     
     let totalScore = 0;
+    let validTrips = 0;
     
     trips.forEach(trip => {
+      if (!trip || typeof trip !== 'object') return;
+      
       let score = 50; // Base score
       
       // Cost efficiency (lower cost per day = higher score)
-      const costPerDay = (trip.estimatedCost || 0) / (trip.totalDuration || 7);
+      const cost = Number(trip.estimatedCost) || 0;
+      const duration = this.extractValidDuration(trip) || 7;
+      const costPerDay = cost / duration;
       if (costPerDay < 200) score += 20;
       else if (costPerDay < 300) score += 10;
       
@@ -919,28 +1055,10 @@ export class TripAnalytics {
       else if (milesPerPark < 300) score += 5;
       
       totalScore += Math.min(100, score);
+      validTrips++;
     });
-    
-    return Math.round(totalScore / trips.length);
-  }
 
-  static generateEfficiencyRecommendations(trips) {
-    const recommendations = [];
-    const efficiency = this.analyzeEfficiency(trips);
-    
-    if (efficiency.costPerDay > 250) {
-      recommendations.push('Consider longer trips to reduce daily costs');
-    }
-    
-    if (efficiency.milesPerDay > 300) {
-      recommendations.push('Plan shorter driving days for better enjoyment');
-    }
-    
-    if (efficiency.parksPerTrip < 2) {
-      recommendations.push('Combine nearby parks in single trips for better efficiency');
-    }
-    
-    return recommendations;
+    return validTrips > 0 ? Math.round(totalScore / validTrips) : 0;
   }
 
   static getCostTrendRecommendation(costTrends) {

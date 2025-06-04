@@ -50,7 +50,11 @@ const SimpleRouteMap = ({ parks, transportationMode }) => {
       const park1 = parks[i];
       const park2 = parks[i + 1];
       
-      if (park1.coordinates && park2.coordinates) {
+      if (park1.coordinates && park2.coordinates && 
+          typeof park1.coordinates.lat === 'number' && 
+          typeof park1.coordinates.lng === 'number' &&
+          typeof park2.coordinates.lat === 'number' && 
+          typeof park2.coordinates.lng === 'number') {
         const distance = calculateDistance(park1.coordinates, park2.coordinates);
         totalDistance += distance;
       }
@@ -60,7 +64,13 @@ const SimpleRouteMap = ({ parks, transportationMode }) => {
   };
 
   const calculateDistance = (coord1, coord2) => {
-    // Simple distance calculation (Haversine formula)
+    // Validate coordinates exist and are numbers
+    if (!coord1 || !coord2 || 
+        typeof coord1.lat !== 'number' || typeof coord1.lng !== 'number' ||
+        typeof coord2.lat !== 'number' || typeof coord2.lng !== 'number') {
+      return 0;
+    }
+    
     const R = 3959; // Earth's radius in miles
     const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
     const dLon = (coord2.lng - coord1.lng) * Math.PI / 180;
@@ -106,9 +116,11 @@ const SimpleRouteMap = ({ parks, transportationMode }) => {
                 <div className="flex items-center gap-2 text-gray-500">
                   {transportationMode === 'flying' ? <FaPlane /> : <FaCar />}
                   <div className="text-xs">
-                    {park.coordinates && parks[index + 1].coordinates
+                    {park.coordinates && parks[index + 1].coordinates &&
+                     typeof park.coordinates.lat === 'number' &&
+                     typeof parks[index + 1].coordinates.lat === 'number'
                       ? `${Math.round(calculateDistance(park.coordinates, parks[index + 1].coordinates))} mi`
-                      : 'Est. distance'
+                      : 'Distance N/A'
                     }
                   </div>
                 </div>
@@ -204,7 +216,11 @@ const LeafletMap = ({ parks, transportationMode, onFullscreenToggle, activePark 
 
       // Add markers for parks
       parks.forEach((park, index) => {
-        if (park.coordinates && park.coordinates.lat && park.coordinates.lng) {
+        if (park.coordinates && 
+            typeof park.coordinates.lat === 'number' && 
+            typeof park.coordinates.lng === 'number' &&
+            !isNaN(park.coordinates.lat) && 
+            !isNaN(park.coordinates.lng)) {
           const marker = window.L.marker([park.coordinates.lat, park.coordinates.lng])
             .addTo(map);
           
@@ -219,9 +235,14 @@ const LeafletMap = ({ parks, transportationMode, onFullscreenToggle, activePark 
       });
 
       // Add route line if multiple parks
+      // Add route line if multiple parks
       if (parks.length > 1) {
         const validCoords = parks
-          .filter(park => park.coordinates && park.coordinates.lat && park.coordinates.lng)
+          .filter(park => park.coordinates && 
+                         typeof park.coordinates.lat === 'number' && 
+                         typeof park.coordinates.lng === 'number' &&
+                         !isNaN(park.coordinates.lat) && 
+                         !isNaN(park.coordinates.lng))
           .map(park => [park.coordinates.lat, park.coordinates.lng]);
         
         if (validCoords.length > 1) {
@@ -254,7 +275,11 @@ const LeafletMap = ({ parks, transportationMode, onFullscreenToggle, activePark 
   const getMapBounds = () => {
     if (parks.length === 0) return { center: [39.5, -98.35], zoom: 4 };
     
-    const validParks = parks.filter(p => p.coordinates && p.coordinates.lat && p.coordinates.lng);
+    const validParks = parks.filter(p => p.coordinates && 
+                                       typeof p.coordinates.lat === 'number' && 
+                                       typeof p.coordinates.lng === 'number' &&
+                                       !isNaN(p.coordinates.lat) && 
+                                       !isNaN(p.coordinates.lng));
     if (validParks.length === 0) return { center: [39.5, -98.35], zoom: 4 };
     
     if (validParks.length === 1) {
@@ -333,9 +358,13 @@ const TripMap = ({
   const calculateTravelTime = () => {
     const distance = calculateTotalDistance();
     if (transportationMode === 'flying') {
-      return `${Math.round(parks.length * 2.5)}h`;
+      // Assume 2.5 hours per flight (including airport time)
+      const flightLegs = Math.max(0, parks.length - 1);
+      return `${Math.round(flightLegs * 2.5)}h`;
     } else {
-      return `${Math.round(distance / 60)}h`;
+      // Assume 60 mph average driving speed
+      const drivingHours = distance > 0 ? Math.round(distance / 60) : 0;
+      return `${drivingHours}h`;
     }
   };
 
@@ -362,7 +391,7 @@ const TripMap = ({
             <p className="text-sm text-pink-600 mt-1">
               {parks.length === 0 
                 ? 'Add parks to see your route' 
-                : `${parks.length} park${parks.length !== 1 ? 's' : ''} • ${calculateTotalDistance()} miles`
+                : `${parks.length} park${parks.length !== 1 ? 's' : ''} • ${calculateTotalDistance()} miles • ${transportationMode === 'flying' ? 'Flight' : 'Road'} trip`
               }
             </p>
           </div>
@@ -425,9 +454,9 @@ const TripMap = ({
             </div>
             <div>
               <div className="text-lg font-bold text-gray-800">
-                {parks.reduce((sum, park) => sum + (park.stayDuration || 1), 0)}
+                {parks.reduce((sum, park) => sum + (parseInt(park.stayDuration) || 1), 0)}
               </div>
-              <div className="text-xs text-gray-600">Total Days</div>
+              <div className="text-xs text-gray-600">Park Days</div>
             </div>
           </div>
           

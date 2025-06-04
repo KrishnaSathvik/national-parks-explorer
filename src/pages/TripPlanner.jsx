@@ -750,43 +750,81 @@ const TripPlanner = () => {
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + template.duration);
       
-      // Find parks in database
+      // Create proper park mapping from template
       const templateParks = [];
-      
-      template.highlights.forEach((highlight, index) => {
-        const matchingPark = allParks.find(park => 
-          park.name?.toLowerCase().includes(highlight.toLowerCase().split(' ')[0]) ||
-          park.fullName?.toLowerCase().includes(highlight.toLowerCase().split(' ')[0]) ||
-          highlight.toLowerCase().includes(park.name?.toLowerCase().split(' ')[0] || '')
-        );
-        
-        if (matchingPark) {
-          let coordinates = { lat: 0, lng: 0 };
-          if (matchingPark.coordinates && matchingPark.coordinates.includes(',')) {
-            const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
-            if (!isNaN(lat) && !isNaN(lng)) {
-              coordinates = { lat, lng };
-            }
-          }
 
-          templateParks.push({
-            parkId: matchingPark.id,
-            parkName: matchingPark.name || matchingPark.fullName,
-            visitDate: new Date(startDate.getTime() + (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-            stayDuration: Math.ceil(template.duration / template.highlights.length),
-            coordinates,
-            state: matchingPark.state,
-            description: matchingPark.description
-          });
-        }
-      });
+      // Use template.parks array if available, otherwise fall back to highlights
+      const parksToProcess = template.parks || template.highlights.map(highlight => ({ name: highlight, days: 2 }));
+
+      parksToProcess.forEach((parkInfo, index) => {
+              const parkName = parkInfo.name || parkInfo;
+              const stayDuration = parkInfo.days || 2;
+              
+              // Better park matching logic
+              const matchingPark = allParks.find(park => {
+                const dbName = (park.name || park.fullName || '').toLowerCase();
+                const templateName = parkName.toLowerCase();
+                
+                // Direct name match
+                if (dbName.includes(templateName.split(' ')[0]) || templateName.includes(dbName.split(' ')[0])) return true;
+                
+                // Special cases for common park names
+                if (templateName.includes('grand canyon') && dbName.includes('grand canyon')) return true;
+                if (templateName.includes('yellowstone') && dbName.includes('yellowstone')) return true;
+                if (templateName.includes('yosemite') && dbName.includes('yosemite')) return true;
+                if (templateName.includes('zion') && dbName.includes('zion')) return true;
+                if (templateName.includes('bryce') && dbName.includes('bryce')) return true;
+                
+                return false;
+              });
+              
+              if (matchingPark) {
+                let coordinates = { lat: 0, lng: 0 };
+                
+                // Handle different coordinate formats
+                if (matchingPark.coordinates) {
+                  if (typeof matchingPark.coordinates === 'string' && matchingPark.coordinates.includes(',')) {
+                    const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                      coordinates = { lat, lng };
+                    }
+                  } else if (matchingPark.coordinates.lat && matchingPark.coordinates.lng) {
+                    coordinates = { 
+                      lat: parseFloat(matchingPark.coordinates.lat), 
+                      lng: parseFloat(matchingPark.coordinates.lng) 
+                    };
+                  }
+                }
+
+                // Calculate visit date based on cumulative days
+                let cumulativeDays = 0;
+                if (index > 0) {
+                  cumulativeDays = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
+                }
+
+                templateParks.push({
+                  parkId: matchingPark.id,
+                  parkName: matchingPark.name || matchingPark.fullName,
+                  visitDate: new Date(startDate.getTime() + (cumulativeDays * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
+                  stayDuration: stayDuration,
+                  coordinates,
+                  state: matchingPark.state,
+                  description: matchingPark.description
+                });
+              }
+            });
+
+      // Calculate correct end date based on actual park durations
+      const totalDays = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
+      const correctEndDate = new Date(startDate);
+      correctEndDate.setDate(correctEndDate.getDate() + totalDays - 1);
 
       const newTrip = {
         title: template.title.replace(/[🌵🏜️🦌🌟]/g, '').trim(),
         description: template.description,
         parks: templateParks,
         startDate: startDate.toISOString().split('T')[0],
-        endDate: endDate.toISOString().split('T')[0],
+        endDate: correctEndDate.toISOString().split('T')[0],
         transportationMode: template.transportation.rentalCarRequired ? 'driving' : 'flying',
         isPublic: false,
         templateId: template.id,
@@ -803,7 +841,8 @@ const TripPlanner = () => {
 
       setActiveTrip(newTrip);
       setCurrentTab('my-trips');
-      showToast(`✨ ${template.title} loaded with ${template.duration}-day itinerary and ${templateParks.length} parks!`, 'success');
+      const actualDuration = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
+      showToast(`✨ ${template.title} loaded with ${actualDuration}-day itinerary and ${templateParks.length} parks!`, 'success');
       
     } catch (error) {
       console.error('Error creating trip from template:', error);

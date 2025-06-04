@@ -103,6 +103,14 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     if (step === 2) {
       if (!tripData.parks || tripData.parks.length === 0) {
         newErrors.parks = 'Please select at least one park';
+      } else {
+        // Validate that parks have required data
+        const invalidParks = tripData.parks.filter(park => 
+          !park.parkName || !park.stayDuration || park.stayDuration < 1
+        );
+        if (invalidParks.length > 0) {
+          newErrors.parks = 'All parks must have valid names and stay durations';
+        }
       }
     }
     
@@ -110,7 +118,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Trip duration calculation
   const calculateTripDuration = useCallback(() => {
     if (!tripData.startDate || !tripData.endDate) return 0;
     
@@ -121,7 +128,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     end.setHours(0, 0, 0, 0);
     
     const diffTime = end.getTime() - start.getTime();
-    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     return Math.max(1, diffDays + 1);
   }, [tripData.startDate, tripData.endDate]);
@@ -148,8 +155,11 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     const distance = calculateTotalDistance();
     const numParks = tripData.parks.length;
     
+    // Accommodation: nights = days - 1 (unless single day trip)
+    const nights = Math.max(0, duration - 1);
+    
     const costs = {
-      accommodation: duration * 85, // $85/night
+      accommodation: nights * 85, // $85/night
       transportation: tripData.transportationMode === 'flying' 
         ? numParks * 275 // $275 per flight
         : distance * 0.20, // $0.20/mile for gas + wear
@@ -228,9 +238,24 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
 
   // Park management functions
   const parseCoordinates = (coordString) => {
-    if (!coordString || !coordString.includes(',')) return { lat: 0, lng: 0 };
-    const [lat, lng] = coordString.split(',').map(val => parseFloat(val.trim()));
-    return { lat: lat || 0, lng: lng || 0 };
+    // Handle different coordinate formats
+    if (!coordString) return { lat: 0, lng: 0 };
+    
+    // If already an object with lat/lng
+    if (typeof coordString === 'object' && coordString.lat && coordString.lng) {
+      return { 
+        lat: parseFloat(coordString.lat) || 0, 
+        lng: parseFloat(coordString.lng) || 0 
+      };
+    }
+    
+    // If string format "lat,lng"
+    if (typeof coordString === 'string' && coordString.includes(',')) {
+      const [lat, lng] = coordString.split(',').map(val => parseFloat(val.trim()));
+      return { lat: lat || 0, lng: lng || 0 };
+    }
+    
+    return { lat: 0, lng: 0 };
   };
 
   const addParkToTrip = (park) => {
@@ -269,11 +294,23 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
   };
 
   const updateParkDetails = (parkId, field, value) => {
+    const updatedParks = tripData.parks.map(park => {
+      if (park.parkId === parkId) {
+        const updatedPark = { ...park, [field]: value };
+        
+        // Validate stay duration
+        if (field === 'stayDuration') {
+          updatedPark.stayDuration = Math.max(1, Math.min(14, parseInt(value) || 1));
+        }
+        
+        return updatedPark;
+      }
+      return park;
+    });
+    
     setTripData({
       ...tripData,
-      parks: tripData.parks.map(park => 
-        park.parkId === parkId ? { ...park, [field]: value } : park
-      )
+      parks: updatedParks
     });
   };
 
@@ -320,6 +357,21 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
 
     setLoading(true);
     try {
+      // Validate total days match park durations
+      const parkDaysTotal = tripData.parks.reduce((sum, park) => sum + (park.stayDuration || 1), 0);
+      const tripDaysTotal = calculateTripDuration();
+
+      // Warn if significant mismatch
+      if (Math.abs(parkDaysTotal - tripDaysTotal) > 2) {
+        const shouldContinue = window.confirm(
+          `Total park days (${parkDaysTotal}) don't match trip duration (${tripDaysTotal}). Save anyway?`
+        );
+        if (!shouldContinue) {
+          setLoading(false);
+          return;
+        }
+      }
+
       const tripToSave = {
         ...tripData,
         totalDistance: calculateTotalDistance(),
@@ -825,9 +877,10 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     const duration = calculateTripDuration();
                     const distance = calculateTotalDistance();
                     const numParks = tripData.parks.length;
+                    const nights = Math.max(0, duration - 1);
                     
                     const costs = {
-                      accommodation: duration * 85,
+                      accommodation: nights * 85,
                       transportation: tripData.transportationMode === 'flying' 
                         ? numParks * 275 
                         : distance * 0.20,
@@ -841,7 +894,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                           <h4 className="font-semibold text-gray-700">Accommodation</h4>
                           <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
                             <div className="flex justify-between items-center">
-                              <span className="text-sm text-blue-700">{duration} nights × $85</span>
+                              <span className="text-sm text-blue-700">{nights} nights × $85</span>
                               <span className="font-bold text-blue-800">${costs.accommodation}</span>
                             </div>
                           </div>
@@ -949,6 +1002,10 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Duration:</span>
                       <span className="font-medium">{calculateTripDuration()} days</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Nights:</span>
+                      <span className="font-medium">{Math.max(0, calculateTripDuration() - 1)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Transportation:</span>

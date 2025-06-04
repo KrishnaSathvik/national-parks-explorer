@@ -37,6 +37,11 @@ const TripViewer = ({ trip, onClose, onEdit }) => {
     if (!trip.startDate || !trip.endDate) return 0;
     const start = new Date(trip.startDate);
     const end = new Date(trip.endDate);
+    
+    // Normalize to start of day to avoid timezone issues
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+    
     const diffTime = end.getTime() - start.getTime();
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
   };
@@ -52,6 +57,9 @@ const TripViewer = ({ trip, onClose, onEdit }) => {
       const daysAtPark = park.stayDuration || 2;
       
       for (let day = 0; day < daysAtPark; day++) {
+        // Don't exceed total trip duration
+        if (currentDay > duration) break;
+        
         itinerary.push({
           day: currentDay,
           type: 'park',
@@ -65,20 +73,44 @@ const TripViewer = ({ trip, onClose, onEdit }) => {
         currentDay++;
       }
       
+      // Only add travel day if there's significant distance and we're not at trip end
       if (index < trip.parks.length - 1 && currentDay <= duration) {
-        itinerary.push({
-          day: currentDay,
-          type: 'travel',
-          from: park.parkName,
-          to: trip.parks[index + 1].parkName,
-          activities: ['Travel Day', 'Scenic Route Driving']
-        });
-        currentDay++;
+        const nextPark = trip.parks[index + 1];
+        const needsTravelDay = trip.transportationMode === 'flying' || 
+          (park.coordinates && nextPark.coordinates && 
+           calculateDistance(park.coordinates, nextPark.coordinates) > 200);
+        
+        if (needsTravelDay) {
+          itinerary.push({
+            day: currentDay,
+            type: 'travel',
+            from: park.parkName,
+            to: nextPark.parkName,
+            activities: trip.transportationMode === 'flying' 
+              ? ['Flight Day', 'Airport & Travel Time']
+              : ['Travel Day', 'Scenic Route Driving']
+          });
+          currentDay++;
+        }
       }
     });
     
     return itinerary;
   };
+
+  const calculateDistance = (coord1, coord2) => {
+  if (!coord1 || !coord2 || !coord1.lat || !coord2.lat) return 0;
+  
+  const R = 3959; // Earth's radius in miles
+  const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
+  const dLon = (coord2.lng - coord1.lng) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(coord1.lat * Math.PI / 180) * Math.cos(coord2.lat * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  return R * c;
+};
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -252,67 +284,72 @@ const TripViewer = ({ trip, onClose, onEdit }) => {
           )}
 
           {/* Budget Tab */}
-          {activeTab === 'budget' && (
-            <div className="space-y-6">
-              <h3 className="text-xl font-bold text-gray-800 mb-4">Budget Breakdown</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-                  <h4 className="font-semibold text-green-800 mb-4">Transportation</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Travel Costs:</span>
-                      <span className="font-medium">${Math.round((trip.totalDistance || 0) * 0.15)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Vehicle/Flight:</span>
-                      <span className="font-medium">
-                        {trip.transportationMode === 'flying' ? 'Flights' : 'Vehicle costs'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                    {activeTab === 'budget' && (
+                      <div className="space-y-6">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">Budget Breakdown</h3>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+                            <h4 className="font-semibold text-green-800 mb-4">Transportation</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Travel Costs:</span>
+                                <span className="font-medium">
+                                  ${trip.transportationMode === 'flying' 
+                                    ? Math.round((trip.parks?.length || 0) * 275)
+                                    : Math.round((trip.totalDistance || 0) * 0.20)
+                                  }
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Method:</span>
+                                <span className="font-medium capitalize">
+                                  {trip.transportationMode === 'flying' ? 'Flights' : 'Road Trip'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-200">
-                  <h4 className="font-semibold text-blue-800 mb-4">Accommodation</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Lodging ({calculateDuration()} nights):</span>
-                      <span className="font-medium">${calculateDuration() * 85}</span>
-                    </div>
-                  </div>
-                </div>
+                          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-xl border border-blue-200">
+                            <h4 className="font-semibold text-blue-800 mb-4">Accommodation</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Lodging ({Math.max(0, calculateDuration() - 1)} nights):</span>
+                                <span className="font-medium">${Math.max(0, calculateDuration() - 1) * 85}</span>
+                              </div>
+                            </div>
+                          </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
-                  <h4 className="font-semibold text-purple-800 mb-4">Park Fees</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Entry Fees:</span>
-                      <span className="font-medium">${(trip.parks?.length || 0) * 30}</span>
-                    </div>
-                  </div>
-                </div>
+                          <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl border border-purple-200">
+                            <h4 className="font-semibold text-purple-800 mb-4">Park Fees</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Entry Fees:</span>
+                                <span className="font-medium">${(trip.parks?.length || 0) * 30}</span>
+                              </div>
+                            </div>
+                          </div>
 
-                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
-                  <h4 className="font-semibold text-yellow-800 mb-4">Food & Misc</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Meals ({calculateDuration()} days):</span>
-                      <span className="font-medium">${calculateDuration() * 65}</span>
-                    </div>
+                          <div className="bg-gradient-to-br from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
+                            <h4 className="font-semibold text-yellow-800 mb-4">Food & Meals</h4>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>Meals ({calculateDuration()} days):</span>
+                                <span className="font-medium">${calculateDuration() * 55}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-xl text-white text-center">
+                          <div className="text-3xl font-bold">${trip.estimatedCost || 0}</div>
+                          <div className="text-green-100">Total Estimated Cost</div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-
-              <div className="bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-xl text-white text-center">
-                <div className="text-3xl font-bold">${trip.estimatedCost || 0}</div>
-                <div className="text-green-100">Total Estimated Cost</div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
   );
 };
 
