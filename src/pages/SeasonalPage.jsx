@@ -431,7 +431,7 @@ const REAL_SEASONAL_PARK_DATA = {
       'Best photos: just after snowfall'
     ]
   }
-}
+},
   'Yosemite National Park': {
     spring: {
       whyFamous: 'Waterfalls reach peak flow from Sierra snowmelt, creating thunderous cascades, while valley wildflowers create stunning foregrounds for granite dome photography',

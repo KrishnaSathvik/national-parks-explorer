@@ -471,7 +471,7 @@ const TripPlanner = () => {
         accommodation: { nights: 4, rate: 180, total: 720 },
         transportation: { flights: 400, rental: 280, gas: 100, total: 780 },
         food: { daily: 70, days: 5, total: 350 },
-        activities: { parkFees: 60, guided tours: 80, total: 140 },
+        activities: { parkFees: 60, tours: 80, total: 140 },
         total: 1990
       },
       packingList: [
