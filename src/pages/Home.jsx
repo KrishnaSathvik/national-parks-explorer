@@ -58,7 +58,8 @@ L.Icon.Default.mergeOptions({
 });
 
 
-// ===== QUICK ACTIONS PANEL =====
+// Update the QuickActions component in Home.jsx
+
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
   const actions = [
     {
@@ -70,28 +71,28 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
       action: () => onActionClick('trip-planner')
     },
     {
+      id: 'seasonal',
+      icon: '🌸',
+      title: 'Seasonal Guide',
+      description: 'Best parks by season',
+      color: 'from-green-500 to-emerald-500',
+      action: () => onActionClick('seasonal')
+    },
+    {
+      id: 'recommendations',
+      icon: '🧠',
+      title: 'AI Suggestions',
+      description: 'Smart recommendations',
+      color: 'from-purple-500 to-indigo-500',
+      action: () => onActionClick('recommendations')
+    },
+    {
       id: 'favorites',
       icon: '❤️',
       title: 'My Favorites',
       description: `${favorites.length} saved parks`,
       color: 'from-red-500 to-pink-500',
       action: () => onActionClick('favorites')
-    },
-    {
-      id: 'analytics',
-      icon: '📊',
-      title: 'Analytics',
-      description: 'Your travel insights',
-      color: 'from-purple-500 to-indigo-500',
-      action: () => onActionClick('analytics')
-    },
-    {
-      id: 'explore',
-      icon: '🗺️',
-      title: 'Explore Map',
-      description: 'Interactive discovery',
-      color: 'from-blue-500 to-cyan-500',
-      action: () => onActionClick('map')
     }
   ];
 
@@ -409,7 +410,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const { currentUser, userRole, logout } = useAuth();
   const isMobile = useIsMobile();
 
-  const parksPerPage = 12;
+  const parksPerPage = 9;
 
   // ===== FUZZY SEARCH SETUP =====
   const fuse = useMemo(() => new Fuse(parks, {
@@ -503,14 +504,29 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     setCurrentPage(1);
   };
 
+  // Update the handleQuickAction function in Home.jsx
+
   const handleQuickAction = (action) => {
     switch(action) {
       case 'trip-planner':
         navigate('/trip-planner');
         break;
+      case 'seasonal':
+        navigate('/seasonal');
+        showToast('🌸 Explore parks by season!', 'info');
+        break;
+      case 'recommendations':
+        navigate('/recommendations');
+        showToast('🧠 AI recommendations loading...', 'info');
+        break;
       case 'favorites':
-        showToast('Showing your favorite parks', 'info');
-        // You can implement a favorite filter here
+        if (favorites.length === 0) {
+          showToast('❤️ Start favoriting parks to build your collection!', 'info');
+        } else {
+          showToast('Showing your favorite parks', 'info');
+          // Filter current view to show only favorites
+          // You can implement this by updating the filtered array
+        }
         break;
       case 'analytics':
         showToast('Analytics feature coming soon!', 'info');
@@ -659,8 +675,24 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     </FadeInWrapper>
   );
 
+  // Update the renderNavigationLinks function in Home.jsx
+
   const renderNavigationLinks = () => (
     <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm font-medium mb-6">
+      <Link
+        to="/seasonal"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
+      >
+        <FaLeaf /> Seasonal Guide
+      </Link>
+      
+      <Link
+        to="/recommendations"
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-purple-50 hover:text-purple-600 hover:border-purple-300 transition-all duration-200 shadow-sm hover:shadow-md"
+      >
+        <FaBrain /> AI Recommendations
+      </Link>
+      
       <Link
         to="/calendar"
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -683,14 +715,14 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       </Link>
 
       {currentUser && (
-                <Link
-                  to="/account"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  <FaUser />
-                  My Account
-                </Link>
-            )}
+        <Link
+          to="/account"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
+        >
+          <FaUser />
+          My Account
+        </Link>
+      )}
 
       {currentUser ? (
         <>

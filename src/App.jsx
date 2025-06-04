@@ -12,6 +12,7 @@
   import { useLocation } from "react-router-dom";
   import BottomNav from "./components/BottomNav"; // or adjust path if needed
   import AppIntegration from './components/AppIntegration';
+  import { enhanceParkData } from './utils/parkDataHelpers';
 
 
   import {
@@ -41,6 +42,9 @@
   const About = lazy(() => import("./pages/About"));
   const UserAccount = lazy(() => import("./pages/UserAccount"));
   const TripPlanner = lazy(() => import("./pages/TripPlanner"));
+  // Add these imports to your existing lazy imports in App.jsx
+  const SeasonalPage = lazy(() => import("./pages/SeasonalPage"));
+  const RecommendationsPage = lazy(() => import("./pages/RecommendationsPage"));
 
 
 
@@ -66,19 +70,25 @@
     console.log("📍 Current Path:", location.pathname);
     console.log("🙈 Should Hide BottomNav:", shouldHideBottomNav);
 
+    // Replace your existing fetchParks useEffect with this:
     useEffect(() => {
       const fetchParks = async () => {
         try {
           const snapshot = await getDocs(collection(db, "parks"));
-          const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-          setParks(data);
+          const rawData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+          
+          // Enhance park data with computed fields
+          const enhancedData = rawData.map(park => enhanceParkData(park));
+          
+          console.log('✅ Enhanced parks data:', enhancedData.length, 'parks loaded');
+          setParks(enhancedData);
         } catch (error) {
           showToast("Failed to load parks data", "error");
           console.error("Error fetching parks:", error);
         }
       };
       fetchParks();
-    }, []);
+    }, [showToast]); // Add showToast to dependencies
 
       useEffect(() => {
         const handleOffline = () => {
@@ -266,6 +276,30 @@
                   element={
                     <PrivateRoute>
                       <MapPage />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/seasonal"
+                  element={
+                    <PrivateRoute>
+                      <SeasonalPage 
+                        parks={parks} 
+                        favorites={favorites} 
+                        toggleFavorite={toggleFavorite} 
+                      />
+                    </PrivateRoute>
+                  }
+                />
+                <Route
+                  path="/recommendations"
+                  element={
+                    <PrivateRoute>
+                      <RecommendationsPage 
+                        parks={parks} 
+                        favorites={favorites} 
+                        toggleFavorite={toggleFavorite} 
+                      />
                     </PrivateRoute>
                   }
                 />
