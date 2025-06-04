@@ -122,6 +122,316 @@ const REAL_SEASONAL_PARK_DATA = {
       ]
     }
   },
+  'Arches National Park': {
+  spring: {
+    whyFamous: 'Pleasant weather for hiking through red rock landscapes and dramatic desert blooms set against famous arches and spires',
+    uniqueActivities: [
+      'Delicate Arch sunset hike in cool temps',
+      'Desert wildflower photography',
+      'Stargazing with minimal cloud cover',
+      'Ranger-led Fiery Furnace tours',
+      'Canyon hiking through Courthouse Wash'
+    ],
+    insiderTips: [
+      'Arrive before 8 AM to avoid parking issues',
+      'Fiery Furnace requires a permit or guide',
+      'Sun angle is best for arch photography in the morning'
+    ]
+  },
+  summer: {
+    whyFamous: 'Clear skies and iconic desert sunrises/sunsets draw photographers and adventure seekers despite the intense midday heat',
+    uniqueActivities: [
+      'Sunrise at Turret Arch or North Window',
+      'Evening photography at Balanced Rock',
+      'Short hikes at dawn and dusk',
+      'Auto-touring the Scenic Drive',
+      'Night sky astrophotography'
+    ],
+    insiderTips: [
+      'Avoid hiking after 10 AM – temps can exceed 105°F',
+      'Hydrate frequently – bring more water than expected',
+      'Best Milky Way shots: new moon nights, 2–4 AM'
+    ]
+  },
+  fall: {
+    whyFamous: 'Cooler weather and golden desert hues make hiking ideal, and the crowds start to thin, offering a peaceful experience',
+    uniqueActivities: [
+      'Extended hiking to Tower Arch or Devil’s Garden',
+      'Fall light photography at Landscape Arch',
+      'Ranger talks on desert geology',
+      'Rock scrambling in cooler temperatures',
+      'Camping under starry skies'
+    ],
+    insiderTips: [
+      'Perfect temperatures: 60–80°F',
+      'Crowds lighter after Labor Day',
+      'Less dust means clearer photography'
+    ]
+  },
+  winter: {
+    whyFamous: 'Snow-dusted arches create surreal photography opportunities with few visitors and a peaceful desert silence',
+    uniqueActivities: [
+      'Delicate Arch with snow backdrop',
+      'Snowshoeing or light trekking in Devils Garden',
+      'Minimalist winter landscape photography',
+      'Solitude hikes on primitive trails',
+      'Stargazing in silence'
+    ],
+    insiderTips: [
+      'Early closures possible due to snow or ice',
+      'Use traction devices for icy trails',
+      'Visitor center open but limited services'
+    ]
+  }
+},
+'Glacier National Park': {
+  spring: {
+    whyFamous: 'Lower elevation trails open first, wildlife emerges from hibernation, and waterfalls from snowmelt roar down alpine valleys',
+    uniqueActivities: [
+      'Wildlife viewing in Many Glacier area',
+      'Waterfall hikes (Running Eagle Falls)',
+      'Birdwatching in lower valleys',
+      'Photography of snowcapped peaks',
+      'Trail of the Cedars hike'
+    ],
+    insiderTips: [
+      'Going-to-the-Sun Road partially closed until late June',
+      'Wildflowers bloom early in valley areas',
+      'Bears are active – carry bear spray'
+    ]
+  },
+  summer: {
+    whyFamous: 'Full access to Going-to-the-Sun Road and alpine trails, glacier views, and dramatic mountain vistas at their best',
+    uniqueActivities: [
+      'Logan Pass hike to Hidden Lake',
+      'Sunrise photography at Lake McDonald',
+      'Boat tours on St. Mary or Two Medicine lakes',
+      'Glacier-fed lake kayaking',
+      'High alpine wildflower identification'
+    ],
+    insiderTips: [
+      'Entry reservation required (check nps.gov)',
+      'Start hikes early to see wildlife',
+      'Glacier melt creates high waterfalls in July'
+    ]
+  },
+  fall: {
+    whyFamous: 'Golden larch trees light up the mountainsides, wildlife activity spikes, and clear skies provide epic visibility',
+    uniqueActivities: [
+      'Larch and aspen foliage photography',
+      'Moose spotting at Fishercap Lake',
+      'Backcountry camping in cooler temps',
+      'Clear sunrise views from Logan Pass',
+      'Fall color hikes in North Fork'
+    ],
+    insiderTips: [
+      'Roads begin closing mid-October',
+      'Bears hyperfeed in fall – keep distance',
+      'Best foliage: late September – early October'
+    ]
+  },
+  winter: {
+    whyFamous: 'Quiet, snow-covered wilderness perfect for cross-country skiing and peaceful winter solitude with mountain backdrops',
+    uniqueActivities: [
+      'Skiing along Lake McDonald Road',
+      'Snowshoeing from Apgar Village',
+      'Frozen waterfall photography',
+      'Solitude at Bowman Lake',
+      'Ranger-led winter programs'
+    ],
+    insiderTips: [
+      'Only west side of park accessible by road',
+      'Extreme cold possible – dress in layers',
+      'Limited services – plan ahead'
+    ]
+  }
+},
+'Acadia National Park': {
+  spring: {
+    whyFamous: 'Wildflowers bloom, trails open as snow melts, and the park awakens with birdsong and coastal beauty',
+    uniqueActivities: [
+      'Jordan Pond loop hike with lupines in bloom',
+      'Carriage road biking in cool weather',
+      'Birdwatching at Sieur de Monts',
+      'Sunrise from Cadillac Mountain',
+      'Explore tide pools at low tide'
+    ],
+    insiderTips: [
+      'Mosquitoes are active – bring spray',
+      'Trails muddy from melt – wear waterproof boots',
+      'Check tide tables for coastal hikes'
+    ]
+  },
+  summer: {
+    whyFamous: 'Mild temperatures, lush greenery, and fully open roads make Acadia a popular coastal escape',
+    uniqueActivities: [
+      'Sunrise at Cadillac Mountain (early morning)',
+      'Ocean Path hike to Thunder Hole',
+      'Kayaking in Frenchman Bay',
+      'Biking scenic carriage roads',
+      'Swimming at Sand Beach'
+    ],
+    insiderTips: [
+      'Crowds peak in July/August – arrive early',
+      'Park Loop Road best done clockwise',
+      'Book Bar Harbor accommodations early'
+    ]
+  },
+  fall: {
+    whyFamous: 'World-famous fall foliage paints the park in red, gold, and orange with crisp air and fewer crowds',
+    uniqueActivities: [
+      'Park Loop drive for foliage views',
+      'Jordan Pond fall reflection photography',
+      'Foliage hike to Beehive or Bubble Rock',
+      'Lobster boat tours in cool air',
+      'Photography from Otter Cliff'
+    ],
+    insiderTips: [
+      'Peak color: early to mid-October',
+      'Cool mornings – layer up',
+      'Foliage best with morning sun or after rain'
+    ]
+  },
+  winter: {
+    whyFamous: 'Peaceful snowy coastline, cross-country skiing along carriage roads, and unique ocean-meets-snow scenes',
+    uniqueActivities: [
+      'Snowshoeing to Jordan Pond',
+      'Cross-country skiing carriage trails',
+      'Frozen coastline photography',
+      'Peaceful wildlife tracking',
+      'Cozy winter stays in Bar Harbor'
+    ],
+    insiderTips: [
+      'Limited road access (some areas gated)',
+      'Ice possible near shoreline – wear spikes',
+      'Best light: midday when sun is low'
+    ]
+  }
+},
+'Rocky Mountain National Park': {
+  spring: {
+    whyFamous: 'Lower elevation trails melt first, elk and moose emerge, and alpine lakes begin thawing for crystal-clear reflections',
+    uniqueActivities: [
+      'Elk viewing in Moraine Park',
+      'Thawing lake photography (Sprague Lake)',
+      'Birdwatching on Cub Lake Trail',
+      'Ranger-led spring ecology walks',
+      'Snowshoeing at Bear Lake early season'
+    ],
+    insiderTips: [
+      'Check trail conditions for snow patches',
+      'Roads to high elevations may still be closed',
+      'Start early – spring storms common'
+    ]
+  },
+  summer: {
+    whyFamous: 'All roads and alpine trails open with wildflowers, abundant wildlife, and dramatic mountain views at their best',
+    uniqueActivities: [
+      'Trail Ridge Road scenic drive',
+      'Alpine lake hikes (Emerald, Sky Pond)',
+      'Sunrise photography from Many Parks Curve',
+      'Backpacking above treeline',
+      'Wildflower identification on Ute Trail'
+    ],
+    insiderTips: [
+      'Timed entry permits required',
+      'Afternoon thunderstorms are common – hike early',
+      'Expect altitude effects above 10,000 feet'
+    ]
+  },
+  fall: {
+    whyFamous: 'Golden aspens and elk rut make this one of the most photogenic and sonically rich seasons in the park',
+    uniqueActivities: [
+      'Elk bugling at dawn in Moraine Park',
+      'Aspen grove hikes in Bear Lake area',
+      'Fall color photography along Peak to Peak Hwy',
+      'Stargazing under crisp skies',
+      'Cool weather day hiking'
+    ],
+    insiderTips: [
+      'Best foliage: mid-September',
+      'Elk are active at dawn/dusk',
+      'Clear skies ideal for night photography'
+    ]
+  },
+  winter: {
+    whyFamous: 'Snow blankets alpine terrain offering snowshoeing and solitude, with wildlife sightings at lower elevations',
+    uniqueActivities: [
+      'Snowshoe to Dream Lake',
+      'Winter wildlife photography (elk, coyote)',
+      'Cross-country skiing near Hidden Valley',
+      'Snowy sunrise shots at Bear Lake',
+      'Ranger-led winter walks'
+    ],
+    insiderTips: [
+      'Weather can be extreme – check forecasts',
+      'Only lower trails accessible in deep snow',
+      'Dress in layers – quick weather shifts'
+    ]
+  }
+},
+'Badlands National Park': {
+  spring: {
+    whyFamous: 'Prairie wildflowers bloom across rugged formations, and baby bison and bighorn sheep sightings increase',
+    uniqueActivities: [
+      'Fossil exhibit trail hikes',
+      'Sunrise photography at Big Badlands Overlook',
+      'Wildflower photography in prairie areas',
+      'Bison and bighorn sheep spotting',
+      'Night sky viewing in cool air'
+    ],
+    insiderTips: [
+      'Best wildlife viewing: early mornings',
+      'Spring storms = dramatic cloud photos',
+      'Avoid muddy trails after rain'
+    ]
+  },
+  summer: {
+    whyFamous: 'Vast landscapes under epic skies make this a surreal experience, though scorching temps require caution',
+    uniqueActivities: [
+      'Sunset shots from Pinnacles Overlook',
+      'Short hikes at dawn (Door Trail, Notch Trail)',
+      'Night sky astrophotography',
+      'Ranger fossil talks',
+      'Scenic drive with air-conditioned breaks'
+    ],
+    insiderTips: [
+      'Temps can exceed 100°F – bring water',
+      'Storms = amazing sky backdrops',
+      'Best photography light: 6–8 AM and 6–9 PM'
+    ]
+  },
+  fall: {
+    whyFamous: 'Cooler temps and golden prairie light make fall perfect for hiking and extended photo sessions',
+    uniqueActivities: [
+      'Extended hikes on Castle Trail',
+      'Sunset photography in golden grasslands',
+      'Fossil hunting in drier weather',
+      'Comfortable backcountry camping',
+      'Bird migration observation'
+    ],
+    insiderTips: [
+      'Best hiking weather: September–October',
+      'Sun angles are ideal for formation shadows',
+      'Fewer bugs and crowds'
+    ]
+  },
+  winter: {
+    whyFamous: 'Frost and snow create an eerie beauty in the formations, and silence amplifies the remote feel',
+    uniqueActivities: [
+      'Frosty sunrise photography at Conata Basin',
+      'Snow-covered butte photography',
+      'Wildlife tracking in snow',
+      'Solitude walks in main loop',
+      'Winter night sky views'
+    ],
+    insiderTips: [
+      'Road closures after storms common',
+      'Dress for strong wind chills',
+      'Best photos: just after snowfall'
+    ]
+  }
+}
   'Yosemite National Park': {
     spring: {
       whyFamous: 'Waterfalls reach peak flow from Sierra snowmelt, creating thunderous cascades, while valley wildflowers create stunning foregrounds for granite dome photography',
