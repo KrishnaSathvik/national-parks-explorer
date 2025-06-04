@@ -1,4 +1,4 @@
-// src/pages/TripPlanner.jsx - Enhanced version with all integrated features
+// Updated imports section for TripPlanner.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -10,7 +10,18 @@ import TripViewer from '../components/TripViewer';
 import FadeInWrapper from '../components/FadeInWrapper';
 import { useLocation } from 'react-router-dom';
 import { Link } from "react-router-dom";
-import { FaPlus, FaRoute, FaCalendarAlt, FaChartBar, FaStar, FaBrain, FaMapMarkerAlt, FaDollarSign } from 'react-icons/fa';
+import { 
+  FaPlus, 
+  FaRoute, 
+  FaCalendarAlt, 
+  FaChartBar, 
+  FaStar, 
+  FaBrain, 
+  FaMapMarkerAlt, 
+  FaDollarSign,
+  FaArrowLeft  // Added missing import
+} from 'react-icons/fa';
+
 
 const TripPlanner = () => {
   const { currentUser } = useAuth();

@@ -59,6 +59,7 @@ L.Icon.Default.mergeOptions({
 });
 
 
+// Updated QuickActions component in Home.jsx
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
   const actions = [
     {
@@ -89,21 +90,23 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
 
   return (
     <FadeInWrapper delay={0.2}>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-        {actions.map((action, index) => (
-          <FadeInWrapper key={action.id} delay={index * 0.1}>
-            <button 
-              onClick={action.action}
-              className="group bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 min-h-[120px] md:min-h-[140px]"
-            >
-              <div className="text-3xl md:text-4xl mb-3 group-hover:scale-110 transition-transform">
-                {action.icon}
-              </div>
-              <div className="font-semibold text-gray-800 text-sm md:text-base mb-1">{action.title}</div>
-              <div className="text-xs md:text-sm text-gray-600">{action.description}</div>
-            </button>
-          </FadeInWrapper>
-        ))}
+      <div className="flex justify-center mb-6 md:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl">
+          {actions.map((action, index) => (
+            <FadeInWrapper key={action.id} delay={index * 0.1}>
+              <button 
+                onClick={action.action}
+                className="group bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 min-h-[140px] md:min-h-[160px] w-full flex flex-col items-center justify-center"
+              >
+                <div className="text-4xl md:text-5xl mb-4 group-hover:scale-110 transition-transform">
+                  {action.icon}
+                </div>
+                <div className="font-semibold text-gray-800 text-base md:text-lg mb-2">{action.title}</div>
+                <div className="text-sm md:text-base text-gray-600 text-center">{action.description}</div>
+              </button>
+            </FadeInWrapper>
+          ))}
+        </div>
       </div>
     </FadeInWrapper>
   );
