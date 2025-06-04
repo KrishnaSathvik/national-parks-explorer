@@ -57,15 +57,8 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       setParksData(allParks);
       setParksLoading(false);
     }
-    
-    // If trip has preloaded parks, auto-advance to step 2
-    if (trip.parks && trip.parks.length > 0 && currentStep === 1) {
-      setTimeout(() => {
-        setCurrentStep(2);
-        showToast('🎯 Park added! Set your dates and preferences.', 'info');
-      }, 1000);
-    }
-  }, [allParks, trip.parks]);
+      // Don't auto-advance if trip has preloaded parks - let user start at step 1
+    }, [allParks]);    
 
   // Analyze route whenever parks change
   useEffect(() => {

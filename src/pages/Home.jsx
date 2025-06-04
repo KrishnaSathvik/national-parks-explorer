@@ -59,9 +59,6 @@ L.Icon.Default.mergeOptions({
 });
 
 
-// Update the QuickActions component in Home.jsx
-
-// Fixed QuickActions component
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
   const actions = [
     {
@@ -100,18 +97,18 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
 
   return (
     <FadeInWrapper delay={0.2}>
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-6 mb-6 md:mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
         {actions.map((action, index) => (
           <FadeInWrapper key={action.id} delay={index * 0.1}>
             <button 
               onClick={action.action}
-              className="group bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105"
+              className="group bg-white p-4 md:p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 min-h-[120px] md:min-h-[140px]"
             >
-              <div className="text-2xl md:text-3xl mb-2 group-hover:scale-110 transition-transform">
+              <div className="text-3xl md:text-4xl mb-3 group-hover:scale-110 transition-transform">
                 {action.icon}
               </div>
-              <div className="font-semibold text-gray-800 text-sm md:text-base">{action.title}</div>
-              <div className="text-xs md:text-sm text-gray-600 mt-1">{action.description}</div>
+              <div className="font-semibold text-gray-800 text-sm md:text-base mb-1">{action.title}</div>
+              <div className="text-xs md:text-sm text-gray-600">{action.description}</div>
             </button>
           </FadeInWrapper>
         ))}
@@ -857,7 +854,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
         {/* Results Summary */}
         <div className="flex items-center justify-between text-sm text-gray-600 border-t border-gray-100 pt-4">
-          <div>
+          <div className="text-sm text-gray-600">
             Showing {currentParks.length} of {filtered.length} parks
             {search && ` matching "${search}"`}
           </div>
@@ -1101,10 +1098,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
             
             {/* Navigation Links */}
             {renderNavigationLinks()}
-            
-            {/* Stats Cards */}
-            {renderStatsCards()}
-            
+                        
             {/* Quick Actions */}
             <QuickActions 
               favorites={favorites} 
