@@ -1,4 +1,4 @@
-// Enhanced TripPlanner.jsx with improved functionality
+// Enhanced TripPlanner.jsx - Fixed Version
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -36,459 +36,107 @@ const TripPlanner = () => {
   const [viewingTrip, setViewingTrip] = useState(null);
   const [loading, setLoading] = useState(true);
   const [currentTab, setCurrentTab] = useState('my-trips');
-  
-  // Enhanced auto-loading preferences
-  const [autoLoadPreferences, setAutoLoadPreferences] = useState({
-    enabled: true,
-    triggerOnFirstVisit: true,
-    lastRecommended: null,
-    showVisualIndicators: true
-  });
-
-  const [autoLoadingState, setAutoLoadingState] = useState({
-    isLoading: false,
-    hasTriggered: false,
-    recommendedTemplate: null,
-    showRecommendationBanner: false
-  });
 
   // Tab configuration
   const tabs = [
     { id: 'my-trips', title: 'My Trips', icon: FaRoute, description: 'Your planned adventures' },
-    { id: 'templates', title: 'Templates', icon: FaStar, description: 'Detailed trip guides' },
-    { id: 'analytics', title: 'Analytics', icon: FaChartBar, description: 'Your travel insights' },
-    { id: 'suggestions', title: 'Suggestions', icon: FaBrain, description: 'Smart recommendations' }
+    { id: 'templates', title: 'Templates', icon: FaStar, description: 'Pre-built trip guides' },
+    { id: 'analytics', title: 'Analytics', icon: FaChartBar, description: 'Your travel insights' }
   ];
 
-  // Enhanced detailed trip templates
+  // Enhanced detailed trip templates with proper structure
   const detailedTemplates = [
     {
-      id: 'big-bend-texas',
-      title: '🌵 Big Bend National Park Adventure',
-      subtitle: 'Texas Desert & Rio Grande Experience',
-      description: 'Explore the Chihuahuan Desert, paddle the Rio Grande, and experience one of America\'s most remote national parks',
-      duration: 3,
-      difficulty: 'Moderate',
-      estimatedCost: 1200,
-      season: 'October-April',
-      image: '🌵',
-      region: 'Texas',
-      highlights: ['Santa Elena Canyon', 'Chisos Mountains', 'Hot Springs', 'Dark Sky Stargazing'],
-      transportation: {
-        arrival: 'Fly to Midland/Odessa (MAF)',
-        drivingTime: '4.5 hours from airport',
-        rentalCarRequired: true
-      },
-      itinerary: [
-        {
-          day: 1,
-          title: 'Arrival & Desert Introduction',
-          activities: [
-            { time: '10:00 AM', type: 'travel', activity: 'Flight STL → MAF (Midland International)', icon: '✈️' },
-            { time: '2:00 PM', type: 'drive', activity: 'Scenic drive to Big Bend (4.5 hrs)', icon: '🚗' },
-            { time: '7:00 PM', type: 'accommodation', activity: 'Check-in: Chisos Mountains Lodge', icon: '🛏️' },
-            { time: '8:00 PM', type: 'sunset', activity: 'Sotol Vista Overlook sunset', icon: '🌄' }
-          ],
-          tips: ['Fill up on gas and bring snacks - services are limited!', 'Chisos Lodge books up fast - reserve early']
-        },
-        {
-          day: 2,
-          title: 'Rio Grande & Canyon Adventures',
-          activities: [
-            { time: '7:00 AM', type: 'hike', activity: 'Santa Elena Canyon Trail (1.7 mi RT)', icon: '🥾' },
-            { time: '10:00 AM', type: 'water', activity: 'Rio Grande kayaking/rafting (half-day)', icon: '🛶' },
-            { time: '2:00 PM', type: 'drive', activity: 'Ross Maxwell Scenic Drive', icon: '🛣️' },
-            { time: '4:00 PM', type: 'explore', activity: 'Mule Ears Viewpoint & Tuff Canyon', icon: '📸' },
-            { time: '9:00 PM', type: 'stargazing', activity: 'Dark Sky Park stargazing', icon: '⭐' }
-          ],
-          tips: ['Start early to avoid heat', 'Book river trips in advance', 'Bring headlamp for stargazing']
-        },
-        {
-          day: 3,
-          title: 'Chisos Mountains & Departure',
-          activities: [
-            { time: '6:00 AM', type: 'hike', activity: 'Lost Mine Trail (4.8 mi RT) - early start!', icon: '🥾' },
-            { time: '10:00 AM', type: 'explore', activity: 'Window View Trail (0.3 mi easy)', icon: '🚶' },
-            { time: '12:00 PM', type: 'visit', activity: 'Panther Junction Visitor Center', icon: '🏛️' },
-            { time: '2:00 PM', type: 'travel', activity: 'Drive back to Midland (5 hrs + airport time)', icon: '🚗' }
-          ],
-          tips: ['Allow 7 hours total for departure day', 'Pack lunch for the road']
-        }
-      ],
-      budgetBreakdown: {
-        accommodation: { nights: 2, rate: 150, total: 300 },
-        transportation: { flights: 400, rental: 180, gas: 120, total: 700 },
-        food: { daily: 60, days: 3, total: 180 },
-        activities: { riverTrip: 80, parkFees: 30, total: 110 },
-        total: 1290
-      },
-      packingList: ['Hiking boots', 'Sun hat', 'Sunscreen SPF 50+', 'Water bottles', 'Headlamp', 'Layers for temperature swings'],
-      bonusActivities: [
-        'Boquillas Crossing to Mexico (passport required)',
-        'Hot Springs Historic Trail natural soak',
-        'Photography workshops at sunset'
-      ]
-    },
-    {
-      id: 'utah-big5-extended',
-      title: '🏜️ Utah\'s Mighty Five Complete',
-      subtitle: 'All Five Utah National Parks',
-      description: 'Experience every Utah national park with expert routing and hidden gems',
+      id: 'utah-big5',
+      title: 'Utah\'s Big 5 National Parks',
+      subtitle: 'Complete Utah Adventure',
+      description: 'Experience all five magnificent Utah national parks in one epic 12-day adventure',
       duration: 12,
-      difficulty: 'Moderate to Advanced',
-      estimatedCost: 3200,
-      season: 'April-October',
+      difficulty: 'Moderate',
+      estimatedCost: 2800,
+      season: 'Spring/Fall',
       image: '🏜️',
       region: 'Utah',
-      highlights: ['Delicate Arch', 'Narrows', 'Angels Landing', 'Mesa Arch', 'Bryce Amphitheater'],
+      highlights: ['Delicate Arch', 'The Narrows', 'Bryce Amphitheater', 'Capitol Reef Scenic Drive'],
       transportation: {
-        arrival: 'Fly to Salt Lake City or Las Vegas',
-        drivingTime: 'Various between parks',
+        arrival: 'Salt Lake City Airport',
+        drivingTime: 'Road trip between parks',
         rentalCarRequired: true
       },
-      itinerary: [
-        {
-          day: 1,
-          title: 'Arrival & Arches National Park',
-          activities: [
-            { time: '9:00 AM', type: 'travel', activity: 'Arrival in Moab', icon: '✈️' },
-            { time: '11:00 AM', type: 'hike', activity: 'Delicate Arch Trail (3 mi RT)', icon: '🥾' },
-            { time: '3:00 PM', type: 'explore', activity: 'Windows Section & Turret Arch', icon: '📸' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Courthouse Towers sunset', icon: '🌄' }
-          ],
-          tips: ['Start with easier hikes to acclimate', 'Bring plenty of water']
-        },
-        {
-          day: 2,
-          title: 'Canyonlands & Moab Adventures',
-          activities: [
-            { time: '8:00 AM', type: 'hike', activity: 'Mesa Arch Sunrise Hike', icon: '🌅' },
-            { time: '10:00 AM', type: 'drive', activity: 'Island in the Sky Scenic Drive', icon: '🛣️' },
-            { time: '2:00 PM', type: 'explore', activity: 'Dead Horse Point State Park', icon: '📍' },
-            { time: '5:00 PM', type: 'relax', activity: 'Downtown Moab - Dinner & shopping', icon: '🍽️' }
-          ],
-          tips: ['Watch for afternoon thunderstorms', 'Use sun protection at Dead Horse Point']
-        },
-        {
-          day: 3,
-          title: 'Drive to Capitol Reef',
-          activities: [
-            { time: '9:00 AM', type: 'drive', activity: 'Moab → Capitol Reef via Scenic Byway 24 (2.5 hrs)', icon: '🚗' },
-            { time: '12:00 PM', type: 'explore', activity: 'Fruita Historic District & Petroglyphs', icon: '🏛️' },
-            { time: '3:00 PM', type: 'hike', activity: 'Hickman Bridge Trail (1.8 mi RT)', icon: '🥾' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Sunset Point View', icon: '🌄' }
-          ],
-          tips: ['Try pies at Gifford House!', 'Spot bighorn sheep along the drive']
-        },
-        {
-          day: 4,
-          title: 'Capitol Reef & Scenic Drive',
-          activities: [
-            { time: '8:00 AM', type: 'hike', activity: 'Cohab Canyon or Cassidy Arch Trail', icon: '🥾' },
-            { time: '12:00 PM', type: 'drive', activity: 'Scenic Capitol Gorge Drive', icon: '🛣️' },
-            { time: '3:00 PM', type: 'relax', activity: 'Apple picking or picnic in Fruita', icon: '🍎' }
-          ],
-          tips: ['Cohab Canyon offers incredible hidden views']
-        },
-        {
-          day: 5,
-          title: 'Scenic Drive to Bryce Canyon',
-          activities: [
-            { time: '9:00 AM', type: 'drive', activity: 'Capitol Reef → Bryce Canyon (~2.5 hrs)', icon: '🚗' },
-            { time: '12:00 PM', type: 'explore', activity: 'Scenic stops along UT-12 (Burr Trail, Escalante)', icon: '📍' },
-            { time: '4:00 PM', type: 'accommodation', activity: 'Check-in: Bryce Lodge or Ruby’s Inn', icon: '🛏️' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Sunset Point Amphitheater', icon: '🌄' }
-          ],
-          tips: ['UT-12 is one of America’s most scenic drives']
-        },
-        {
-          day: 6,
-          title: 'Bryce Canyon Hikes & Hoodoos',
-          activities: [
-            { time: '7:00 AM', type: 'hike', activity: 'Navajo Loop & Queen’s Garden (3 mi combo)', icon: '🥾' },
-            { time: '11:00 AM', type: 'explore', activity: 'Scenic Drive to Rainbow Point', icon: '🛣️' },
-            { time: '3:00 PM', type: 'relax', activity: 'Visitor Center or local lunch', icon: '🍽️' }
-          ],
-          tips: ['Early morning gives best light on hoodoos']
-        },
-        {
-          day: 7,
-          title: 'Drive to Zion National Park',
-          activities: [
-            { time: '8:00 AM', type: 'drive', activity: 'Bryce → Zion (2 hrs)', icon: '🚗' },
-            { time: '11:00 AM', type: 'explore', activity: 'Zion Scenic Drive via shuttle', icon: '🚌' },
-            { time: '3:00 PM', type: 'hike', activity: 'Riverside Walk or Watchman Trail', icon: '🥾' }
-          ],
-          tips: ['Zion has shuttle-only zones in peak season']
-        },
-        {
-          day: 8,
-          title: 'Zion Extreme Adventures',
-          activities: [
-            { time: '6:00 AM', type: 'hike', activity: 'Angels Landing (permit required)', icon: '⚠️' },
-            { time: '12:00 PM', type: 'explore', activity: 'Zion Human History Museum', icon: '🏛️' },
-            { time: '4:00 PM', type: 'relax', activity: 'Springdale town shopping/dinner', icon: '🛍️' }
-          ],
-          tips: ['Permits for Angels Landing must be applied in advance']
-        },
-        {
-          day: 9,
-          title: 'The Narrows & Riverside',
-          activities: [
-            { time: '7:00 AM', type: 'hike', activity: 'The Narrows (rent water gear)', icon: '🌊' },
-            { time: '1:00 PM', type: 'relax', activity: 'Zion Lodge lunch', icon: '🍴' }
-          ],
-          tips: ['Check flash flood warnings before entering The Narrows']
-        }
-        // Continue up to day 12 if needed with Las Vegas/SLC return
+      parks: [
+        { name: 'Arches National Park', days: 2, state: 'Utah' },
+        { name: 'Canyonlands National Park', days: 2, state: 'Utah' },
+        { name: 'Capitol Reef National Park', days: 2, state: 'Utah' },
+        { name: 'Bryce Canyon National Park', days: 3, state: 'Utah' },
+        { name: 'Zion National Park', days: 3, state: 'Utah' }
       ],
       budgetBreakdown: {
         accommodation: { nights: 11, rate: 120, total: 1320 },
-        transportation: { flights: 500, rental: 660, gas: 400, total: 1560 },
-        food: { daily: 70, days: 12, total: 840 },
-        activities: { parkFees: 150, gear: 80, guides: 200, total: 430 },
-        total: 4150
-      },
-      packingList: [
-        'Sturdy hiking shoes',
-        'Lightweight layers (desert days, chilly nights)',
-        'Sunhat & sunglasses',
-        'Hydration pack or large water bottles',
-        'Permit printouts (e.g., Angels Landing)',
-        'Trekking poles (optional for Narrows)'
-      ],
-      bonusActivities: [
-        'Canyoneering in Escalante',
-        'Horseback riding in Bryce',
-        'Helicopter ride over Canyonlands',
-        'Moab stargazing tours',
-        'ATV tours near Zion or Arches'
-      ]
+        transportation: { rental: 350, gas: 400, total: 750 },
+        food: { daily: 60, days: 12, total: 720 },
+        activities: { parkFees: 150, gear: 80, total: 230 },
+        total: 3020
+      }
     },
     {
-      id: 'yellowstone-tetons-wildlife',
-      title: '🦌 Yellowstone & Tetons Wildlife Safari',
-      subtitle: 'Wildlife Photography & Geysers',
-      description: 'Perfect timing for wildlife viewing, geyser exploration, and mountain photography',
-      duration: 8,
-      difficulty: 'Easy to Moderate',
-      estimatedCost: 2400,
-      season: 'May-September',
-      image: '🦌',
-      region: 'Wyoming',
-      highlights: ['Old Faithful', 'Grand Prismatic', 'Wildlife viewing', 'Jackson Lake'],
-      transportation: {
-        arrival: 'Jackson Hole Airport (JAC)',
-        drivingTime: 'Minimal - stay in area',
-        rentalCarRequired: true
-      },
-      itinerary: [
-        {
-          day: 1,
-          title: 'Arrival in Jackson & Scenic Drive',
-          activities: [
-            { time: '11:00 AM', type: 'travel', activity: 'Arrive at Jackson Hole Airport', icon: '✈️' },
-            { time: '1:00 PM', type: 'drive', activity: 'Scenic drive to Grand Teton NP', icon: '🚗' },
-            { time: '3:00 PM', type: 'explore', activity: 'Jenny Lake Overlook & Visitor Center', icon: '📍' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Sunset at Oxbow Bend', icon: '🌄' }
-          ],
-          tips: ['Oxbow Bend is best at sunset for wildlife and reflections']
-        },
-        {
-          day: 2,
-          title: 'Grand Teton Wildlife Day',
-          activities: [
-            { time: '6:00 AM', type: 'wildlife', activity: 'Sunrise wildlife spotting at Mormon Row', icon: '🦌' },
-            { time: '9:00 AM', type: 'hike', activity: 'Taggart Lake Trail (3.8 mi RT)', icon: '🥾' },
-            { time: '2:00 PM', type: 'explore', activity: 'Signal Mountain & Jackson Lake', icon: '📸' },
-            { time: '9:00 PM', type: 'stargazing', activity: 'Dark skies over Grand Teton', icon: '⭐' }
-          ],
-          tips: ['Use binoculars and long lenses for wildlife shots']
-        },
-        {
-          day: 3,
-          title: 'Drive to Yellowstone & Geyser Basin',
-          activities: [
-            { time: '8:00 AM', type: 'drive', activity: 'Drive from Tetons → Yellowstone South Entrance (~1.5 hrs)', icon: '🚗' },
-            { time: '11:00 AM', type: 'explore', activity: 'West Thumb Geyser Basin', icon: '♨️' },
-            { time: '1:00 PM', type: 'explore', activity: 'Old Faithful Geyser eruption', icon: '🌋' },
-            { time: '3:00 PM', type: 'hike', activity: 'Observation Point Trail (1.6 mi RT)', icon: '🥾' },
-            { time: '6:00 PM', type: 'accommodation', activity: 'Check-in: Old Faithful Inn or nearby lodging', icon: '🛏️' }
-          ],
-          tips: ['Check eruption times at visitor center']
-        },
-        {
-          day: 4,
-          title: 'Geysers & Hot Springs Photography',
-          activities: [
-            { time: '7:00 AM', type: 'explore', activity: 'Morning Glory Pool & Upper Geyser Basin walk', icon: '📸' },
-            { time: '11:00 AM', type: 'explore', activity: 'Grand Prismatic Spring Overlook (via Fairy Falls Trail)', icon: '🌈' },
-            { time: '2:00 PM', type: 'drive', activity: 'Firehole Lake Drive & Gibbon Falls', icon: '🛣️' }
-          ],
-          tips: ['Visit Grand Prismatic around midday for vivid colors']
-        },
-        {
-          day: 5,
-          title: 'Wildlife Safari: Hayden & Lamar Valley',
-          activities: [
-            { time: '5:00 AM', type: 'wildlife', activity: 'Drive to Hayden Valley for sunrise safari', icon: '🦅' },
-            { time: '9:00 AM', type: 'visit', activity: 'Grand Canyon of the Yellowstone - Artist Point', icon: '🏞️' },
-            { time: '1:00 PM', type: 'picnic', activity: 'Lunch at Canyon Village', icon: '🍽️' },
-            { time: '4:00 PM', type: 'drive', activity: 'Drive to Lamar Valley (2 hrs)', icon: '🚗' },
-            { time: '6:00 PM', type: 'wildlife', activity: 'Evening wolf/bear spotting in Lamar Valley', icon: '🐺' }
-          ],
-          tips: ['Bring long zoom lenses or spotting scopes']
-        },
-        {
-          day: 6,
-          title: 'Mammoth Area & Northern Yellowstone',
-          activities: [
-            { time: '9:00 AM', type: 'explore', activity: 'Mammoth Hot Springs Terraces walk', icon: '♨️' },
-            { time: '12:00 PM', type: 'visit', activity: 'Historic Fort Yellowstone area', icon: '🏛️' },
-            { time: '3:00 PM', type: 'relax', activity: 'Boiling River soak (if open)', icon: '💧' }
-          ],
-          tips: ['Watch for elk herds around Mammoth area']
-        },
-        {
-          day: 7,
-          title: 'Return to Tetons & Relax',
-          activities: [
-            { time: '9:00 AM', type: 'drive', activity: 'Yellowstone → Grand Teton (~2 hrs)', icon: '🚗' },
-            { time: '12:00 PM', type: 'explore', activity: 'Lunch at Dornan’s, Moose Junction', icon: '🍴' },
-            { time: '2:00 PM', type: 'relax', activity: 'Scenic float trip on Snake River', icon: '🛶' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Final sunset at Schwabacher Landing', icon: '🌄' }
-          ],
-          tips: ['Float trips can be booked online in advance']
-        },
-        {
-          day: 8,
-          title: 'Departure from Jackson Hole',
-          activities: [
-            { time: '8:00 AM', type: 'souvenir', activity: 'Quick breakfast & gift shop in Jackson', icon: '☕' },
-            { time: '10:00 AM', type: 'travel', activity: 'Fly out from Jackson Hole Airport', icon: '✈️' }
-          ],
-          tips: ['Arrive 90 minutes early to JAC - small airport but busy in summer']
-        }
-      ],
-      budgetBreakdown: {
-        accommodation: { nights: 7, rate: 180, total: 1260 },
-        transportation: { flights: 600, rental: 420, gas: 200, total: 1220 },
-        food: { daily: 80, days: 8, total: 640 },
-        activities: { parkFees: 70, tours: 300, gear: 110, total: 480 },
-        total: 3600
-      },
-      packingList: [
-        'Camera with telephoto lens',
-        'Binoculars',
-        'Warm layers (mornings are cold)',
-        'Refillable water bottles',
-        'Bear spray (available locally)',
-        'National Park Pass or entry fee'
-      ],
-      bonusActivities: [
-        'Horseback riding near Roosevelt',
-        'Yellowstone Lake boat tours',
-        'Wildlife photography workshops',
-        'Scenic flight over the Tetons',
-        'Night sky ranger program at Colter Bay'
-      ]
-    },
-    {
-      id: 'yosemite-sequoia-california',
-      title: '🌲 Yosemite & Sequoia National Park Adventure',
-      subtitle: 'Granite Cliffs & Giant Trees of California',
-      description: 'Experience two of California’s crown jewels—massive granite peaks, giant sequoias, and some of the best hikes and views in the U.S.',
-      duration: 5,
+      id: 'california-classics',
+      title: 'California National Parks',
+      subtitle: 'Desert to Mountains Adventure',
+      description: 'From desert landscapes to towering sequoias, explore California\'s diverse national parks',
+      duration: 10,
       difficulty: 'Moderate',
-      estimatedCost: 1600,
-      season: 'May-October',
+      estimatedCost: 2400,
+      season: 'Year-round',
       image: '🌲',
       region: 'California',
-      highlights: ['Yosemite Valley', 'Half Dome View', 'Mariposa Grove', 'Tunnel View', 'General Sherman Tree'],
+      highlights: ['Half Dome', 'General Sherman Tree', 'Death Valley', 'Joshua Tree Forest'],
       transportation: {
-        arrival: 'Fly to Fresno Yosemite International (FAT)',
-        drivingTime: '1.5–2 hours to each park',
+        arrival: 'Los Angeles or San Francisco',
+        drivingTime: 'Various between parks',
         rentalCarRequired: true
       },
-      itinerary: [
-        {
-          day: 1,
-          title: 'Arrival & Giant Trees in Sequoia',
-          activities: [
-            { time: '10:00 AM', type: 'travel', activity: 'Flight into Fresno Yosemite Intl (FAT)', icon: '✈️' },
-            { time: '12:00 PM', type: 'drive', activity: 'Drive to Sequoia National Park (~2 hrs)', icon: '🚗' },
-            { time: '3:00 PM', type: 'explore', activity: 'Walk the Congress Trail to General Sherman Tree', icon: '🌲' },
-            { time: '6:00 PM', type: 'sunset', activity: 'Sunset at Moro Rock (short climb)', icon: '🌄' },
-            { time: '8:00 PM', type: 'accommodation', activity: 'Check-in: Wuksachi Lodge or nearby', icon: '🛏️' }
-          ],
-          tips: ['Start early — park roads can be narrow and curvy', 'Bring layers; elevation = chilly evenings']
-        },
-        {
-          day: 2,
-          title: 'Sequoia & Kings Canyon Scenic Drive',
-          activities: [
-            { time: '8:00 AM', type: 'hike', activity: 'Hike to Tokopah Falls (4 mi RT)', icon: '🥾' },
-            { time: '11:00 AM', type: 'drive', activity: 'Scenic drive to Kings Canyon', icon: '🛣️' },
-            { time: '1:00 PM', type: 'explore', activity: 'Zumwalt Meadow & Grizzly Falls picnic', icon: '🍽️' },
-            { time: '5:00 PM', type: 'drive', activity: 'Head toward Yosemite lodging (2.5–3 hrs)', icon: '🚗' }
-          ],
-          tips: ['Kings Canyon is one of the deepest in the U.S.!', 'Watch for black bears in meadows']
-        },
-        {
-          day: 3,
-          title: 'Yosemite Valley Essentials',
-          activities: [
-            { time: '7:00 AM', type: 'sunrise', activity: 'Tunnel View at sunrise', icon: '🌄' },
-            { time: '9:00 AM', type: 'hike', activity: 'Vernal & Nevada Falls via Mist Trail (5–7 mi RT)', icon: '💦' },
-            { time: '2:00 PM', type: 'visit', activity: 'Yosemite Visitor Center & Valley View', icon: '🏞️' },
-            { time: '5:00 PM', type: 'relax', activity: 'Dinner at Curry Village or Yosemite Village', icon: '🍽️' }
-          ],
-          tips: ['Mist Trail is slippery – wear grippy shoes', 'Yosemite parking fills fast – arrive early!']
-        },
-        {
-          day: 4,
-          title: 'Glacier Point & Mariposa Grove',
-          activities: [
-            { time: '8:00 AM', type: 'drive', activity: 'Drive to Glacier Point', icon: '🚗' },
-            { time: '9:00 AM', type: 'explore', activity: 'Panoramic views: Half Dome, Clouds Rest, Nevada Falls', icon: '📸' },
-            { time: '12:00 PM', type: 'visit', activity: 'Lunch and explore Mariposa Grove of Giant Sequoias', icon: '🌳' },
-            { time: '4:00 PM', type: 'hike', activity: 'Hike the Grizzly Giant Loop (2 mi RT)', icon: '🥾' }
-          ],
-          tips: ['Road to Glacier Point may be seasonal – check status', 'Shuttle required for Mariposa Grove in summer']
-        },
-        {
-          day: 5,
-          title: 'Wrap-up & Departure',
-          activities: [
-            { time: '9:00 AM', type: 'souvenir', activity: 'Morning coffee & gift shopping at Yosemite Village', icon: '☕' },
-            { time: '11:00 AM', type: 'drive', activity: 'Drive back to Fresno Airport (~2.5 hrs)', icon: '🚗' },
-            { time: '3:00 PM', type: 'travel', activity: 'Fly home from FAT', icon: '✈️' }
-          ],
-          tips: ['Allow extra time for traffic near Yosemite exits']
-        }
+      parks: [
+        { name: 'Yosemite National Park', days: 3, state: 'California' },
+        { name: 'Sequoia National Park', days: 2, state: 'California' },
+        { name: 'Death Valley National Park', days: 2, state: 'California' },
+        { name: 'Joshua Tree National Park', days: 3, state: 'California' }
       ],
       budgetBreakdown: {
-        accommodation: { nights: 4, rate: 180, total: 720 },
-        transportation: { flights: 400, rental: 280, gas: 100, total: 780 },
-        food: { daily: 70, days: 5, total: 350 },
-        activities: { parkFees: 60, tours: 80, total: 140 },
-        total: 1990
+        accommodation: { nights: 9, rate: 140, total: 1260 },
+        transportation: { rental: 300, gas: 350, total: 650 },
+        food: { daily: 65, days: 10, total: 650 },
+        activities: { parkFees: 120, tours: 200, total: 320 },
+        total: 2880
+      }
+    },
+    {
+      id: 'yellowstone-tetons',
+      title: 'Yellowstone & Grand Teton',
+      subtitle: 'Wildlife & Geysers Adventure',
+      description: 'Experience America\'s first national park and the stunning Teton Range',
+      duration: 8,
+      difficulty: 'Easy to Moderate',
+      estimatedCost: 2000,
+      season: 'Summer',
+      image: '🦌',
+      region: 'Wyoming',
+      highlights: ['Old Faithful', 'Grand Prismatic', 'Jenny Lake', 'Wildlife Viewing'],
+      transportation: {
+        arrival: 'Jackson Hole Airport',
+        drivingTime: 'Short drives between areas',
+        rentalCarRequired: true
       },
-      packingList: [
-        'Hiking boots with grip',
-        'Rain jacket (waterfalls spray)',
-        'Reusable water bottle',
-        'Bear-safe food container or daypack',
-        'Camera with wide-angle lens',
-        'Sunscreen + hat'
+      parks: [
+        { name: 'Grand Teton National Park', days: 3, state: 'Wyoming' },
+        { name: 'Yellowstone National Park', days: 5, state: 'Wyoming' }
       ],
-      bonusActivities: [
-        'Stargazing at Glacier Point (bring a blanket)',
-        'Yosemite Falls Lower Trail night walk',
-        'Sequoia National Forest scenic overlooks',
-        'Sunrise photography at Valley View',
-        'Bike rentals in Yosemite Valley'
-      ]
+      budgetBreakdown: {
+        accommodation: { nights: 7, rate: 150, total: 1050 },
+        transportation: { rental: 280, gas: 200, total: 480 },
+        food: { daily: 70, days: 8, total: 560 },
+        activities: { parkFees: 60, tours: 250, total: 310 },
+        total: 2400
+      }
     }
   ];
 
@@ -505,53 +153,16 @@ const TripPlanner = () => {
     }
   }, [location.state]);
 
-  // Enhanced auto-loading with better logic
-  useEffect(() => {
-    if (currentTab === 'templates' && autoLoadPreferences.enabled && trips.length > 0) {
-      const hasAutoLoadedToday = localStorage.getItem('lastAutoLoadDate') === new Date().toDateString();
-      
-      if (!hasAutoLoadedToday && !autoLoadingState.hasTriggered) {
-        setAutoLoadingState(prev => ({ ...prev, isLoading: true, hasTriggered: true }));
-        localStorage.setItem('lastAutoLoadDate', new Date().toDateString());
-        
-        setTimeout(() => {
-          const recommended = getEnhancedTemplateRecommendation();
-          
-          if (recommended) {
-            setAutoLoadingState(prev => ({
-              ...prev,
-              isLoading: false,
-              recommendedTemplate: recommended,
-              showRecommendationBanner: true
-            }));
-            
-            setAutoLoadPreferences(prev => ({
-              ...prev,
-              lastRecommended: recommended.id
-            }));
-            
-            showToast(`🎯 Based on your travel style, we recommend "${recommended.title}"!`, 'success');
-            
-            setTimeout(() => {
-              const templateElement = document.getElementById(`template-${recommended.id}`);
-              if (templateElement) {
-                templateElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }
-            }, 1000);
-          }
-        }, 2000);
-      }
-    }
-  }, [currentTab, trips.length]);
-
   const fetchData = async () => {
     try {
       setLoading(true);
       
+      // Fetch parks data
       const parksSnapshot = await getDocs(collection(db, 'parks'));
       const parks = parksSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setAllParks(parks);
 
+      // Fetch trips data
       if (currentUser) {
         const q = query(collection(db, 'trips'), where('userId', '==', currentUser.uid));
         const tripsSnapshot = await getDocs(q);
@@ -569,306 +180,123 @@ const TripPlanner = () => {
     }
   };
 
-  // Enhanced recommendation logic that avoids duplicates
-  const getEnhancedTemplateRecommendation = () => {
-    if (trips.length === 0) return null;
-    
-    // Get user's visited states and parks
-    const userStates = [...new Set(trips.flatMap(trip => 
-      trip.parks?.map(p => p.state?.toLowerCase()).filter(Boolean) || []
-    ))];
-    
-    const userParks = trips.flatMap(trip => trip.parks?.map(p => p.parkName?.toLowerCase()) || []);
-    const userTitles = trips.map(trip => trip.title?.toLowerCase() || '');
-    
-    // Filter out templates that are too similar to existing trips
-    const availableTemplates = detailedTemplates.filter(template => {
-      // Check if user already has this exact template
-      const hasExactTemplate = userTitles.some(title => 
-        title.includes(template.title.toLowerCase().replace(/[🌵🏜️🦌]/g, '').trim().split(' ')[0])
-      );
-      
-      // Check if user has been to this region recently
-      const hasVisitedRegion = userStates.includes(template.region?.toLowerCase());
-      
-      return !hasExactTemplate && (!hasVisitedRegion || Math.random() > 0.7);
-    });
-    
-    if (availableTemplates.length === 0) {
-      return detailedTemplates.find(t => t.id === 'big-bend-texas'); // Fallback
-    }
-    
-    // Score templates based on user preferences
-    const scoredTemplates = availableTemplates.map(template => {
-      let score = 50; // Base score
-      
-      const avgCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
-      const avgDuration = trips.reduce((sum, trip) => sum + (trip.totalDuration || 0), 0) / trips.length;
-      
-      // Budget matching
-      if (Math.abs(template.estimatedCost - avgCost) < 500) score += 30;
-      
-      // Duration matching
-      if (Math.abs(template.duration - avgDuration) < 3) score += 20;
-      
-      // Diversity bonus (new region)
-      if (!userStates.includes(template.region?.toLowerCase())) score += 25;
-      
-      return { template, score };
-    });
-    
-    const bestMatch = scoredTemplates.sort((a, b) => b.score - a.score)[0];
-    console.log('🎯 Enhanced recommendation:', bestMatch?.template?.title, 'Score:', bestMatch?.score);
-    
-    return bestMatch?.template || availableTemplates[0];
-  };
-
-  // Enhanced smart suggestions with better fallbacks
-  const generateEnhancedSmartSuggestions = () => {
-    const suggestions = [];
-    
-    if (trips.length === 0) {
-      // First-time user suggestions
-      suggestions.push(
-        {
-          type: 'beginner_friendly',
-          title: 'Perfect First National Park Trip',
-          description: 'Start your national parks journey with the most accessible and rewarding experiences',
-          actionText: 'Plan My First Adventure',
-          parks: ['Great Smoky Mountains NP', 'Mammoth Cave NP'],
-          estimatedDays: 5,
-          estimatedCost: 800,
-          confidence: 95,
-          icon: '🌟',
-          reason: 'Perfect introduction to national parks with easy access and diverse activities'
-        },
-        {
-          type: 'classic_road_trip',
-          title: 'Classic American Road Trip',
-          description: 'Experience the iconic southwestern parks that define American adventure',
-          actionText: 'Start Classic Journey',
-          parks: ['Grand Canyon NP', 'Zion NP', 'Bryce Canyon NP'],
-          estimatedDays: 8,
-          estimatedCost: 1800,
-          confidence: 90,
-          icon: '🛣️',
-          reason: 'Most popular first-time multi-park adventure'
-        }
-      );
-      return suggestions;
-    }
-    
-    // Existing user suggestions with enhanced logic
-    const userStates = [...new Set(trips.flatMap(trip => 
-      trip.parks?.map(p => p.state?.toLowerCase()).filter(Boolean) || []
-    ))];
-    
-    const userParks = trips.flatMap(trip => trip.parks?.map(p => p.parkName?.toLowerCase()) || []);
-    const avgCost = trips.reduce((sum, trip) => sum + (trip.estimatedCost || 0), 0) / trips.length;
-    const totalParksVisited = userParks.length;
-    
-    // Advanced user suggestions
-    if (totalParksVisited >= 5) {
-      suggestions.push({
-        type: 'expert_challenge',
-        title: 'Alaska Wilderness Challenge',
-        description: 'Ready for the ultimate adventure? Tackle America\'s final frontier',
-        actionText: 'Accept the Challenge',
-        parks: ['Denali National Park', 'Katmai National Park'],
-        estimatedDays: 10,
-        estimatedCost: Math.max(4500, avgCost * 1.5),
-        confidence: 85,
-        icon: '🏔️',
-        reason: `With ${totalParksVisited} parks under your belt, you\'re ready for Alaska!`
-      });
-    }
-    
-    // Regional completion suggestions
-    if (userStates.includes('utah') && userParks.filter(p => ['zion', 'bryce', 'arches', 'capitol', 'canyonlands'].some(up => p.includes(up))).length >= 2) {
-      const visitedUtah = userParks.filter(p => ['zion', 'bryce', 'arches', 'capitol', 'canyonlands'].some(up => p.includes(up)));
-      const missingUtah = ['Arches', 'Bryce Canyon', 'Canyonlands', 'Capitol Reef', 'Zion'].filter(up => 
-        !userParks.some(p => p.includes(up.toLowerCase()))
-      );
-      
-      if (missingUtah.length > 0 && missingUtah.length < 4) {
-        suggestions.push({
-          type: 'complete_series',
-          title: 'Complete Utah\'s Big 5',
-          description: `You've conquered ${visitedUtah.length} Utah parks. Finish the legendary Big 5!`,
-          actionText: 'Complete the Collection',
-          parks: missingUtah.map(park => `${park} National Park`),
-          estimatedDays: missingUtah.length * 2,
-          estimatedCost: Math.round(avgCost * (missingUtah.length / 3)),
-          confidence: 95,
-          icon: '🏆',
-          reason: `${missingUtah.length} parks left to complete Utah\'s Big 5`
-        });
-      }
-    }
-    
-    // Budget-conscious suggestions
-    if (avgCost > 2500) {
-      suggestions.push({
-        type: 'budget_optimization',
-        title: 'Hidden Gems on a Budget',
-        description: 'Discover amazing parks without the premium price tag',
-        actionText: 'Explore Budget-Friendly',
-        parks: ['Hot Springs NP', 'Congaree NP', 'Mammoth Cave NP'],
-        estimatedDays: 6,
-        estimatedCost: 1000,
-        confidence: 80,
-        icon: '💎',
-        reason: 'Great value adventures in underrated parks'
-      });
-    }
-    
-    // Always provide at least one suggestion
-    if (suggestions.length === 0) {
-      suggestions.push({
-        type: 'seasonal_special',
-        title: 'Perfect Season Adventure',
-        description: 'Specially timed for optimal weather and experiences',
-        actionText: 'Book Seasonal Trip',
-        parks: ['Yellowstone NP', 'Grand Teton NP'],
-        estimatedDays: Math.max(6, Math.round(avgCost / 300)),
-        estimatedCost: Math.max(1800, avgCost),
-        confidence: 85,
-        icon: '🌺',
-        reason: 'Ideal timing for wildlife and wildflowers'
-      });
-    }
-    
-    return suggestions.slice(0, 4);
-  };
-
-  // Enhanced template creation with proper date constraints
-  const createTripFromDetailedTemplate = (template) => {
+  // Enhanced template creation with proper park mapping
+  const createTripFromDetailedTemplate = async (template) => {
     try {
-      // Calculate start and end dates based on template duration
+      setLoading(true);
+      
+      // Calculate start and end dates
       const startDate = new Date();
       startDate.setDate(startDate.getDate() + 30); // 30 days from now
       const endDate = new Date(startDate);
       endDate.setDate(endDate.getDate() + template.duration);
-      
-      // Create proper park mapping from template
+
+      // Map template parks to actual park data
       const templateParks = [];
+      let currentDate = new Date(startDate);
 
-      // Use template.parks array if available, otherwise fall back to highlights
-      const parksToProcess = template.parks || template.highlights.map(highlight => ({ name: highlight, days: 2 }));
+      for (const templatePark of template.parks) {
+        // Find matching park in database
+        const matchingPark = allParks.find(park => {
+          const dbName = (park.name || park.fullName || '').toLowerCase();
+          const templateName = templatePark.name.toLowerCase();
+          return dbName.includes(templateName.split(' ')[0]) || 
+                 templateName.includes(dbName.split(' ')[0]);
+        });
 
-      parksToProcess.forEach((parkInfo, index) => {
-              const parkName = parkInfo.name || parkInfo;
-              const stayDuration = parkInfo.days || 2;
-              
-              // Better park matching logic
-              const matchingPark = allParks.find(park => {
-                const dbName = (park.name || park.fullName || '').toLowerCase();
-                const templateName = parkName.toLowerCase();
-                
-                // Direct name match
-                if (dbName.includes(templateName.split(' ')[0]) || templateName.includes(dbName.split(' ')[0])) return true;
-                
-                // Special cases for common park names
-                if (templateName.includes('grand canyon') && dbName.includes('grand canyon')) return true;
-                if (templateName.includes('yellowstone') && dbName.includes('yellowstone')) return true;
-                if (templateName.includes('yosemite') && dbName.includes('yosemite')) return true;
-                if (templateName.includes('zion') && dbName.includes('zion')) return true;
-                if (templateName.includes('bryce') && dbName.includes('bryce')) return true;
-                
-                return false;
-              });
-              
-              if (matchingPark) {
-                let coordinates = { lat: 0, lng: 0 };
-                
-                // Handle different coordinate formats
-                if (matchingPark.coordinates) {
-                  if (typeof matchingPark.coordinates === 'string' && matchingPark.coordinates.includes(',')) {
-                    const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                      coordinates = { lat, lng };
-                    }
-                  } else if (matchingPark.coordinates.lat && matchingPark.coordinates.lng) {
-                    coordinates = { 
-                      lat: parseFloat(matchingPark.coordinates.lat), 
-                      lng: parseFloat(matchingPark.coordinates.lng) 
-                    };
-                  }
-                }
-
-                // Calculate visit date based on cumulative days
-                let cumulativeDays = 0;
-                if (index > 0) {
-                  cumulativeDays = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
-                }
-
-                templateParks.push({
-                  parkId: matchingPark.id,
-                  parkName: matchingPark.name || matchingPark.fullName,
-                  visitDate: new Date(startDate.getTime() + (cumulativeDays * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-                  stayDuration: stayDuration,
-                  coordinates,
-                  state: matchingPark.state,
-                  description: matchingPark.description
-                });
+        if (matchingPark) {
+          // Parse coordinates properly
+          let coordinates = { lat: 0, lng: 0 };
+          if (matchingPark.coordinates) {
+            if (typeof matchingPark.coordinates === 'string' && matchingPark.coordinates.includes(',')) {
+              const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
+              if (!isNaN(lat) && !isNaN(lng)) {
+                coordinates = { lat, lng };
               }
-            });
+            } else if (matchingPark.coordinates.lat && matchingPark.coordinates.lng) {
+              coordinates = { 
+                lat: parseFloat(matchingPark.coordinates.lat), 
+                lng: parseFloat(matchingPark.coordinates.lng) 
+              };
+            }
+          }
 
-      // Calculate correct end date based on actual park durations
-      const totalDays = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
-      const correctEndDate = new Date(startDate);
-      correctEndDate.setDate(correctEndDate.getDate() + totalDays - 1);
+          templateParks.push({
+            parkId: matchingPark.id,
+            parkName: matchingPark.name || matchingPark.fullName,
+            visitDate: currentDate.toISOString().split('T')[0],
+            stayDuration: templatePark.days || 2,
+            coordinates,
+            state: templatePark.state || matchingPark.state,
+            description: matchingPark.description || ''
+          });
 
+          // Advance date for next park
+          currentDate.setDate(currentDate.getDate() + (templatePark.days || 2));
+        } else {
+          console.warn(`Park not found in database: ${templatePark.name}`);
+        }
+      }
+
+      // Create the trip object
       const newTrip = {
-        title: template.title.replace(/[🌵🏜️🦌🌟]/g, '').trim(),
+        title: template.title,
         description: template.description,
         parks: templateParks,
         startDate: startDate.toISOString().split('T')[0],
-        endDate: correctEndDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
         transportationMode: template.transportation.rentalCarRequired ? 'driving' : 'flying',
         isPublic: false,
         templateId: template.id,
-        totalDistance: 0,
-        estimatedCost: template.budgetBreakdown?.total || template.estimatedCost,
+        totalDistance: 0, // Will be calculated in TripBuilder
+        estimatedCost: template.estimatedCost,
         totalDuration: template.duration,
         templateData: {
-          itinerary: template.itinerary,
           budgetBreakdown: template.budgetBreakdown,
-          packingList: template.packingList,
-          season: template.season
+          season: template.season,
+          difficulty: template.difficulty
         }
       };
 
       setActiveTrip(newTrip);
       setCurrentTab('my-trips');
-      const actualDuration = templateParks.reduce((sum, park) => sum + park.stayDuration, 0);
-      showToast(`✨ ${template.title} loaded with ${actualDuration}-day itinerary and ${templateParks.length} parks!`, 'success');
+      showToast(`✨ ${template.title} template loaded with ${templateParks.length} parks!`, 'success');
       
     } catch (error) {
       console.error('Error creating trip from template:', error);
       showToast('Failed to load template. Please try again.', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Enhanced save function with better error handling
+  // Enhanced save function with proper validation
   const saveTrip = async (tripData) => {
     try {
+      setLoading(true);
+
       // Validate required fields
       if (!tripData.title?.trim()) {
-        showToast('Trip title is required', 'error');
-        return null;
+        throw new Error('Trip title is required');
       }
       
       if (!tripData.parks || tripData.parks.length === 0) {
-        showToast('Please add at least one park to your trip', 'error');
-        return null;
+        throw new Error('Please add at least one park to your trip');
       }
 
-      // Clean and validate numeric fields
+      // Clean and validate the trip data
       const cleanedTripData = {
         title: tripData.title.trim(),
         description: tripData.description?.trim() || '',
-        parks: tripData.parks || [],
+        parks: tripData.parks.map(park => ({
+          parkId: park.parkId,
+          parkName: park.parkName,
+          visitDate: park.visitDate || '',
+          stayDuration: parseInt(park.stayDuration) || 1,
+          coordinates: park.coordinates || { lat: 0, lng: 0 },
+          state: park.state || '',
+          description: park.description || ''
+        })),
         startDate: tripData.startDate || '',
         endDate: tripData.endDate || '',
         transportationMode: tripData.transportationMode || 'driving',
@@ -881,20 +309,23 @@ const TripPlanner = () => {
       };
 
       if (!currentUser) {
+        // Save to localStorage for non-authenticated users
         const newTrip = { 
           id: Date.now().toString(), 
           ...cleanedTripData, 
           createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
           userId: 'local' 
         };
         const updatedTrips = [...trips, newTrip];
         setTrips(updatedTrips);
         localStorage.setItem('trips', JSON.stringify(updatedTrips));
-        showToast('💖 Trip saved locally! Log in to sync across devices', 'info');
+        showToast('💾 Trip saved locally! Sign in to sync across devices', 'success');
         setActiveTrip(null);
         return newTrip;
       }
 
+      // Save to Firestore for authenticated users
       const firestoreData = {
         ...cleanedTripData,
         userId: currentUser.uid,
@@ -903,11 +334,15 @@ const TripPlanner = () => {
       };
 
       if (tripData.id) {
+        // Update existing trip
         await updateDoc(doc(db, 'trips', tripData.id), firestoreData);
-        const updatedTrips = trips.map(t => t.id === tripData.id ? { ...firestoreData, id: tripData.id } : t);
+        const updatedTrips = trips.map(t => 
+          t.id === tripData.id ? { ...firestoreData, id: tripData.id } : t
+        );
         setTrips(updatedTrips);
         showToast('✅ Trip updated successfully!', 'success');
       } else {
+        // Create new trip
         const docRef = await addDoc(collection(db, 'trips'), firestoreData);
         const savedTrip = { id: docRef.id, ...firestoreData };
         setTrips([...trips, savedTrip]);
@@ -919,8 +354,10 @@ const TripPlanner = () => {
       
     } catch (error) {
       console.error('Save error:', error);
-      showToast(`❌ Failed to save trip: ${error.message}`, 'error');
+      showToast(`❌ Save failed: ${error.message}`, 'error');
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -932,7 +369,10 @@ const TripPlanner = () => {
       startDate: '',
       endDate: '',
       transportationMode: 'driving',
-      isPublic: false
+      isPublic: false,
+      totalDistance: 0,
+      estimatedCost: 0,
+      totalDuration: 0
     });
     setCurrentTab('my-trips');
   };
@@ -962,61 +402,8 @@ const TripPlanner = () => {
     }
   };
 
-  const createTripFromSuggestion = (suggestion) => {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 14);
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + suggestion.estimatedDays);
-
-    const suggestedParks = [];
-    
-    suggestion.parks.forEach((parkName, index) => {
-      const matchingPark = allParks.find(park => 
-        park.name?.toLowerCase().includes(parkName.toLowerCase().split(' ')[0]) ||
-        park.fullName?.toLowerCase().includes(parkName.toLowerCase().split(' ')[0])
-      );
-      
-      if (matchingPark) {
-        let coordinates = { lat: 0, lng: 0 };
-        if (matchingPark.coordinates && matchingPark.coordinates.includes(',')) {
-          const [lat, lng] = matchingPark.coordinates.split(',').map(val => parseFloat(val.trim()));
-          if (!isNaN(lat) && !isNaN(lng)) {
-            coordinates = { lat, lng };
-          }
-        }
-
-        suggestedParks.push({
-          parkId: matchingPark.id,
-          parkName: matchingPark.name || matchingPark.fullName,
-          visitDate: new Date(startDate.getTime() + (index * 24 * 60 * 60 * 1000)).toISOString().split('T')[0],
-          stayDuration: Math.ceil(suggestion.estimatedDays / suggestion.parks.length),
-          coordinates,
-          state: matchingPark.state,
-          description: matchingPark.description
-        });
-      }
-    });
-
-    const newTrip = {
-      title: suggestion.title,
-      description: suggestion.description,
-      parks: suggestedParks,
-      startDate: startDate.toISOString().split('T')[0],
-      endDate: endDate.toISOString().split('T')[0],
-      transportationMode: 'driving',
-      estimatedCost: suggestion.estimatedCost,
-      totalDuration: suggestion.estimatedDays,
-      isPublic: false,
-      suggestionType: suggestion.type
-    };
-
-    setActiveTrip(newTrip);
-    setCurrentTab('my-trips');
-    showToast(`🧠 Smart suggestion applied! ${suggestedParks.length} parks added.`, 'success');
-  };
-
-  // Enhanced template card component
-  const DetailedTemplateCard = ({ template, isRecommended = false }) => {
+  // Template card component
+  const TemplateCard = ({ template }) => {
     const getDifficultyColor = (difficulty) => {
       if (difficulty.toLowerCase().includes('easy')) return 'text-green-600 bg-green-100';
       if (difficulty.toLowerCase().includes('moderate')) return 'text-yellow-600 bg-yellow-100';
@@ -1025,22 +412,9 @@ const TripPlanner = () => {
     };
 
     return (
-      <div 
-        id={`template-${template.id}`}
-        className={`group bg-white rounded-3xl overflow-hidden shadow-lg border transition-all duration-300 hover:shadow-2xl ${
-          isRecommended 
-            ? 'border-yellow-300 ring-2 ring-yellow-200 transform hover:scale-105' 
-            : 'border-gray-100 hover:shadow-xl'
-        }`}
-      >
+      <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300">
         {/* Header */}
         <div className="relative bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 p-6 text-white">
-          {isRecommended && (
-            <div className="absolute top-3 right-3 bg-yellow-400 text-yellow-900 px-3 py-1 rounded-full text-xs font-bold animate-pulse flex items-center gap-1">
-              🎯 Smart Pick
-            </div>
-          )}
-          
           <div className="flex items-start justify-between mb-4">
             <div className="text-4xl mb-2">{template.image}</div>
             <div className="text-right">
@@ -1069,8 +443,8 @@ const TripPlanner = () => {
             </div>
             
             <div className="text-center">
-              <div className="font-bold text-gray-800">{template.highlights.length}</div>
-              <div className="text-xs text-gray-500">Highlights</div>
+              <div className="font-bold text-gray-800">{template.parks.length}</div>
+              <div className="text-xs text-gray-500">Parks</div>
             </div>
             
             <div className="text-center">
@@ -1079,199 +453,46 @@ const TripPlanner = () => {
             </div>
           </div>
 
-          {/* Transportation Info */}
-          <div className="bg-blue-50 p-4 rounded-lg mb-4">
-            <h5 className="font-semibold text-blue-800 mb-2 flex items-center gap-2">
-              <FaRoute className="text-blue-600" />
-              Getting There
-            </h5>
-            <div className="text-sm text-blue-700">
-              <div>✈️ {template.transportation.arrival}</div>
-              <div>🚗 {template.transportation.drivingTime}</div>
-              {template.transportation.rentalCarRequired && (
-                <div className="text-xs text-blue-600 mt-1">🔑 Rental car required</div>
-              )}
-            </div>
-          </div>
-
           {/* Highlights */}
           <div className="mb-6">
             <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
               <FaStar className="text-yellow-500" />
-              Must-See Highlights
+              Highlights
             </h5>
             <div className="grid grid-cols-2 gap-2">
-              {template.highlights.map((highlight, idx) => (
-                <div key={idx} className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-2">
-                  <FaCamera className="text-purple-500" />
+              {template.highlights.slice(0, 4).map((highlight, idx) => (
+                <div key={idx} className="bg-gradient-to-r from-pink-100 to-purple-100 text-purple-700 px-3 py-2 rounded-lg text-xs font-medium">
                   {highlight}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Sample Itinerary Preview */}
-          {template.itinerary && (
-            <div className="mb-6">
-              <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <FaCalendarAlt className="text-blue-500" />
-                Sample Itinerary
-              </h5>
-              <div className="space-y-2">
-                {template.itinerary.slice(0, 2).map((day, idx) => (
-                  <div key={idx} className="bg-gray-50 p-3 rounded-lg">
-                    <div className="font-medium text-gray-800 text-sm mb-1">
-                      Day {day.day}: {day.title}
-                    </div>
-                    <div className="text-xs text-gray-600">
-                      {day.activities.slice(0, 2).map((activity, actIdx) => (
-                        <div key={actIdx} className="flex items-center gap-2 mb-1">
-                          <span>{activity.icon}</span>
-                          <span>{activity.time} - {activity.activity}</span>
-                        </div>
-                      ))}
-                      {day.activities.length > 2 && (
-                        <div className="text-gray-500">+{day.activities.length - 2} more activities...</div>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {template.itinerary.length > 2 && (
-                  <div className="text-sm text-gray-500 text-center">
-                    +{template.itinerary.length - 2} more days of detailed planning...
-                  </div>
-                )}
-              </div>
+          {/* Parks List */}
+          <div className="mb-6">
+            <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <FaMapMarkerAlt className="text-green-500" />
+              Parks Included
+            </h5>
+            <div className="space-y-2">
+              {template.parks.map((park, idx) => (
+                <div key={idx} className="flex justify-between items-center text-sm">
+                  <span className="text-gray-700">{park.name}</span>
+                  <span className="text-gray-500">{park.days} day{park.days > 1 ? 's' : ''}</span>
+                </div>
+              ))}
             </div>
-          )}
-
-          {/* Budget Breakdown Preview */}
-          {template.budgetBreakdown && (
-            <div className="mb-6">
-              <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <FaDollarSign className="text-green-500" />
-                Budget Breakdown
-              </h5>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-blue-50 p-2 rounded">
-                  <div className="font-medium text-blue-800">Accommodation</div>
-                  <div className="text-blue-600">${template.budgetBreakdown.accommodation?.total || 0}</div>
-                </div>
-                <div className="bg-green-50 p-2 rounded">
-                  <div className="font-medium text-green-800">Transportation</div>
-                  <div className="text-green-600">${template.budgetBreakdown.transportation?.total || 0}</div>
-                </div>
-                <div className="bg-yellow-50 p-2 rounded">
-                  <div className="font-medium text-yellow-800">Food & Meals</div>
-                  <div className="text-yellow-600">${template.budgetBreakdown.food?.total || 0}</div>
-                </div>
-                <div className="bg-purple-50 p-2 rounded">
-                  <div className="font-medium text-purple-800">Activities</div>
-                  <div className="text-purple-600">${template.budgetBreakdown.activities?.total || 0}</div>
-                </div>
-              </div>
-            </div>
-          )}
+          </div>
 
           {/* Action Button */}
           <button
             onClick={() => createTripFromDetailedTemplate(template)}
-            className={`w-full py-4 px-6 rounded-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 ${
-              isRecommended
-                ? 'bg-gradient-to-r from-yellow-400 to-orange-400 text-yellow-900 hover:from-yellow-500 hover:to-orange-500'
-                : 'bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600'
-            }`}
+            disabled={loading}
+            className="w-full py-4 px-6 rounded-xl transition-all duration-200 font-semibold flex items-center justify-center gap-2 shadow-lg hover:shadow-xl transform hover:scale-105 bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:from-pink-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaStar /> 
-            {isRecommended ? 'Use Smart Pick ✨' : 'Use This Template'}
+            {loading ? 'Loading...' : 'Use This Template'}
           </button>
-          
-          {template.bonusActivities && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <div className="text-xs text-gray-600 font-medium mb-1">Bonus Activities:</div>
-              <div className="text-xs text-gray-500">
-                {template.bonusActivities.slice(0, 2).join(' • ')}
-                {template.bonusActivities.length > 2 && ' • +more'}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  // Enhanced Recommendation Banner
-  const RecommendationBanner = () => {
-    if (!autoLoadingState.showRecommendationBanner || !autoLoadingState.recommendedTemplate) {
-      return null;
-    }
-    
-    const template = autoLoadingState.recommendedTemplate;
-    const reason = trips.length > 0 
-      ? `Based on your ${trips.length} planned trips and preferences`
-      : 'Perfect for first-time adventurers';
-
-    return (
-      <div className="bg-gradient-to-r from-yellow-50 via-orange-50 to-red-50 border-2 border-yellow-300 rounded-2xl p-6 mb-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-yellow-100/20 to-orange-100/20 animate-pulse"></div>
-        
-        <div className="relative z-10">
-          <div className="flex items-start justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="bg-gradient-to-r from-yellow-400 to-orange-400 p-3 rounded-xl text-white animate-bounce">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-yellow-800 mb-1">
-                  Smart Recommendation: {template.title}
-                </h3>
-                <p className="text-yellow-700 text-sm">{reason}</p>
-              </div>
-            </div>
-            
-            <button
-              onClick={() => setAutoLoadingState(prev => ({ ...prev, showRecommendationBanner: false }))}
-              className="text-yellow-600 hover:text-yellow-800 p-1 rounded-full hover:bg-yellow-200 transition"
-            >
-              ✕
-            </button>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            <span className="bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full font-medium text-sm">
-              {template.duration} days
-            </span>
-            <span className="bg-green-200 text-green-800 px-3 py-1 rounded-full font-medium text-sm">
-              ${template.estimatedCost?.toLocaleString()}
-            </span>
-            <span className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full font-medium text-sm">
-              {template.highlights?.length} highlights
-            </span>
-          </div>
-          
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                createTripFromDetailedTemplate(template);
-                setAutoLoadingState(prev => ({ ...prev, showRecommendationBanner: false }));
-              }}
-              className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition font-medium flex items-center gap-2 shadow-lg"
-            >
-              <span>✨</span> Use This Recommendation
-            </button>
-            
-            <button
-              onClick={() => {
-                document.getElementById(`template-${template.id}`)?.scrollIntoView({ 
-                  behavior: 'smooth', 
-                  block: 'center' 
-                });
-              }}
-              className="bg-white text-yellow-700 border-2 border-yellow-300 px-6 py-3 rounded-xl hover:bg-yellow-50 transition font-medium"
-            >
-              View Details
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -1309,7 +530,7 @@ const TripPlanner = () => {
                 <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
                   <div>
                     <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-4">
-                      🧠 Trip Planner
+                      🗺️ Trip Planner
                     </h1>
                     <p className="text-lg md:text-xl text-pink-100 max-w-2xl">
                       Plan your perfect national parks adventure with detailed guides and smart recommendations.
@@ -1449,101 +670,25 @@ const TripPlanner = () => {
               <FadeInWrapper delay={0.2}>
                 <div className="space-y-6 md:space-y-8">
                   <div className="text-center mb-6 md:mb-8">
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">🌟 Detailed Trip Templates</h3>
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">🌟 Expert Trip Templates</h3>
                     <p className="text-gray-600">
-                      Expert-designed adventures with day-by-day itineraries and budget breakdowns
+                      Carefully crafted adventures with detailed itineraries and budget breakdowns
                     </p>
                   </div>
 
-                  {/* Enhanced Auto-Load Status Panel */}
-                  {trips.length > 0 && (
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-200 mb-8">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold text-blue-800 flex items-center gap-2">
-                            <span>🎯</span> Smart Template Engine
-                          </h4>
-                          <p className="text-sm text-blue-600">
-                            AI-powered recommendations based on your {trips.length} trip{trips.length !== 1 ? 's' : ''} and preferences
-                          </p>
-                        </div>
-                        
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={autoLoadPreferences.enabled}
-                            onChange={(e) => setAutoLoadPreferences({
-                              ...autoLoadPreferences,
-                              enabled: e.target.checked
-                            })}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </div>
-                      
-                      {autoLoadPreferences.enabled && (
-                        <div className="mt-4 flex items-center gap-4">
-                          <button
-                            onClick={() => {
-                              const template = getEnhancedTemplateRecommendation();
-                              if (template) {
-                                showToast(`🧠 AI Recommended: ${template.title}`, 'info');
-                                createTripFromDetailedTemplate(template);
-                              } else {
-                                showToast('No new recommendations available right now', 'info');
-                              }
-                            }}
-                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm flex items-center gap-2"
-                          >
-                            <FaBrain />
-                            Get AI Recommendation
-                          </button>
-                          
-                          <button
-                            onClick={() => {
-                              localStorage.removeItem('lastAutoLoadDate');
-                              setAutoLoadingState({
-                                isLoading: false,
-                                hasTriggered: false,
-                                recommendedTemplate: null,
-                                showRecommendationBanner: false
-                              });
-                              showToast('AI engine reset! Fresh recommendations on next visit.', 'info');
-                            }}
-                            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm"
-                          >
-                            Reset AI Engine
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Recommendation Banner */}
-                  <RecommendationBanner />
-
-                  {/* Enhanced Templates Grid */}
+                  {/* Templates Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {detailedTemplates.map((template, index) => {
-                      const isRecommended = trips.length > 0 && 
-                        getEnhancedTemplateRecommendation()?.id === template.id;
-                        
-                      return (
-                        <FadeInWrapper key={template.id} delay={index * 0.1}>
-                          <DetailedTemplateCard 
-                            template={template} 
-                            isRecommended={isRecommended}
-                          />
-                        </FadeInWrapper>
-                      );
-                    })}
+                    {detailedTemplates.map((template, index) => (
+                      <FadeInWrapper key={template.id} delay={index * 0.1}>
+                        <TemplateCard template={template} />
+                      </FadeInWrapper>
+                    ))}
                   </div>
                 </div>
               </FadeInWrapper>
             )}
 
-            {/* Enhanced Analytics Tab */}
+            {/* Analytics Tab */}
             {currentTab === 'analytics' && (
               <FadeInWrapper delay={0.2}>
                 <div className="space-y-6 md:space-y-8">
@@ -1720,164 +865,6 @@ const TripPlanner = () => {
                               <span>Longest trip: {Math.max(...trips.map(t => t.totalDistance || 0)).toLocaleString()} miles</span>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </FadeInWrapper>
-            )}
-
-            {/* Enhanced Suggestions Tab */}
-            {currentTab === 'suggestions' && (
-              <FadeInWrapper delay={0.2}>
-                <div className="space-y-6 md:space-y-8">
-                  {trips.length === 0 ? (
-                    <div className="text-center py-12 md:py-20">
-                      <div className="text-4xl md:text-6xl mb-4">🧠</div>
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Create Your First Trip</h3>
-                      <p className="text-gray-600 mb-6">
-                        Once you create a few trips, our AI will analyze your preferences and suggest personalized adventures.
-                      </p>
-                      <button
-                        onClick={createNewTrip}
-                        className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition"
-                      >
-                        Start Planning
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
-                        <div className="text-center mb-6 md:mb-8">
-                          <div className="text-4xl md:text-6xl mb-4">🧠</div>
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Smart Recommendations</h3>
-                          <p className="text-gray-600">
-                            Based on your {trips.length} planned trip{trips.length !== 1 ? 's' : ''}, here are intelligent suggestions
-                          </p>
-                        </div>
-
-                        {(() => {
-                          const suggestions = generateEnhancedSmartSuggestions();
-                          
-                          if (suggestions.length === 0) {
-                            return (
-                              <div className="text-center py-12">
-                                <div className="text-6xl mb-4">🤔</div>
-                                <h4 className="text-xl font-semibold text-gray-600 mb-2">Analyzing Your Preferences</h4>
-                                <p className="text-gray-500 mb-6">
-                                  Plan a few more trips so our AI can better understand your travel style!
-                                </p>
-                                <button
-                                  onClick={createNewTrip}
-                                  className="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition"
-                                >
-                                  Plan Another Trip
-                                </button>
-                              </div>
-                            );
-                          }
-
-                          return (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              {suggestions.map((suggestion, index) => (
-                                <div key={index} className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300">
-                                  <div className="flex items-start justify-between mb-4">
-                                    <span className="text-4xl">{suggestion.icon}</span>
-                                    <div className="text-right">
-                                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                                        {suggestion.confidence}% Match
-                                      </div>
-                                      <div className="text-xs text-gray-500 mt-1 capitalize">{suggestion.type.replace('_', ' ')}</div>
-                                    </div>
-                                  </div>
-                                  
-                                  <h4 className="text-xl font-bold text-gray-800 mb-2">{suggestion.title}</h4>
-                                  <p className="text-gray-600 mb-4">{suggestion.description}</p>
-                                  
-                                  <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                                    <div className="grid grid-cols-3 gap-4 text-center">
-                                      <div>
-                                        <div className="font-bold text-gray-800">{suggestion.parks.length}</div>
-                                        <div className="text-xs text-gray-500">Parks</div>
-                                      </div>
-                                      <div>
-                                        <div className="font-bold text-gray-800">{suggestion.estimatedDays}</div>
-                                        <div className="text-xs text-gray-500">Days</div>
-                                      </div>
-                                      <div>
-                                        <div className="font-bold text-green-600">${suggestion.estimatedCost?.toLocaleString()}</div>
-                                        <div className="text-xs text-gray-500">Budget</div>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div className="mb-4">
-                                    <h5 className="font-semibold text-gray-700 mb-2">Suggested Parks:</h5>
-                                    <div className="space-y-1">
-                                      {suggestion.parks.map((park, idx) => (
-                                        <div key={idx} className="text-sm text-gray-600">• {park}</div>
-                                      ))}
-                                    </div>
-                                  </div>
-
-                                  <div className="text-xs text-purple-700 bg-purple-100 px-3 py-2 rounded-lg mb-4 flex items-center gap-2">
-                                    <FaBrain />
-                                    {suggestion.reason}
-                                  </div>
-                                  
-                                  <button
-                                    onClick={() => createTripFromSuggestion(suggestion)}
-                                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-200 font-medium flex items-center justify-center gap-2"
-                                  >
-                                    <span>✨</span> {suggestion.actionText}
-                                  </button>
-                                </div>
-                              ))}
-                            </div>
-                          );
-                        })()}
-                      </div>
-
-                      <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
-                        <div className="text-center mb-6">
-                          <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">Quick Start Options</h3>
-                          <p className="text-gray-600">Choose how you'd like to begin your next adventure</p>
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <button
-                            onClick={() => {
-                              setCurrentTab('templates');
-                              showToast('🌟 Browse our detailed templates with day-by-day itineraries!', 'info');
-                            }}
-                            className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-pink-400 hover:bg-pink-50 transition-all text-center group"
-                          >
-                            <span className="text-3xl md:text-4xl block mb-2 group-hover:scale-110 transition-transform">🌟</span>
-                            <h4 className="font-semibold text-gray-800">Browse Templates</h4>
-                            <p className="text-sm text-gray-600">Detailed guides with itineraries</p>
-                          </button>
-                          
-                          <button
-                            onClick={createNewTrip}
-                            className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 hover:bg-blue-50 transition-all text-center group"
-                          >
-                            <span className="text-3xl md:text-4xl block mb-2 group-hover:scale-110 transition-transform">🚀</span>
-                            <h4 className="font-semibold text-gray-800">Create from Scratch</h4>
-                            <p className="text-sm text-gray-600">Build your custom adventure</p>
-                          </button>
-                          
-                          <button
-                            onClick={() => {
-                              setCurrentTab('analytics');
-                              showToast('📊 Check out your detailed travel insights!', 'info');
-                            }}
-                            className="p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-green-400 hover:bg-green-50 transition-all text-center group"
-                          >
-                            <span className="text-3xl md:text-4xl block mb-2 group-hover:scale-110 transition-transform">📊</span>
-                            <h4 className="font-semibold text-gray-800">View Analytics</h4>
-                            <p className="text-sm text-gray-600">Understand your travel style</p>
-                          </button>
                         </div>
                       </div>
                     </>
