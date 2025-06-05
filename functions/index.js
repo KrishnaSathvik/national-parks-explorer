@@ -31,7 +31,8 @@ const corsHandler = cors({
   origin: [
     "https://www.nationalparksexplorerusa.com",
     "https://national-parks-explorer.vercel.app",
-    "https://national-parks-explor-git-5ffdad-shadowdevils-projects-ae938de8.vercel.app", // Add your current deploy URL
+    "https://national-parks-explor-git-5ffdad-shadowdevils-projects-ae938de8.vercel.app", // ✅ Already correct
+    "https://national-parks-explor-*.vercel.app", // ✅ Add wildcard for all deploy previews
     "http://localhost:5173",
     "http://localhost:3000"
   ],
