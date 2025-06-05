@@ -87,10 +87,10 @@ try {
 }
 
 // Initialize core services with enhanced error handling
-export const auth = getAuth(app);
-export const provider = new GoogleAuthProvider();
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Enhanced provider configuration
 provider.addScope('profile');
@@ -220,7 +220,7 @@ const enableFirestorePersistence = async (retries = 3) => {
 enableFirestorePersistence();
 
 // Enhanced FCM token management with comprehensive error handling
-export const requestNotificationPermission = async (options = {}) => {
+const requestNotificationPermission = async (options = {}) => {
   const {
     retries = 3,
     retryDelay = 2000,
@@ -516,7 +516,7 @@ const setupForegroundMessaging = () => {
 setupForegroundMessaging();
 
 // Enhanced analytics helper functions
-export const logAnalyticsEvent = (eventName, parameters = {}) => {
+const logAnalyticsEvent = (eventName, parameters = {}) => {
   if (!analytics) return;
   
   try {
@@ -536,7 +536,7 @@ export const logAnalyticsEvent = (eventName, parameters = {}) => {
   }
 };
 
-export const setAnalyticsUser = (userId, properties = {}) => {
+const setAnalyticsUser = (userId, properties = {}) => {
   if (!analytics) return;
   
   try {
@@ -552,7 +552,7 @@ export const setAnalyticsUser = (userId, properties = {}) => {
 };
 
 // Enhanced performance monitoring
-export const createPerformanceTrace = (traceName) => {
+const createPerformanceTrace = (traceName) => {
   if (!performance) return null;
   
   try {
@@ -602,7 +602,7 @@ window.addEventListener('online', handleNetworkChange);
 window.addEventListener('offline', handleNetworkChange);
 
 // Enhanced Firestore helpers with error handling and retries
-export const firestoreHelpers = {
+const firestoreHelpers = {
   // Enhanced document operations with retry logic
   async getDocument(docRef, options = {}) {
     const { retries = 3, useCache = true } = options;
@@ -689,7 +689,7 @@ export const firestoreHelpers = {
 };
 
 // Enhanced storage helpers
-export const storageHelpers = {
+const storageHelpers = {
   // Upload file with progress tracking
   async uploadFile(file, path, options = {}) {
     const { 
@@ -752,7 +752,7 @@ export const storageHelpers = {
 };
 
 // Enhanced error boundary for Firebase operations
-export const handleFirebaseError = (error, operation = 'Firebase operation') => {
+const handleFirebaseError = (error, operation = 'Firebase operation') => {
   console.error(`❌ ${operation} failed:`, error);
   
   // Map common Firebase errors to user-friendly messages
@@ -815,27 +815,27 @@ if (import.meta.env.DEV) {
   }
 }
 
-// Export services and helpers
-export { 
-  messaging, 
-  analytics, 
-  performance
+export {
+  app,
+  auth,
+  provider,
+  db,
+  storage,
+  messaging,
+  analytics,
+  performance,
+  logAnalyticsEvent,
+  setAnalyticsUser,
+  createPerformanceTrace,
+  firestoreHelpers,
+  storageHelpers,
+  handleFirebaseError,
+  requestNotificationPermission
 };
 
-// Export enhanced functions
-export {
-  deleteToken,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  addDoc,
-  serverTimestamp,
-  collection
-};
 
 // Cleanup function for app shutdown
-export const cleanupFirebase = async () => {
+const cleanupFirebase = async () => {
   try {
     console.log('🧹 Cleaning up Firebase resources...');
     
