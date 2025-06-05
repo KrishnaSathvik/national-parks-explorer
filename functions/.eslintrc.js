@@ -1,28 +1,23 @@
+// functions/.eslintrc.js
 module.exports = {
-  env: {
-    es6: true,
-    node: true,
-  },
-  parserOptions: {
-    "ecmaVersion": 2018,
-  },
-  extends: [
-    "eslint:recommended",
-    "google",
-  ],
-  rules: {
-    "no-restricted-globals": ["error", "name", "length"],
-    "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
-  },
-  overrides: [
-    {
-      files: ["**/*.spec.*"],
-      env: {
-        mocha: true,
-      },
-      rules: {},
+    env: {
+        node: true,
+        es6: true,
     },
-  ],
-  globals: {},
+    parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: "script",
+    },
+    extends: ["eslint:recommended", "google"],
+    rules: {
+        quotes: ["error", "double"],
+        "no-unused-vars": ["warn", {varsIgnorePattern: "^[A-Z_]+$"}],
+    },
+    globals: {
+        require: "readonly",
+        exports: "readonly",
+        module: "readonly",
+        process: "readonly",
+        __dirname: "readonly",
+    },
 };

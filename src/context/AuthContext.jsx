@@ -1,42 +1,33 @@
 // ✨ Enhanced AuthContext.jsx - Advanced Authentication System
+import {createContext, useCallback, useContext, useEffect, useReducer, useState} from "react";
 import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useCallback,
-  useReducer
-} from "react";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signOut,
-  signInWithPopup,
-  GoogleAuthProvider,
-  sendPasswordResetEmail,
-  updateProfile,
-  updatePassword,
-  EmailAuthProvider,
-  reauthenticateWithCredential,
   deleteUser,
-  sendEmailVerification
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  reauthenticateWithCredential,
+  sendEmailVerification,
+  sendPasswordResetEmail,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  updatePassword,
+  updateProfile
 } from "firebase/auth";
 import {
+  collection,
+  deleteDoc,
   doc,
   getDoc,
-  updateDoc,
-  setDoc,
-  serverTimestamp,
-  collection,
-  query,
-  where,
   getDocs,
-  deleteDoc
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where
 } from "firebase/firestore";
-import { requestNotificationPermission } from "../firebase";
-import { auth, db } from "../firebase";
+import {auth, db, requestNotificationPermission} from "../firebase";
 
 // Create Auth context
 const AuthContext = createContext();
@@ -240,37 +231,60 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, [fetchUserData]);
 
-  // Enhanced Service Worker and FCM setup
-  useEffect(() => {
-    const registerServiceWorker = async () => {
-      if ('serviceWorker' in navigator) {
-        try {
-          // Unregister old service workers
+    // ✅ FIX: Enhanced Service Worker and FCM setup
+    useEffect(() => {
+        const registerServiceWorker = async () => {
+            if (!('serviceWorker' in navigator)) {
+                console.warn('⚠️ Service Worker not supported');
+                return;
+            }
+
+            try {
+                // Clean up old service workers first
           const registrations = await navigator.serviceWorker.getRegistrations();
           for (let registration of registrations) {
-            if (registration.scope.includes('enhanced-sw') || registration.scope.includes('sw.js')) {
+              // Only unregister old/incompatible service workers
+              if (registration.scope.includes('enhanced-sw') ||
+                  registration.scope.includes('sw.js') ||
+                  !registration.active) {
               await registration.unregister();
-              console.log('🗑️ Unregistered old service worker');
+                  console.log('🗑️ Unregistered old service worker:', registration.scope);
             }
           }
 
           // Register Firebase messaging service worker
           const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-            scope: '/'
+              scope: '/',
+              updateViaCache: 'none'
           });
 
           console.log('✅ Firebase Service Worker registered:', registration.scope);
+
+                // Wait for service worker to be ready
           await navigator.serviceWorker.ready;
           console.log('✅ Service Worker is ready for FCM');
 
-        } catch (error) {
-          console.error('❌ Service Worker registration failed:', error);
-        }
-      }
-    };
+                // Handle service worker updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    if (newWorker) {
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('🔄 New service worker available');
+                                // Optionally show update notification to user
+                            }
+                        });
+                    }
+                });
 
-    registerServiceWorker();
-  }, []);
+            } catch (error) {
+          console.error('❌ Service Worker registration failed:', error);
+                // Don't throw - app should work without service worker
+            }
+        };
+
+        registerServiceWorker();
+    }, []);
 
   // Enhanced notification setup for logged-in users
   useEffect(() => {

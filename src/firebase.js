@@ -1,52 +1,32 @@
 // ✨ Enhanced firebase.js - Advanced Firebase Integration System
-import { initializeApp } from "firebase/app";
-import { 
-  getAuth, 
-  GoogleAuthProvider,
-  connectAuthEmulator 
-} from "firebase/auth";
+import {initializeApp} from "firebase/app";
+import {connectAuthEmulator, getAuth, GoogleAuthProvider} from "firebase/auth";
 import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
   addDoc,
-  serverTimestamp,
+  CACHE_SIZE_UNLIMITED,
+  clearIndexedDbPersistence,
   collection,
   connectFirestoreEmulator,
-  enableNetwork,
   disableNetwork,
-  clearIndexedDbPersistence,
+  doc,
   enableIndexedDbPersistence,
-  CACHE_SIZE_UNLIMITED
+  enableNetwork,
+  getDoc,
+  getFirestore,
+  serverTimestamp,
+  setDoc,
+  updateDoc
 } from "firebase/firestore";
-import {
-  getMessaging,
-  getToken,
-  onMessage,
-  deleteToken,
-  isSupported as isMessagingSupported
-} from "firebase/messaging";
+import {getMessaging, getToken, isSupported as isMessagingSupported, onMessage} from "firebase/messaging";
 import {
   getAnalytics,
+  isSupported as isAnalyticsSupported,
   logEvent,
   setUserId,
-  setUserProperties,
-  isSupported as isAnalyticsSupported
+  setUserProperties
 } from "firebase/analytics";
-import {
-  getPerformance,
-  trace,
-} from "firebase/performance";
-import {
-  getStorage,
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-  connectStorageEmulator
-} from "firebase/storage";
+import {getPerformance, trace} from "firebase/performance";
+import {connectStorageEmulator, deleteObject, getDownloadURL, getStorage, ref, uploadBytes} from "firebase/storage";
 
 // Enhanced Firebase configuration with validation
 const firebaseConfig = {
@@ -153,17 +133,25 @@ const initializeAnalytics = async () => {
   }
 };
 
+// ✅ FIX: Enhanced performance initialization with proper error handling
+// ✅ FIX: Enhanced performance initialization with proper error handling
 const initializePerformance = async () => {
   try {
-    const isSupported = await isPerformanceSupported();
-    if (!isSupported) {
-      console.warn('⚠️ Firebase Performance not supported in this environment');
+    // Additional checks for performance monitoring
+    if (typeof window === 'undefined') {
+      console.warn('⚠️ Firebase Performance requires browser environment');
       return null;
     }
 
-    const perf = getPerformance(app);
+    // Check if we're in a supported environment
+    if (!window.location.protocol.startsWith('https') && window.location.hostname !== 'localhost') {
+      console.warn('⚠️ Firebase Performance requires HTTPS in production');
+      return null;
+    }
+
+    performance = getPerformance(app);
     console.log('✅ Firebase Performance initialized');
-    return perf;
+    return performance;
   } catch (error) {
     console.error('❌ Failed to initialize Firebase Performance:', error);
     return null;
@@ -177,6 +165,8 @@ Promise.all([
   initializePerformance()
 ]).then(() => {
   console.log('🚀 Firebase initialization complete');
+}).catch(error => {
+    console.error('❌ Firebase services initialization failed:', error);
 });
 
 // Enhanced Firestore persistence with retry logic
@@ -444,71 +434,75 @@ const sendWelcomeNotification = async (token) => {
   }
 };
 
-// Enhanced foreground message handling with rich notifications
+// ✅ FIX: Enhanced foreground message handling with proper null checks
 const setupForegroundMessaging = () => {
   if (!messaging) return;
 
-  onMessage(messaging, (payload) => {
-    console.log('🔔 Foreground notification received:', payload);
-    
     try {
-      const { notification, data } = payload;
-      
-      if (notification) {
-        const { title, body, icon, badge, image } = notification;
-        
-        // Show enhanced browser notification
-        if (Notification.permission === 'granted') {
-          const notificationOptions = {
-            body,
-            icon: icon || '/icons/icon-192x192.png',
-            badge: badge || '/icons/icon-72x72.png',
-            image: image,
-            tag: data?.type || 'general',
-            requireInteraction: false,
-            silent: false,
-            vibrate: [200, 100, 200],
-            data: data,
-            actions: data?.actions ? JSON.parse(data.actions) : []
-          };
+        onMessage(messaging, (payload) => {
+            console.log('🔔 Foreground notification received:', payload);
 
-          const notif = new Notification(title, notificationOptions);
-          
-          // Handle notification clicks
-          notif.onclick = (event) => {
-            event.preventDefault();
-            window.focus();
-            
-            if (data?.url) {
-              window.open(data.url, '_blank');
+            try {
+                const {notification, data} = payload;
+
+                if (notification) {
+                    const {title, body, icon, badge, image} = notification;
+
+                    // Show enhanced browser notification
+                    if (Notification.permission === 'granted') {
+                        const notificationOptions = {
+                            body,
+                            icon: icon || '/icons/icon-192x192.png',
+                            badge: badge || '/icons/icon-72x72.png',
+                            image: image,
+                            tag: data?.type || 'general',
+                            requireInteraction: false,
+                            silent: false,
+                            vibrate: [200, 100, 200],
+                            data: data,
+                            actions: data?.actions ? JSON.parse(data.actions) : []
+                        };
+
+                        const notif = new Notification(title, notificationOptions);
+
+                        // Handle notification clicks
+                        notif.onclick = (event) => {
+                            event.preventDefault();
+                            window.focus();
+
+                            if (data?.url) {
+                                window.open(data.url, '_blank');
+                            }
+
+                            notif.close();
+
+                            // Log interaction
+                            logAnalyticsEvent('notification_clicked', {
+                                notification_type: data?.type || 'unknown',
+                                notification_title: title
+                            });
+                        };
+
+                        // Auto-close after delay
+                        setTimeout(() => {
+                            notif.close();
+                        }, 8000);
+                    }
+
+                    // Log notification received
+                    logAnalyticsEvent('notification_received', {
+                        notification_type: data?.type || 'unknown',
+                        notification_title: title,
+                        foreground: true
+                    });
+                }
+            } catch (error) {
+                console.error('❌ Error handling foreground notification:', error);
             }
-            
-            notif.close();
-            
-            // Log interaction
-            logAnalyticsEvent('notification_clicked', {
-              notification_type: data?.type || 'unknown',
-              notification_title: title
-            });
-          };
-
-          // Auto-close after delay
-          setTimeout(() => {
-            notif.close();
-          }, 8000);
-        }
-        
-        // Log notification received
-        logAnalyticsEvent('notification_received', {
-          notification_type: data?.type || 'unknown',
-          notification_title: title,
-          foreground: true
         });
-      }
     } catch (error) {
-      console.error('❌ Error handling foreground notification:', error);
+        console.error('❌ Error setting up foreground messaging:', error);
     }
-  });
 };
 
 // Setup foreground messaging
@@ -831,7 +825,6 @@ export {
   handleFirebaseError,
   requestNotificationPermission
 };
-
 
 // Cleanup function for app shutdown
 const cleanupFirebase = async () => {
