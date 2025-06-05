@@ -219,7 +219,7 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => (
   </div>
 );
 
-/// ✨ Enhanced Park Card Component with Component Classes - FIXED
+/// ✨ Enhanced Park Card Component with Complete Data Display - FIXED
 const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip }) => {
   const navigate = useNavigate();
 
@@ -233,20 +233,45 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
     if (desc.includes('water') || highlight.includes('lake') || highlight.includes('river')) icons.push('🌊');
     if (desc.includes('mountain') || highlight.includes('peak')) icons.push('⛰️');
     if (desc.includes('scenic') || highlight.includes('scenic')) icons.push('📸');
+    if (desc.includes('desert')) icons.push('🏜️');
+    if (desc.includes('forest')) icons.push('🌲');
+    if (desc.includes('canyon')) icons.push('🏔️');
 
-    return icons.slice(0, 3);
+    return icons.slice(0, 4);
   };
 
   const formatHighlight = (highlight) => {
     if (!highlight) return 'Scenic views and natural beauty';
-
     const formatted = highlight.charAt(0).toUpperCase() + highlight.slice(1);
-
     if (formatted.length < 20) {
       return `${formatted} - Perfect for exploration`;
     }
-
     return formatted;
+  };
+
+  const formatSize = (size) => {
+    if (!size) return 'Size varies';
+    if (typeof size === 'number') {
+      if (size > 1000) return `${(size / 1000).toFixed(1)}k acres`;
+      return `${size} acres`;
+    }
+    return size;
+  };
+
+  const formatVisitors = (visitors) => {
+    if (!visitors) return 'Popular destination';
+    if (typeof visitors === 'number') {
+      if (visitors > 1000000) return `${(visitors / 1000000).toFixed(1)}M visitors/year`;
+      if (visitors > 1000) return `${(visitors / 1000).toFixed(0)}k visitors/year`;
+      return `${visitors} visitors/year`;
+    }
+    return visitors;
+  };
+
+  const formatEstablished = (established) => {
+    if (!established) return 'Historic park';
+    if (typeof established === 'number') return `Est. ${established}`;
+    return established;
   };
 
   const formatHours = (hours) => {
@@ -331,18 +356,32 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
             <span>{park.state}</span>
           </div>
 
+          {/* Enhanced Stats Grid */}
+          <div className="park-card-stats">
+            <div className="park-stat-item">
+              <div className="park-stat-label">Established</div>
+              <div className="park-stat-value">{formatEstablished(park.established)}</div>
+            </div>
+            <div className="park-stat-item">
+              <div className="park-stat-label">Size</div>
+              <div className="park-stat-value">{formatSize(park.size)}</div>
+            </div>
+            <div className="park-stat-item">
+              <div className="park-stat-label">Annual Visitors</div>
+              <div className="park-stat-value">{formatVisitors(park.annualVisitors)}</div>
+            </div>
+            <div className="park-stat-item">
+              <div className="park-stat-label">Hours</div>
+              <div className="park-stat-value">{formatHours(park.hours)}</div>
+            </div>
+          </div>
+
           {/* Park info */}
           <div className="park-card-info">
             {/* Highlight */}
             <div className="park-info-item">
-              <span className="park-info-label highlight-label">🎯 Highlight:</span>
+              <span className="park-info-label highlight-label">🎯 Highlight</span>
               <span className="park-info-text">{formatHighlight(park.highlight)}</span>
-            </div>
-
-            {/* Hours */}
-            <div className="park-info-item">
-              <span className="park-info-label hours-label">🕒 Hours:</span>
-              <span className="park-info-text">{formatHours(park.hours)}</span>
             </div>
           </div>
 
@@ -366,7 +405,7 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
         </div>
       </div>
   );
-}; // ✅ CRITICAL: This closing brace was missing!
+};
 
 // ===== MAIN HOME COMPONENT =====
 const Home = ({ parks, favorites, toggleFavorite }) => {

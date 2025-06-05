@@ -156,24 +156,163 @@ const Breadcrumb = ({ park, fromAccount, fromFavorites, currentPage }) => {
   );
 };
 
-// Enhanced stats card component
-const StatCard = ({ icon, label, value, color, delay = 0 }) => (
-  <FadeInWrapper delay={delay}>
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      className={`bg-gradient-to-br ${color} p-4 md:p-6 rounded-2xl text-white shadow-lg transform transition-all duration-300`}
-    >
-      <div className="flex items-center justify-between mb-2">
-        <div className="text-2xl md:text-3xl">{icon}</div>
-        <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
-          Live
+// Enhanced stats card component with better data
+const StatCard = ({ icon, label, value, color, delay = 0, subtitle }) => (
+    <FadeInWrapper delay={delay}>
+      <motion.div
+          whileHover={{ scale: 1.05 }}
+          className={`bg-gradient-to-br ${color} p-4 md:p-6 rounded-2xl text-white shadow-lg transform transition-all duration-300`}
+      >
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-2xl md:text-3xl">{icon}</div>
+          <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
+            Live
+          </div>
         </div>
-      </div>
-      <div className="text-xl md:text-2xl font-bold mb-1">{value}</div>
-      <div className="text-white/90 font-medium text-sm">{label}</div>
-    </motion.div>
-  </FadeInWrapper>
+        <div className="text-xl md:text-2xl font-bold mb-1">{value}</div>
+        <div className="text-white/90 font-medium text-sm">{label}</div>
+        {subtitle && (
+            <div className="text-white/70 text-xs mt-1">{subtitle}</div>
+        )}
+      </motion.div>
+    </FadeInWrapper>
 );
+
+// Helper functions for formatting data
+const formatParkSize = (size) => {
+  if (!size) return 'Size varies';
+  if (typeof size === 'number') {
+    if (size > 1000000) return `${(size / 1000000).toFixed(1)}M acres`;
+    if (size > 1000) return `${(size / 1000).toFixed(1)}k acres`;
+    return `${size} acres`;
+  }
+  return size;
+};
+
+const formatVisitorCount = (visitors) => {
+  if (!visitors) return 'Popular destination';
+  if (typeof visitors === 'number') {
+    if (visitors > 1000000) return `${(visitors / 1000000).toFixed(1)}M`;
+    if (visitors > 1000) return `${(visitors / 1000).toFixed(0)}k`;
+    return visitors.toLocaleString();
+  }
+  return visitors;
+};
+
+const formatEstablishedYear = (established) => {
+  if (!established) return 'Historic';
+  if (typeof established === 'number') {
+    const currentYear = new Date().getFullYear();
+    const age = currentYear - established;
+    return `${established} (${age} years)`;
+  }
+  return established;
+};
+
+// Updated Quick Stats section for ParkDetails
+const renderQuickStats = (park, averageRating, reviews) => {
+  return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        <StatCard
+            icon="🏛️"
+            label="Established"
+            value={formatEstablishedYear(park.established)}
+            subtitle="Years of conservation"
+            color="from-blue-500 to-indigo-500"
+            delay={0.1}
+        />
+        <StatCard
+            icon="📏"
+            label="Park Size"
+            value={formatParkSize(park.size)}
+            subtitle="Protected area"
+            color="from-green-500 to-emerald-500"
+            delay={0.2}
+        />
+        <StatCard
+            icon="👥"
+            label="Annual Visitors"
+            value={formatVisitorCount(park.annualVisitors)}
+            subtitle="People visit yearly"
+            color="from-purple-500 to-pink-500"
+            delay={0.3}
+        />
+        <StatCard
+            icon="⭐"
+            label="Average Rating"
+            value={averageRating ? `${averageRating}/5` : 'No reviews'}
+            subtitle={`${reviews.length} review${reviews.length !== 1 ? 's' : ''}`}
+            color="from-yellow-500 to-orange-500"
+            delay={0.4}
+        />
+      </div>
+  );
+};
+
+// Enhanced park information section
+const EnhancedParkInfo = ({ park }) => {
+  const parkFacts = [
+    {
+      icon: '🗓️',
+      label: 'Established',
+      value: formatEstablishedYear(park.established),
+      color: 'text-blue-600'
+    },
+    {
+      icon: '📐',
+      label: 'Total Area',
+      value: formatParkSize(park.size),
+      color: 'text-green-600'
+    },
+    {
+      icon: '👥',
+      label: 'Annual Visitors',
+      value: formatVisitorCount(park.annualVisitors),
+      color: 'text-purple-600'
+    },
+    {
+      icon: '🌡️',
+      label: 'Climate',
+      value: park.climate || 'Varies by season',
+      color: 'text-orange-600'
+    },
+    {
+      icon: '🚗',
+      label: 'Nearest City',
+      value: park.nearestCity || 'Multiple access points',
+      color: 'text-cyan-600'
+    },
+    {
+      icon: '⏰',
+      label: 'Operating Hours',
+      value: park.hours || '24 hours (typical)',
+      color: 'text-indigo-600'
+    }
+  ];
+
+  return (
+      <FadeInWrapper delay={0.5}>
+        <div className="bg-gradient-to-r from-gray-50 to-white p-6 md:p-8 rounded-2xl border border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+            📊 Park Information
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {parkFacts.map((fact, index) => (
+                <FadeInWrapper key={fact.label} delay={index * 0.1}>
+                  <div className="bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-2xl">{fact.icon}</span>
+                      <span className={`font-semibold ${fact.color}`}>{fact.label}</span>
+                    </div>
+                    <div className="text-gray-800 font-medium">{fact.value}</div>
+                  </div>
+                </FadeInWrapper>
+            ))}
+          </div>
+        </div>
+      </FadeInWrapper>
+  );
+};
 
 // Enhanced weather card component
 const WeatherCard = ({ day, index }) => (
