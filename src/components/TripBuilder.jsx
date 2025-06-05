@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../firebase';
-import { useAuth } from '../context/AuthContext';
+// Fixed TripBuilder.jsx - Simplified and Working Version
+import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from '../context/ToastContext';
-import { TripOptimizer } from '../utils/TripOptimizer';
 import TripMap from './TripMap';
 import FadeInWrapper from './FadeInWrapper';
 import { 
@@ -21,25 +18,15 @@ import {
   FaChevronRight,
   FaSearch,
   FaPlus,
-  FaTrash,
-  FaMagic,
-  FaSort,
-  FaChartLine,
-  FaExclamationTriangle
+  FaTrash
 } from 'react-icons/fa';
 
 const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
-  const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [tripData, setTripData] = useState(trip);
-  const [parksData, setParksData] = useState(allParks || []);
   const [loading, setLoading] = useState(false);
-  const [parksLoading, setParksLoading] = useState(!allParks);
   const [currentStep, setCurrentStep] = useState(1);
   const [errors, setErrors] = useState({});
-  const [routeAnalysis, setRouteAnalysis] = useState(null);
-
-  // Park search state
   const [parkSearch, setParkSearch] = useState('');
   const [showParkDropdown, setShowParkDropdown] = useState(false);
 
@@ -49,42 +36,18 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     { id: 3, title: 'Review & Save', icon: FaCheckCircle, description: 'Finalize your trip' }
   ];
 
-  // WITH THIS:
+  // Initialize trip data
   useEffect(() => {
-    if (!allParks || allParks.length === 0) {
-      fetchAllParks();
-    } else {
-      setParksData(allParks);
-      setParksLoading(false);
+    if (trip) {
+      setTripData({
+        ...trip,
+        parks: trip.parks || [],
+        totalDistance: trip.totalDistance || 0,
+        estimatedCost: trip.estimatedCost || 0,
+        totalDuration: trip.totalDuration || 0
+      });
     }
-      // Don't auto-advance if trip has preloaded parks - let user start at step 1
-    }, [allParks]);    
-
-  // Analyze route whenever parks change
-  useEffect(() => {
-    if (tripData.parks.length >= 2) {
-      const analysis = TripOptimizer.analyzeRoute(tripData.parks);
-      setRouteAnalysis(analysis);
-    } else {
-      setRouteAnalysis(null);
-    }
-  }, [tripData.parks]);
-
-  const fetchAllParks = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'parks'));
-      const parks = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setParksData(parks);
-    } catch (error) {
-      console.error('Error fetching parks:', error);
-      showToast('Failed to load parks data', 'error');
-    } finally {
-      setParksLoading(false);
-    }
-  };
+  }, [trip]);
 
   // Validation functions
   const validateStep = (step) => {
@@ -103,14 +66,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     if (step === 2) {
       if (!tripData.parks || tripData.parks.length === 0) {
         newErrors.parks = 'Please select at least one park';
-      } else {
-        // Validate that parks have required data
-        const invalidParks = tripData.parks.filter(park => 
-          !park.parkName || !park.stayDuration || park.stayDuration < 1
-        );
-        if (invalidParks.length > 0) {
-          newErrors.parks = 'All parks must have valid names and stay durations';
-        }
       }
     }
     
@@ -118,6 +73,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Calculate trip duration
   const calculateTripDuration = useCallback(() => {
     if (!tripData.startDate || !tripData.endDate) return 0;
     
@@ -133,8 +89,27 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Math.max(1, diffDays + 1);
   }, [tripData.startDate, tripData.endDate]);
 
-  // Distance calculation
-  const calculateDistance = useCallback((coord1, coord2) => {
+  // Calculate total distance
+  const calculateTotalDistance = useCallback(() => {
+    if (tripData.parks.length < 2) return 0;
+    
+    let total = 0;
+    for (let i = 0; i < tripData.parks.length - 1; i++) {
+      const park1 = tripData.parks[i];
+      const park2 = tripData.parks[i + 1];
+      
+      if (park1.coordinates && park2.coordinates && 
+          park1.coordinates.lat && park2.coordinates.lat) {
+        const distance = calculateDistance(park1.coordinates, park2.coordinates);
+        total += distance;
+      }
+    }
+    
+    return Math.round(total);
+  }, [tripData.parks]);
+
+  // Distance calculation helper
+  const calculateDistance = (coord1, coord2) => {
     const R = 3959; // Earth's radius in miles
     const dLat = (coord2.lat - coord1.lat) * Math.PI / 180;
     const dLon = (coord2.lng - coord1.lng) * Math.PI / 180;
@@ -144,18 +119,14 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       Math.sin(dLon/2) * Math.sin(dLon/2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     return R * c;
-  }, []);
+  };
 
-  const calculateTotalDistance = useCallback(() => {
-    return TripOptimizer.calculateTotalDistance(tripData.parks);
-  }, [tripData.parks]);
-
+  // Calculate estimated cost
   const calculateEstimatedCost = useCallback(() => {
     const duration = calculateTripDuration();
     const distance = calculateTotalDistance();
     const numParks = tripData.parks.length;
     
-    // Accommodation: nights = days - 1 (unless single day trip)
     const nights = Math.max(0, duration - 1);
     
     const costs = {
@@ -170,78 +141,24 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return Math.round(costs.accommodation + costs.transportation + costs.parkFees + costs.food);
   }, [calculateTripDuration, calculateTotalDistance, tripData.parks.length, tripData.transportationMode]);
 
-  // Route optimization functions
-  const optimizeRoute = useCallback(() => {
-    if (tripData.parks.length < 3) {
-      showToast('Need at least 3 parks to optimize route', 'info');
-      return;
-    }
-
-    const currentDistance = calculateTotalDistance();
-    const optimizedParks = TripOptimizer.optimizeRoute(tripData.parks);
+  // Update trip data whenever calculations change
+  useEffect(() => {
+    const newTotalDistance = calculateTotalDistance();
+    const newEstimatedCost = calculateEstimatedCost();
+    const newTotalDuration = calculateTripDuration();
     
-    setTripData({
-      ...tripData,
-      parks: optimizedParks
-    });
+    setTripData(prev => ({
+      ...prev,
+      totalDistance: newTotalDistance,
+      estimatedCost: newEstimatedCost,
+      totalDuration: newTotalDuration
+    }));
+  }, [tripData.parks, tripData.startDate, tripData.endDate, tripData.transportationMode, calculateTotalDistance, calculateEstimatedCost, calculateTripDuration]);
 
-    // Calculate savings after state update
-    setTimeout(() => {
-      const newDistance = TripOptimizer.calculateTotalDistance(optimizedParks);
-      const savings = currentDistance - newDistance;
-      
-      if (savings > 0) {
-        showToast(`Route optimized! Saved ${Math.round(savings)} miles`, 'success');
-      } else {
-        showToast('Route was already optimal!', 'info');
-      }
-    }, 100);
-  }, [tripData.parks, calculateTotalDistance, showToast]);
-
-  const sortParksByDate = useCallback(() => {
-    const parksWithDates = tripData.parks.filter(park => park.visitDate);
-    const parksWithoutDates = tripData.parks.filter(park => !park.visitDate);
-    
-    if (parksWithDates.length === 0) {
-      showToast('Add visit dates to parks for date-based sorting', 'info');
-      return;
-    }
-
-    const sortedParks = [
-      ...parksWithDates.sort((a, b) => new Date(a.visitDate) - new Date(b.visitDate)),
-      ...parksWithoutDates
-    ];
-
-    setTripData({
-      ...tripData,
-      parks: sortedParks
-    });
-
-    showToast('Parks sorted by visit dates!', 'success');
-  }, [tripData.parks, showToast]);
-
-  const getOptimizationPotential = useMemo(() => {
-    if (tripData.parks.length < 3) return null;
-    
-    const currentDistance = calculateTotalDistance();
-    const optimizedParks = TripOptimizer.optimizeRoute([...tripData.parks]);
-    const optimizedDistance = TripOptimizer.calculateTotalDistance(optimizedParks);
-    const savings = currentDistance - optimizedDistance;
-    
-    return {
-      currentDistance,
-      optimizedDistance,
-      savings: Math.max(0, savings),
-      canOptimize: savings > 10
-    };
-  }, [tripData.parks, calculateTotalDistance]);
-
-  // Park management functions
+  // Parse coordinates helper
   const parseCoordinates = (coordString) => {
-    // Handle different coordinate formats
     if (!coordString) return { lat: 0, lng: 0 };
     
-    // If already an object with lat/lng
     if (typeof coordString === 'object' && coordString.lat && coordString.lng) {
       return { 
         lat: parseFloat(coordString.lat) || 0, 
@@ -249,7 +166,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       };
     }
     
-    // If string format "lat,lng"
     if (typeof coordString === 'string' && coordString.includes(',')) {
       const [lat, lng] = coordString.split(',').map(val => parseFloat(val.trim()));
       return { lat: lat || 0, lng: lng || 0 };
@@ -258,6 +174,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     return { lat: 0, lng: 0 };
   };
 
+  // Add park to trip
   const addParkToTrip = (park) => {
     const coordinates = parseCoordinates(park.coordinates);
 
@@ -268,60 +185,59 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       stayDuration: 2,
       coordinates,
       state: park.state,
-      description: park.description
+      description: park.description || ''
     };
     
-    setTripData({
-      ...tripData,
-      parks: [...tripData.parks, newPark]
-    });
+    setTripData(prev => ({
+      ...prev,
+      parks: [...prev.parks, newPark]
+    }));
 
     setParkSearch('');
     setShowParkDropdown(false);
     showToast(`Added ${newPark.parkName} to your trip!`, 'success');
   };
 
+  // Remove park from trip
   const removeParkFromTrip = (parkId) => {
     const parkToRemove = tripData.parks.find(p => p.parkId === parkId);
-    setTripData({
-      ...tripData,
-      parks: tripData.parks.filter(p => p.parkId !== parkId)
-    });
+    setTripData(prev => ({
+      ...prev,
+      parks: prev.parks.filter(p => p.parkId !== parkId)
+    }));
     
     if (parkToRemove) {
       showToast(`Removed ${parkToRemove.parkName} from trip`, 'info');
     }
   };
 
+  // Update park details
   const updateParkDetails = (parkId, field, value) => {
-    const updatedParks = tripData.parks.map(park => {
-      if (park.parkId === parkId) {
-        const updatedPark = { ...park, [field]: value };
-        
-        // Validate stay duration
-        if (field === 'stayDuration') {
-          updatedPark.stayDuration = Math.max(1, Math.min(14, parseInt(value) || 1));
+    setTripData(prev => ({
+      ...prev,
+      parks: prev.parks.map(park => {
+        if (park.parkId === parkId) {
+          const updatedPark = { ...park, [field]: value };
+          
+          if (field === 'stayDuration') {
+            updatedPark.stayDuration = Math.max(1, Math.min(14, parseInt(value) || 1));
+          }
+          
+          return updatedPark;
         }
-        
-        return updatedPark;
-      }
-      return park;
-    });
-    
-    setTripData({
-      ...tripData,
-      parks: updatedParks
-    });
+        return park;
+      })
+    }));
   };
 
-  // Park search and filtering
+  // Get filtered parks for search
   const getFilteredParks = () => {
     if (!parkSearch.trim()) return [];
     
     const selectedParkIds = tripData.parks.map(p => p.parkId);
     const searchLower = parkSearch.toLowerCase();
     
-    return parksData
+    return allParks
       .filter(park => !selectedParkIds.includes(park.id))
       .filter(park =>
         park.name?.toLowerCase().includes(searchLower) ||
@@ -336,7 +252,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
     if (validateStep(currentStep)) {
       if (currentStep < 3) {
         setCurrentStep(currentStep + 1);
-        // Clear any remaining errors when moving forward
         setErrors({});
         showToast(`Step ${currentStep + 1} completed!`, 'success');
       }
@@ -357,30 +272,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
 
     setLoading(true);
     try {
-      // Validate total days match park durations
-      const parkDaysTotal = tripData.parks.reduce((sum, park) => sum + (park.stayDuration || 1), 0);
-      const tripDaysTotal = calculateTripDuration();
-
-      // Warn if significant mismatch
-      if (Math.abs(parkDaysTotal - tripDaysTotal) > 2) {
-        const shouldContinue = window.confirm(
-          `Total park days (${parkDaysTotal}) don't match trip duration (${tripDaysTotal}). Save anyway?`
-        );
-        if (!shouldContinue) {
-          setLoading(false);
-          return;
-        }
-      }
-
-      const tripToSave = {
-        ...tripData,
-        totalDistance: calculateTotalDistance(),
-        estimatedCost: calculateEstimatedCost(),
-        totalDuration: calculateTripDuration(),
-        updatedAt: new Date()
-      };
-      
-      await onSave(tripToSave);
+      await onSave(tripData);
     } catch (error) {
       console.error('Save error:', error);
       showToast('Failed to save trip', 'error');
@@ -395,11 +287,10 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
       <FadeInWrapper delay={0.1}>
         <div className="bg-white rounded-2xl p-4 md:p-6 shadow-lg border border-gray-100">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Enhanced Trip Builder</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800">Trip Builder</h2>
             <div className="text-sm text-gray-500">Step {currentStep} of 3</div>
           </div>
           
-          {/* Mobile-friendly step indicator */}
           <div className="flex items-center justify-between">
             {steps.map((step, index) => {
               const Icon = step.icon;
@@ -458,13 +349,13 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g., Pacific Northwest Adventure"
-                      value={tripData.title}
+                      placeholder="e.g., Utah's Big 5 Adventure"
+                      value={tripData.title || ''}
                       onChange={(e) => {
-                        setTripData({...tripData, title: e.target.value});
-                        if (errors.title) setErrors({...errors, title: ''});
+                        setTripData(prev => ({...prev, title: e.target.value}));
+                        if (errors.title) setErrors(prev => ({...prev, title: ''}));
                       }}
-                      className={`w-full p-4 border-2 rounded-xl text-base font-medium focus:outline-none transition-all min-h-[48px] ${
+                      className={`w-full p-4 border-2 rounded-xl text-base font-medium focus:outline-none transition-all ${
                         errors.title 
                           ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
                           : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
@@ -481,23 +372,20 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
                         Start Date *
                       </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={tripData.startDate}
-                          onChange={(e) => {
-                            setTripData({...tripData, startDate: e.target.value});
-                            if (errors.startDate) setErrors({...errors, startDate: ''});
-                          }}
-                          min={new Date().toISOString().split('T')[0]}
-                          className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white min-h-[48px] ${
-                            errors.startDate 
-                              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
-                              : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
-                          }`}
-                        />
-                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      </div>
+                      <input
+                        type="date"
+                        value={tripData.startDate || ''}
+                        onChange={(e) => {
+                          setTripData(prev => ({...prev, startDate: e.target.value}));
+                          if (errors.startDate) setErrors(prev => ({...prev, startDate: ''}));
+                        }}
+                        min={new Date().toISOString().split('T')[0]}
+                        className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white ${
+                          errors.startDate 
+                            ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
+                            : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
+                        }`}
+                      />
                       {errors.startDate && (
                         <p className="mt-2 text-sm text-red-600">{errors.startDate}</p>
                       )}
@@ -507,23 +395,20 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                       <label className="block text-sm font-semibold text-gray-700 mb-3">
                         End Date *
                       </label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          value={tripData.endDate}
-                          onChange={(e) => {
-                            setTripData({...tripData, endDate: e.target.value});
-                            if (errors.endDate) setErrors({...errors, endDate: ''});
-                          }}
-                          min={tripData.startDate || new Date().toISOString().split('T')[0]}
-                          className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white min-h-[48px] ${
-                            errors.endDate 
-                              ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
-                              : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
-                          }`}
-                        />
-                        <FaCalendarAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-                      </div>
+                      <input
+                        type="date"
+                        value={tripData.endDate || ''}
+                        onChange={(e) => {
+                          setTripData(prev => ({...prev, endDate: e.target.value}));
+                          if (errors.endDate) setErrors(prev => ({...prev, endDate: ''}));
+                        }}
+                        min={tripData.startDate || new Date().toISOString().split('T')[0]}
+                        className={`w-full p-4 border-2 rounded-xl focus:outline-none transition-all text-gray-700 bg-white ${
+                          errors.endDate 
+                            ? 'border-red-300 focus:border-red-400 focus:ring-4 focus:ring-red-100' 
+                            : 'border-gray-200 focus:border-pink-400 focus:ring-4 focus:ring-pink-100'
+                        }`}
+                      />
                       {errors.endDate && (
                         <p className="mt-2 text-sm text-red-600">{errors.endDate}</p>
                       )}
@@ -549,8 +434,8 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     </label>
                     <textarea
                       placeholder="Describe your adventure goals and interests..."
-                      value={tripData.description}
-                      onChange={(e) => setTripData({...tripData, description: e.target.value})}
+                      value={tripData.description || ''}
+                      onChange={(e) => setTripData(prev => ({...prev, description: e.target.value}))}
                       rows={4}
                       className="w-full p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all resize-none"
                     />
@@ -564,8 +449,8 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <button
                         type="button"
-                        onClick={() => setTripData({...tripData, transportationMode: 'driving'})}
-                        className={`p-4 md:p-6 rounded-xl border-2 transition-all text-left min-h-[100px] ${
+                        onClick={() => setTripData(prev => ({...prev, transportationMode: 'driving'}))}
+                        className={`p-4 md:p-6 rounded-xl border-2 transition-all text-left ${
                           tripData.transportationMode === 'driving' 
                             ? 'border-pink-400 bg-pink-50 shadow-lg' 
                             : 'border-gray-200 hover:border-pink-200'
@@ -579,8 +464,8 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                       
                       <button
                         type="button"
-                        onClick={() => setTripData({...tripData, transportationMode: 'flying'})}
-                        className={`p-4 md:p-6 rounded-xl border-2 transition-all text-left min-h-[100px] ${
+                        onClick={() => setTripData(prev => ({...prev, transportationMode: 'flying'}))}
+                        className={`p-4 md:p-6 rounded-xl border-2 transition-all text-left ${
                           tripData.transportationMode === 'flying' 
                             ? 'border-pink-400 bg-pink-50 shadow-lg' 
                             : 'border-gray-200 hover:border-pink-200'
@@ -592,6 +477,9 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                         <div className="text-xs text-green-600">✓ Faster for distant parks</div>
                       </button>
                     </div>
+                    {errors.transportationMode && (
+                      <p className="mt-2 text-sm text-red-600">{errors.transportationMode}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -621,7 +509,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                         }}
                         onFocus={() => setShowParkDropdown(parkSearch.length > 0)}
                         onBlur={() => setTimeout(() => setShowParkDropdown(false), 200)}
-                        className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all min-h-[48px]"
+                        className="w-full p-4 pl-12 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
                       />
                       <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
                     </div>
@@ -693,19 +581,19 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                                   <label className="block text-xs font-medium text-gray-600 mb-1">Visit Date</label>
                                   <input
                                     type="date"
-                                    value={park.visitDate}
+                                    value={park.visitDate || ''}
                                     onChange={(e) => updateParkDetails(park.parkId, 'visitDate', e.target.value)}
                                     min={tripData.startDate || new Date().toISOString().split('T')[0]}
                                     max={tripData.endDate || undefined}
-                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm min-h-[44px]"
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
                                   />
                                 </div>
                                 <div>
                                   <label className="block text-xs font-medium text-gray-600 mb-1">Stay Duration</label>
                                   <select
-                                    value={park.stayDuration}
+                                    value={park.stayDuration || 2}
                                     onChange={(e) => updateParkDetails(park.parkId, 'stayDuration', parseInt(e.target.value))}
-                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm min-h-[44px]"
+                                    className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-400 text-sm"
                                   >
                                     {[1,2,3,4,5,6,7].map(days => (
                                       <option key={days} value={days}>
@@ -728,112 +616,6 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                     </div>
                   )}
                 </div>
-
-                {/* Route Optimization Panel */}
-                {tripData.parks.length >= 2 && (
-                  <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-3">
-                      <FaMagic className="text-purple-500" />
-                      Route Optimization
-                    </h3>
-                    
-                    <div className="space-y-4">
-                      {/* Current Route Stats */}
-                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-xl border border-blue-200">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-sm font-medium text-blue-700">Current Route</span>
-                          <span className="text-lg font-bold text-blue-800">
-                            {calculateTotalDistance()} miles
-                          </span>
-                        </div>
-                        <div className="text-xs text-blue-600">
-                          Total driving distance between parks
-                        </div>
-                      </div>
-
-                      {/* Route Analysis */}
-                      {routeAnalysis && (
-                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
-                          <div className="flex items-center gap-2 mb-2">
-                            <FaChartLine className="text-orange-600" />
-                            <span className="text-sm font-medium text-orange-700">Route Analysis</span>
-                          </div>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
-                            <div>
-                              <div className="font-bold text-orange-800">{routeAnalysis.averageDistance}</div>
-                              <div className="text-orange-600">Avg Distance</div>
-                            </div>
-                            <div>
-                              <div className="font-bold text-orange-800">{routeAnalysis.longestSegment}</div>
-                              <div className="text-orange-600">Longest Leg</div>
-                            </div>
-                            <div>
-                              <div className="font-bold text-orange-800">{routeAnalysis.shortestSegment}</div>
-                              <div className="text-orange-600">Shortest Leg</div>
-                            </div>
-                            <div>
-                              <div className="font-bold text-orange-800">{routeAnalysis.efficiency}</div>
-                              <div className="text-orange-600">Efficiency</div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Optimization Suggestion */}
-                      {getOptimizationPotential?.canOptimize && (
-                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-xl border border-green-200">
-                          <div className="flex justify-between items-center mb-2">
-                            <span className="text-sm font-medium text-green-700">Potential Savings</span>
-                            <span className="text-lg font-bold text-green-800">
-                              -{Math.round(getOptimizationPotential.savings)} miles
-                            </span>
-                          </div>
-                          <div className="text-xs text-green-600">
-                            Optimize route to reduce driving distance
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Action Buttons */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <button
-                          onClick={optimizeRoute}
-                          disabled={tripData.parks.length < 3}
-                          className="flex items-center justify-center gap-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 px-4 rounded-xl hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                        >
-                          <FaRoute />
-                          {tripData.parks.length < 3 ? 'Need 3+ Parks' : 'Optimize Route'}
-                        </button>
-                        
-                        <button
-                          onClick={sortParksByDate}
-                          className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-3 px-4 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium shadow-lg hover:shadow-xl"
-                        >
-                          <FaSort />
-                          Sort by Dates
-                        </button>
-                      </div>
-
-                      {/* Optimization Tips */}
-                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-xl border border-yellow-200">
-                        <div className="flex items-start gap-3">
-                          <div className="text-yellow-600 text-xl">💡</div>
-                          <div>
-                            <div className="font-medium text-yellow-800 mb-1">Optimization Tips</div>
-                            <div className="text-yellow-700 text-sm space-y-1">
-                              <div>• Add more parks for better optimization</div>
-                              <div>• Set visit dates for chronological sorting</div>
-                              <div>• Consider your starting location when planning</div>
-                              {routeAnalysis?.recommendations?.map((rec, index) => (
-                                <div key={index}>• {rec}</div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </FadeInWrapper>
           )}
@@ -851,15 +633,15 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                   
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="text-center">
-                      <div className="text-2xl md:text-3xl font-bold">${calculateEstimatedCost()}</div>
+                      <div className="text-2xl md:text-3xl font-bold">${tripData.estimatedCost || 0}</div>
                       <div className="text-pink-200 text-sm">Budget</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl md:text-3xl font-bold">{calculateTotalDistance()}</div>
+                      <div className="text-2xl md:text-3xl font-bold">{tripData.totalDistance || 0}</div>
                       <div className="text-pink-200 text-sm">Miles</div>
                     </div>
                     <div className="text-center">
-                      <div className="text-2xl md:text-3xl font-bold">{calculateTripDuration()}</div>
+                      <div className="text-2xl md:text-3xl font-bold">{tripData.totalDuration || 0}</div>
                       <div className="text-pink-200 text-sm">Days</div>
                     </div>
                     <div className="text-center">
@@ -939,7 +721,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                   })()}
                   
                   <div className="mt-6 bg-gradient-to-r from-green-500 to-emerald-500 p-6 rounded-xl text-white text-center">
-                    <div className="text-2xl md:text-3xl font-bold">${calculateEstimatedCost()}</div>
+                    <div className="text-2xl md:text-3xl font-bold">${tripData.estimatedCost || 0}</div>
                     <div className="text-green-100">Total Estimated Cost</div>
                   </div>
                 </div>
@@ -986,42 +768,34 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
                 transportationMode={tripData.transportationMode}
               />
               
-              {/* Enhanced Quick Stats Panel */}
+              {/* Quick Stats Panel */}
               {tripData.parks.length > 0 && (
                 <div className="mt-6 bg-white rounded-xl p-4 shadow-lg border border-gray-100">
-                  <h4 className="font-semibold text-gray-800 mb-3">Enhanced Stats</h4>
+                  <h4 className="font-semibold text-gray-800 mb-3">Trip Stats</h4>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Total Distance:</span>
-                      <span className="font-medium">{calculateTotalDistance()} mi</span>
+                      <span className="font-medium">{tripData.totalDistance || 0} mi</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Est. Budget:</span>
-                      <span className="font-medium">${calculateEstimatedCost()}</span>
+                      <span className="font-medium">${tripData.estimatedCost || 0}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Duration:</span>
-                      <span className="font-medium">{calculateTripDuration()} days</span>
+                      <span className="font-medium">{tripData.totalDuration || 0} days</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Nights:</span>
-                      <span className="font-medium">{Math.max(0, calculateTripDuration() - 1)}</span>
+                      <span className="text-gray-600">Parks:</span>
+                      <span className="font-medium">{tripData.parks.length}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Transportation:</span>
                       <span className="font-medium capitalize flex items-center gap-1">
                         {tripData.transportationMode === 'flying' ? <FaPlane /> : <FaCar />}
-                        {tripData.transportationMode}
+                        {tripData.transportationMode || 'driving'}
                       </span>
                     </div>
-                    {routeAnalysis && (
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Route Efficiency:</span>
-                        <span className={`font-medium ${routeAnalysis.efficiency === 'Good' ? 'text-green-600' : 'text-yellow-600'}`}>
-                          {routeAnalysis.efficiency}
-                        </span>
-                      </div>
-                    )}
                   </div>
                 </div>
               )}
@@ -1035,7 +809,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-gray-200">
           <button
             onClick={currentStep === 1 ? onCancel : prevStep}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition font-medium min-h-[48px]"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition font-medium"
           >
             <FaChevronLeft />
             {currentStep === 1 ? 'Cancel' : 'Previous Step'}
@@ -1045,7 +819,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
             {currentStep < 3 ? (
               <button
                 onClick={nextStep}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition font-medium shadow-lg min-h-[48px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-xl hover:from-pink-600 hover:to-purple-600 transition font-medium shadow-lg"
               >
                 Next Step
                 <FaChevronRight />
@@ -1054,7 +828,7 @@ const TripBuilder = ({ trip, allParks, onSave, onCancel }) => {
               <button
                 onClick={handleSave}
                 disabled={loading}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-lg min-h-[48px]"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed transition font-medium shadow-lg"
               >
                 <FaSave />
                 {loading ? 'Saving Trip...' : 'Save Trip'}

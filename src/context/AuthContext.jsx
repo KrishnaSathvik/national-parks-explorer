@@ -1,9 +1,11 @@
+// ✨ Enhanced AuthContext.jsx - Advanced Authentication System
 import {
   createContext,
   useContext,
   useEffect,
   useState,
-  useCallback
+  useCallback,
+  useReducer
 } from "react";
 import {
   getAuth,
@@ -13,13 +15,25 @@ import {
   signOut,
   signInWithPopup,
   GoogleAuthProvider,
+  sendPasswordResetEmail,
+  updateProfile,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  deleteUser,
+  sendEmailVerification
 } from "firebase/auth";
 import {
   doc,
   getDoc,
   updateDoc,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+  deleteDoc
 } from "firebase/firestore";
 import { requestNotificationPermission } from "../firebase";
 import { auth, db } from "../firebase";
@@ -28,52 +42,227 @@ import { auth, db } from "../firebase";
 const AuthContext = createContext();
 
 // Hook to use auth context
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-// Provider
+// Enhanced auth state reducer for better state management
+const authReducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_USER':
+      return { 
+        ...state, 
+        currentUser: action.payload.user,
+        userRole: action.payload.role,
+        userProfile: action.payload.profile,
+        loading: false 
+      };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload, loading: false };
+    case 'CLEAR_ERROR':
+      return { ...state, error: null };
+    case 'UPDATE_PROFILE':
+      return { 
+        ...state, 
+        userProfile: { ...state.userProfile, ...action.payload } 
+      };
+    case 'SET_PREFERENCES':
+      return { 
+        ...state, 
+        userPreferences: { ...state.userPreferences, ...action.payload } 
+      };
+    case 'RESET_STATE':
+      return {
+        currentUser: null,
+        userRole: null,
+        userProfile: null,
+        userPreferences: null,
+        loading: false,
+        error: null,
+        isEmailVerified: false
+      };
+    default:
+      return state;
+  }
+};
+
+// Initial auth state
+const initialAuthState = {
+  currentUser: null,
+  userRole: null,
+  userProfile: null,
+  userPreferences: null,
+  loading: true,
+  error: null,
+  isEmailVerified: false
+};
+
+// Enhanced Auth Provider
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [state, dispatch] = useReducer(authReducer, initialAuthState);
+  const [connectionStatus, setConnectionStatus] = useState('online');
+  const [retryAttempts, setRetryAttempts] = useState(0);
 
-  // Watch auth state
+  // Enhanced user data fetcher with retry logic
+  const fetchUserData = useCallback(async (user, attempt = 0) => {
+    const maxRetries = 3;
+    
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Get user document from Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      let userProfile = null;
+      let userRole = "user";
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        userRole = userData.role || "user";
+        userProfile = {
+          displayName: userData.displayName || user.displayName || "",
+          email: userData.email || user.email,
+          photoURL: userData.photoURL || user.photoURL || "",
+          favoriteParks: userData.favoriteParks || [],
+          favoriteEvents: userData.favoriteEvents || [],
+          createdAt: userData.createdAt,
+          lastLoginAt: userData.lastLoginAt,
+          preferences: userData.preferences || {},
+          stats: userData.stats || {
+            parksVisited: 0,
+            reviewsWritten: 0,
+            tripsPlanned: 0
+          }
+        };
+        
+        // Update last login time
+        await updateDoc(userRef, {
+          lastLoginAt: serverTimestamp(),
+          email: user.email // Ensure email is current
+        });
+      } else {
+        // Create new user document for first-time users
+        const newUserData = {
+          email: user.email,
+          displayName: user.displayName || "",
+          photoURL: user.photoURL || "",
+          createdAt: serverTimestamp(),
+          lastLoginAt: serverTimestamp(),
+          role: "user",
+          favoriteParks: [],
+          favoriteEvents: [],
+          preferences: {
+            notifications: true,
+            emailUpdates: true,
+            theme: 'light',
+            language: 'en'
+          },
+          stats: {
+            parksVisited: 0,
+            reviewsWritten: 0,
+            tripsPlanned: 0
+          }
+        };
+        
+        await setDoc(userRef, newUserData);
+        userProfile = { ...newUserData, createdAt: new Date(), lastLoginAt: new Date() };
+      }
+      
+      dispatch({ 
+        type: 'SET_USER', 
+        payload: { 
+          user, 
+          role: userRole, 
+          profile: userProfile 
+        } 
+      });
+      
+      setRetryAttempts(0);
+      
+    } catch (error) {
+      console.error("❌ Error fetching user data:", error);
+      
+      if (attempt < maxRetries && error.code !== 'permission-denied') {
+        console.log(`🔄 Retrying user data fetch (${attempt + 1}/${maxRetries})`);
+        setTimeout(() => {
+          fetchUserData(user, attempt + 1);
+        }, Math.pow(2, attempt) * 1000); // Exponential backoff
+        setRetryAttempts(attempt + 1);
+      } else {
+        // Fallback to basic user data
+        dispatch({ 
+          type: 'SET_USER', 
+          payload: { 
+            user, 
+            role: "user", 
+            profile: {
+              displayName: user.displayName || "",
+              email: user.email,
+              photoURL: user.photoURL || "",
+              favoriteParks: [],
+              favoriteEvents: [],
+              preferences: {},
+              stats: { parksVisited: 0, reviewsWritten: 0, tripsPlanned: 0 }
+            }
+          } 
+        });
+        
+        dispatch({ 
+          type: 'SET_ERROR', 
+          payload: 'Failed to load complete user profile. Some features may be limited.' 
+        });
+      }
+    }
+  }, []);
+
+  // Watch auth state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-
       if (user) {
-        try {
-          // ✅ Get user role
-          const userSnap = await getDoc(doc(db, "users", user.uid));
-          setUserRole(userSnap.exists() ? userSnap.data().role || "user" : "user");
-        } catch (error) {
-          console.error("❌ Error fetching user role:", error);
-          setUserRole("user");
+        await fetchUserData(user);
+        
+        // Check email verification status
+        if (!user.emailVerified && user.providerData[0]?.providerId === 'password') {
+          console.warn("⚠️ Email not verified");
         }
       } else {
-        setUserRole(null);
+        dispatch({ type: 'RESET_STATE' });
       }
-
-      setLoading(false);
     });
 
     return unsubscribe;
-  }, []);
+  }, [fetchUserData]);
 
-  // ✅ Register Service Worker on app load
+  // Enhanced Service Worker and FCM setup
   useEffect(() => {
     const registerServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
         try {
+          // Unregister old service workers
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+            if (registration.scope.includes('enhanced-sw') || registration.scope.includes('sw.js')) {
+              await registration.unregister();
+              console.log('🗑️ Unregistered old service worker');
+            }
+          }
+
+          // Register Firebase messaging service worker
           const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
             scope: '/'
           });
-          console.log('✅ Service Worker registered:', registration);
-          
-          // Wait for service worker to be ready
+
+          console.log('✅ Firebase Service Worker registered:', registration.scope);
           await navigator.serviceWorker.ready;
-          console.log('✅ Service Worker is ready');
-          
+          console.log('✅ Service Worker is ready for FCM');
+
         } catch (error) {
           console.error('❌ Service Worker registration failed:', error);
         }
@@ -83,20 +272,18 @@ export const AuthProvider = ({ children }) => {
     registerServiceWorker();
   }, []);
 
-  // 🔔 Enhanced notification setup for logged-in users
+  // Enhanced notification setup for logged-in users
   useEffect(() => {
     const setupNotifications = async () => {
-      if (currentUser && typeof window !== "undefined" && "Notification" in window) {
+      if (state.currentUser && typeof window !== "undefined" && "Notification" in window) {
         try {
-          // Small delay to ensure service worker is fully ready
           await new Promise(resolve => setTimeout(resolve, 1000));
           
           const token = await requestNotificationPermission();
           
-          if (token) {
-            // Update user document with FCM token
+          if (token && state.currentUser) {
             try {
-              const userRef = doc(db, "users", currentUser.uid);
+              const userRef = doc(db, "users", state.currentUser.uid);
               await updateDoc(userRef, {
                 fcmToken: token,
                 tokenUpdatedAt: serverTimestamp(),
@@ -112,65 +299,315 @@ export const AuthProvider = ({ children }) => {
       }
     };
 
-    if (currentUser) {
+    if (state.currentUser) {
       setupNotifications();
     }
-  }, [currentUser]);
+  }, [state.currentUser]);
 
-  // Auth methods
-  const signup = useCallback(
-    (email, password) => createUserWithEmailAndPassword(auth, email, password),
-    []
-  );
-  
-  const login = useCallback(
-    (email, password) => signInWithEmailAndPassword(auth, email, password),
-    []
-  );
-  
-  const logout = useCallback(() => signOut(auth), []);
-  
-  const loginWithGoogle = useCallback(async () => {
-    const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      setConnectionStatus('online');
+      dispatch({ type: 'CLEAR_ERROR' });
+    };
+    
+    const handleOffline = () => {
+      setConnectionStatus('offline');
+    };
 
-    const userRef = doc(db, "users", result.user.uid);
-    const userSnap = await getDoc(userRef);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
 
-    if (!userSnap.exists()) {
-      // Create new user document
-      await setDoc(userRef, {
-        email: result.user.email,
-        displayName: result.user.displayName || "",
-        createdAt: serverTimestamp(),
-        role: "user",
-        favoriteParks: [],
-        favoriteEvents: [],
-      });
-    } else {
-      // Update existing user
-      await updateDoc(userRef, {
-        email: result.user.email,
-        displayName: result.user.displayName || "",
-        lastLoginAt: serverTimestamp(),
-      });
-    }
-
-    return result;
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
+  // Enhanced authentication methods
+  const signup = useCallback(async (email, password, displayName = "") => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'CLEAR_ERROR' });
+      
+      const result = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update user profile
+      if (displayName) {
+        await updateProfile(result.user, { displayName });
+      }
+      
+      // Send email verification
+      await sendEmailVerification(result.user);
+      
+      return result;
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+      throw error;
+    }
+  }, []);
+  
+  const login = useCallback(async (email, password) => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'CLEAR_ERROR' });
+      
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      return result;
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+      throw error;
+    }
+  }, []);
+  
+  const logout = useCallback(async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      await signOut(auth);
+      dispatch({ type: 'RESET_STATE' });
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+      throw error;
+    }
+  }, []);
+  
+  const loginWithGoogle = useCallback(async () => {
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      dispatch({ type: 'CLEAR_ERROR' });
+      
+      const provider = new GoogleAuthProvider();
+      provider.addScope('profile');
+      provider.addScope('email');
+      
+      const result = await signInWithPopup(auth, provider);
+      return result;
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+      throw error;
+    }
+  }, []);
+
+  // Additional authentication methods
+  const resetPassword = useCallback(async (email) => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      return { success: true, message: 'Password reset email sent' };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }, []);
+
+  const updateUserProfile = useCallback(async (updates) => {
+    if (!state.currentUser) throw new Error('No user logged in');
+    
+    try {
+      dispatch({ type: 'SET_LOADING', payload: true });
+      
+      // Update Firebase Auth profile
+      if (updates.displayName || updates.photoURL) {
+        await updateProfile(state.currentUser, {
+          displayName: updates.displayName || state.currentUser.displayName,
+          photoURL: updates.photoURL || state.currentUser.photoURL
+        });
+      }
+      
+      // Update Firestore user document
+      const userRef = doc(db, "users", state.currentUser.uid);
+      const firestoreUpdates = {
+        ...updates,
+        updatedAt: serverTimestamp()
+      };
+      
+      await updateDoc(userRef, firestoreUpdates);
+      
+      // Update local state
+      dispatch({ type: 'UPDATE_PROFILE', payload: updates });
+      
+      return { success: true, message: 'Profile updated successfully' };
+    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: error.message });
+      throw error;
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  }, [state.currentUser]);
+
+  const updateUserPassword = useCallback(async (currentPassword, newPassword) => {
+    if (!state.currentUser) throw new Error('No user logged in');
+    
+    try {
+      // Re-authenticate user
+      const credential = EmailAuthProvider.credential(
+        state.currentUser.email,
+        currentPassword
+      );
+      await reauthenticateWithCredential(state.currentUser, credential);
+      
+      // Update password
+      await updatePassword(state.currentUser, newPassword);
+      
+      return { success: true, message: 'Password updated successfully' };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }, [state.currentUser]);
+
+  const deleteAccount = useCallback(async (password) => {
+    if (!state.currentUser) throw new Error('No user logged in');
+    
+    try {
+      // Re-authenticate user
+      const credential = EmailAuthProvider.credential(
+        state.currentUser.email,
+        password
+      );
+      await reauthenticateWithCredential(state.currentUser, credential);
+      
+      // Delete user data from Firestore
+      const userRef = doc(db, "users", state.currentUser.uid);
+      await deleteDoc(userRef);
+      
+      // Delete user reviews, trips, etc.
+      const collections = ['reviews', 'trips', 'events'];
+      for (const collectionName of collections) {
+        const q = query(
+          collection(db, collectionName),
+          where('userId', '==', state.currentUser.uid)
+        );
+        const snapshot = await getDocs(q);
+        const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
+        await Promise.all(deletePromises);
+      }
+      
+      // Delete Firebase Auth account
+      await deleteUser(state.currentUser);
+      
+      dispatch({ type: 'RESET_STATE' });
+      
+      return { success: true, message: 'Account deleted successfully' };
+    } catch (error) {
+      throw new Error(error.message);
+    }
+  }, [state.currentUser]);
+
+  const updateUserPreferences = useCallback(async (preferences) => {
+    if (!state.currentUser) return;
+    
+    try {
+      const userRef = doc(db, "users", state.currentUser.uid);
+      await updateDoc(userRef, {
+        preferences: { ...state.userProfile?.preferences, ...preferences },
+        updatedAt: serverTimestamp()
+      });
+      
+      dispatch({ type: 'SET_PREFERENCES', payload: preferences });
+    } catch (error) {
+      console.error('Error updating preferences:', error);
+    }
+  }, [state.currentUser, state.userProfile?.preferences]);
+
+  const clearError = useCallback(() => {
+    dispatch({ type: 'CLEAR_ERROR' });
+  }, []);
+
+  const refreshUserData = useCallback(async () => {
+    if (state.currentUser) {
+      await fetchUserData(state.currentUser);
+    }
+  }, [state.currentUser, fetchUserData]);
+
+  // Context value
+  const value = {
+    // State
+    currentUser: state.currentUser,
+    userRole: state.userRole,
+    userProfile: state.userProfile,
+    userPreferences: state.userPreferences,
+    loading: state.loading,
+    error: state.error,
+    isEmailVerified: state.currentUser?.emailVerified || false,
+    connectionStatus,
+    retryAttempts,
+    
+    // Basic auth methods
+    signup,
+    login,
+    logout,
+    loginWithGoogle,
+    
+    // Enhanced methods
+    resetPassword,
+    updateUserProfile,
+    updateUserPassword,
+    deleteAccount,
+    updateUserPreferences,
+    refreshUserData,
+    clearError,
+    
+    // Utility methods
+    isAdmin: state.userRole === 'admin',
+    isModerator: state.userRole === 'moderator' || state.userRole === 'admin',
+    hasRole: (role) => state.userRole === role,
+    isOnline: connectionStatus === 'online'
+  };
+
   return (
-    <AuthContext.Provider
-      value={{
-        currentUser,
-        userRole,
-        signup,
-        login,
-        logout,
-        loginWithGoogle,
-      }}
-    >
-      {!loading && children}
+    <AuthContext.Provider value={value}>
+      {children}
     </AuthContext.Provider>
   );
 };
+
+// Enhanced hooks for specific use cases
+export const useAuthUser = () => {
+  const { currentUser, userProfile, loading } = useAuth();
+  return { user: currentUser, profile: userProfile, loading };
+};
+
+export const useAuthActions = () => {
+  const { 
+    login, 
+    logout, 
+    signup, 
+    loginWithGoogle, 
+    resetPassword,
+    updateUserProfile,
+    updateUserPassword,
+    deleteAccount 
+  } = useAuth();
+  
+  return {
+    login,
+    logout,
+    signup,
+    loginWithGoogle,
+    resetPassword,
+    updateUserProfile,
+    updateUserPassword,
+    deleteAccount
+  };
+};
+
+export const useAuthState = () => {
+  const { 
+    currentUser, 
+    userRole, 
+    loading, 
+    error, 
+    isEmailVerified,
+    connectionStatus 
+  } = useAuth();
+  
+  return {
+    isAuthenticated: !!currentUser,
+    isAdmin: userRole === 'admin',
+    isModerator: userRole === 'moderator' || userRole === 'admin',
+    loading,
+    error,
+    isEmailVerified,
+    isOnline: connectionStatus === 'online'
+  };
+};
+
+export default AuthContext;
