@@ -28,5 +28,4 @@ serviceAccountKey.json
 .env.local
 # BUT allow .env.example (override)
 !.env.example
-
 .env.local
