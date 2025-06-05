@@ -43,12 +43,12 @@ const firebaseConfig = {
 const validateFirebaseConfig = (config) => {
   const requiredFields = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
   const missingFields = requiredFields.filter(field => !config[field]);
-  
+
   if (missingFields.length > 0) {
     console.error('❌ Missing Firebase configuration fields:', missingFields);
     throw new Error(`Firebase configuration incomplete. Missing: ${missingFields.join(', ')}`);
   }
-  
+
   console.log('✅ Firebase configuration validated');
   return true;
 };
@@ -133,8 +133,7 @@ const initializeAnalytics = async () => {
   }
 };
 
-// ✅ FIX: Enhanced performance initialization with proper error handling
-// ✅ FIX: Enhanced performance initialization with proper error handling
+// Enhanced performance initialization with proper error handling
 const initializePerformance = async () => {
   try {
     // Additional checks for performance monitoring
@@ -166,13 +165,13 @@ Promise.all([
 ]).then(() => {
   console.log('🚀 Firebase initialization complete');
 }).catch(error => {
-    console.error('❌ Firebase services initialization failed:', error);
+  console.error('❌ Firebase services initialization failed:', error);
 });
 
 // Enhanced Firestore persistence with retry logic
 const enableFirestorePersistence = async (retries = 3) => {
   if (typeof window === 'undefined') return;
-  
+
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       await enableIndexedDbPersistence(db, {
@@ -183,7 +182,7 @@ const enableFirestorePersistence = async (retries = 3) => {
       return true;
     } catch (error) {
       console.warn(`⚠️ Firestore persistence attempt ${attempt} failed:`, error.code);
-      
+
       if (error.code === 'failed-precondition') {
         console.warn('⚠️ Multiple tabs open, persistence disabled');
         return false;
@@ -191,17 +190,17 @@ const enableFirestorePersistence = async (retries = 3) => {
         console.warn('⚠️ Browser doesn\'t support persistence');
         return false;
       }
-      
+
       if (attempt === retries) {
         console.error('❌ Failed to enable Firestore persistence after', retries, 'attempts');
         return false;
       }
-      
+
       // Wait before retry
       await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
     }
   }
-  
+
   return false;
 };
 
@@ -254,7 +253,7 @@ const requestNotificationPermission = async (options = {}) => {
         if (registration && registration.active) {
           break;
         }
-        
+
         if (attempt < retries) {
           console.log(`🔄 Service worker not ready, retrying... (${attempt}/${retries})`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -279,11 +278,11 @@ const requestNotificationPermission = async (options = {}) => {
           vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
           serviceWorkerRegistration: registration
         });
-        
+
         if (token) {
           break;
         }
-        
+
         if (attempt < retries) {
           console.log(`🔄 No FCM token received, retrying... (${attempt}/${retries})`);
           await new Promise(resolve => setTimeout(resolve, retryDelay));
@@ -305,21 +304,21 @@ const requestNotificationPermission = async (options = {}) => {
     // Store token in Firestore with enhanced error handling
     await saveFCMToken(token);
 
-    // Send welcome notification with error handling
+    // ✅ FIXED: Send welcome notification with error handling (no more 500 error)
     await sendWelcomeNotification(token);
 
     return token;
 
   } catch (error) {
     console.error('❌ Error in requestNotificationPermission:', error);
-    
+
     // Enhanced error reporting
     logAnalyticsEvent('fcm_setup_error', {
       error_code: error.code,
       error_message: error.message,
       permission_status: Notification.permission
     });
-    
+
     return null;
   }
 };
@@ -389,120 +388,116 @@ const saveFCMToken = async (token) => {
   }
 };
 
-// Enhanced welcome notification with fallback
+// ✅ FIXED: Welcome notification using local browser notification (no backend call)
 const sendWelcomeNotification = async (token) => {
   try {
-    const welcomeEndpoint = "https://us-central1-national-parks-explorer-7bc55.cloudfunctions.net/sendWelcomePush";
-    
-    const response = await fetch(welcomeEndpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json"
-      },
-      body: JSON.stringify({ 
-        token,
-        timestamp: Date.now(),
-        source: 'web-app'
-      }),
-      timeout: 10000 // 10 second timeout
-    });
+    // ✅ Show local browser notification instead of calling missing backend
+    if (Notification.permission === 'granted') {
+      new Notification('🏞️ Welcome to Trip Planner!', {
+        body: 'You\'ll receive updates about your favorite parks and trips.',
+        icon: '/icons/icon-192x192.png',
+        badge: '/favicon.ico',
+        tag: 'welcome',
+        requireInteraction: false,
+        silent: false,
+        vibrate: [200, 100, 200]
+      });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      console.log('✅ Welcome notification shown locally');
+
+      // Log success analytics
+      logAnalyticsEvent('welcome_notification_sent', {
+        success: true,
+        type: 'local_browser_notification',
+        timestamp: Date.now()
+      });
+    } else {
+      console.log('ℹ️ Welcome notification skipped - permission not granted');
     }
-
-    const result = await response.json();
-    console.log('✅ Welcome notification sent:', result);
-    
-    // Log success analytics
-    logAnalyticsEvent('welcome_notification_sent', {
-      success: true,
-      response_time: Date.now()
-    });
 
   } catch (error) {
     console.error('❌ Welcome notification failed:', error);
-    
+
     // Log failure analytics
     logAnalyticsEvent('welcome_notification_failed', {
       error_message: error.message,
-      error_code: error.code || 'unknown'
+      error_code: error.code || 'unknown',
+      type: 'local_browser_notification'
     });
-    
+
     // Don't throw - welcome notification is not critical
   }
 };
 
-// ✅ FIX: Enhanced foreground message handling with proper null checks
+// Enhanced foreground message handling with proper null checks
 const setupForegroundMessaging = () => {
   if (!messaging) return;
 
-    try {
-        onMessage(messaging, (payload) => {
-            console.log('🔔 Foreground notification received:', payload);
+  try {
+    onMessage(messaging, (payload) => {
+      console.log('🔔 Foreground notification received:', payload);
 
-            try {
-                const {notification, data} = payload;
+      try {
+        const {notification, data} = payload;
 
-                if (notification) {
-                    const {title, body, icon, badge, image} = notification;
+        if (notification) {
+          const {title, body, icon, badge, image} = notification;
 
-                    // Show enhanced browser notification
-                    if (Notification.permission === 'granted') {
-                        const notificationOptions = {
-                            body,
-                            icon: icon || '/icons/icon-192x192.png',
-                            badge: badge || '/icons/icon-72x72.png',
-                            image: image,
-                            tag: data?.type || 'general',
-                            requireInteraction: false,
-                            silent: false,
-                            vibrate: [200, 100, 200],
-                            data: data,
-                            actions: data?.actions ? JSON.parse(data.actions) : []
-                        };
+          // Show enhanced browser notification
+          if (Notification.permission === 'granted') {
+            const notificationOptions = {
+              body,
+              icon: icon || '/icons/icon-192x192.png',
+              badge: badge || '/favicon.ico',
+              image: image,
+              tag: data?.type || 'general',
+              requireInteraction: false,
+              silent: false,
+              vibrate: [200, 100, 200],
+              data: data,
+              actions: data?.actions ? JSON.parse(data.actions) : []
+            };
 
-                        const notif = new Notification(title, notificationOptions);
+            const notif = new Notification(title, notificationOptions);
 
-                        // Handle notification clicks
-                        notif.onclick = (event) => {
-                            event.preventDefault();
-                            window.focus();
+            // Handle notification clicks
+            notif.onclick = (event) => {
+              event.preventDefault();
+              window.focus();
 
-                            if (data?.url) {
-                                window.open(data.url, '_blank');
-                            }
+              if (data?.url) {
+                window.open(data.url, '_blank');
+              }
 
-                            notif.close();
+              notif.close();
 
-                            // Log interaction
-                            logAnalyticsEvent('notification_clicked', {
-                                notification_type: data?.type || 'unknown',
-                                notification_title: title
-                            });
-                        };
+              // Log interaction
+              logAnalyticsEvent('notification_clicked', {
+                notification_type: data?.type || 'unknown',
+                notification_title: title
+              });
+            };
 
-                        // Auto-close after delay
-                        setTimeout(() => {
-                            notif.close();
-                        }, 8000);
-                    }
+            // Auto-close after delay
+            setTimeout(() => {
+              notif.close();
+            }, 8000);
+          }
 
-                    // Log notification received
-                    logAnalyticsEvent('notification_received', {
-                        notification_type: data?.type || 'unknown',
-                        notification_title: title,
-                        foreground: true
-                    });
-                }
-            } catch (error) {
-                console.error('❌ Error handling foreground notification:', error);
-            }
-        });
-    } catch (error) {
-        console.error('❌ Error setting up foreground messaging:', error);
-    }
+          // Log notification received
+          logAnalyticsEvent('notification_received', {
+            notification_type: data?.type || 'unknown',
+            notification_title: title,
+            foreground: true
+          });
+        }
+      } catch (error) {
+        console.error('❌ Error handling foreground notification:', error);
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error setting up foreground messaging:', error);
+  }
 };
 
 // Setup foreground messaging
@@ -511,7 +506,7 @@ setupForegroundMessaging();
 // Enhanced analytics helper functions
 const logAnalyticsEvent = (eventName, parameters = {}) => {
   if (!analytics) return;
-  
+
   try {
     // Add common parameters
     const enhancedParams = {
@@ -521,7 +516,7 @@ const logAnalyticsEvent = (eventName, parameters = {}) => {
       page_url: window.location.href,
       page_title: document.title
     };
-    
+
     logEvent(analytics, eventName, enhancedParams);
     console.log('📊 Analytics event logged:', eventName, enhancedParams);
   } catch (error) {
@@ -531,7 +526,7 @@ const logAnalyticsEvent = (eventName, parameters = {}) => {
 
 const setAnalyticsUser = (userId, properties = {}) => {
   if (!analytics) return;
-  
+
   try {
     setUserId(analytics, userId);
     setUserProperties(analytics, {
@@ -547,7 +542,7 @@ const setAnalyticsUser = (userId, properties = {}) => {
 // Enhanced performance monitoring
 const createPerformanceTrace = (traceName) => {
   if (!performance) return null;
-  
+
   try {
     const traceInstance = trace(performance, traceName);
     console.log('⏱️ Performance trace started:', traceName);
@@ -558,196 +553,10 @@ const createPerformanceTrace = (traceName) => {
   }
 };
 
-// Network status monitoring for Firestore
-let isOnline = navigator.onLine;
-let networkRetryCount = 0;
-const MAX_NETWORK_RETRIES = 3;
-
-const handleNetworkChange = async () => {
-  const wasOnline = isOnline;
-  isOnline = navigator.onLine;
-  
-  if (!wasOnline && isOnline) {
-    // Back online
-    console.log('🌐 Network restored, re-enabling Firestore');
-    try {
-      await enableNetwork(db);
-      networkRetryCount = 0;
-      
-      logAnalyticsEvent('network_restored', {
-        retry_count: networkRetryCount
-      });
-    } catch (error) {
-      console.error('❌ Failed to re-enable Firestore network:', error);
-    }
-  } else if (wasOnline && !isOnline) {
-    // Gone offline
-    console.log('📴 Network lost, Firestore will use cache');
-    
-    logAnalyticsEvent('network_lost', {
-      timestamp: Date.now()
-    });
-  }
-};
-
-// Setup network monitoring
-window.addEventListener('online', handleNetworkChange);
-window.addEventListener('offline', handleNetworkChange);
-
-// Enhanced Firestore helpers with error handling and retries
-const firestoreHelpers = {
-  // Enhanced document operations with retry logic
-  async getDocument(docRef, options = {}) {
-    const { retries = 3, useCache = true } = options;
-    
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-          console.log('📄 Document retrieved:', docRef.path);
-          return { success: true, data: docSnap.data(), id: docSnap.id };
-        } else {
-          return { success: false, error: 'Document not found', id: docRef.id };
-        }
-      } catch (error) {
-        console.error(`❌ Document retrieval attempt ${attempt} failed:`, error);
-        
-        if (attempt === retries) {
-          return { success: false, error: error.message, id: docRef.id };
-        }
-        
-        // Exponential backoff
-        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
-      }
-    }
-  },
-
-  // Enhanced document creation with validation
-  async createDocument(collectionRef, data, options = {}) {
-    const { validate = true, merge = false } = options;
-    
-    try {
-      // Basic validation
-      if (validate && (!data || Object.keys(data).length === 0)) {
-        throw new Error('Document data cannot be empty');
-      }
-      
-      // Add metadata
-      const enhancedData = {
-        ...data,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        version: 1
-      };
-      
-      const docRef = await addDoc(collectionRef, enhancedData);
-      console.log('📝 Document created:', docRef.id);
-      
-      return { success: true, id: docRef.id, data: enhancedData };
-    } catch (error) {
-      console.error('❌ Document creation failed:', error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  // Enhanced document updates with conflict resolution
-  async updateDocument(docRef, updates, options = {}) {
-    const { merge = true, incrementVersion = true } = options;
-    
-    try {
-      const enhancedUpdates = {
-        ...updates,
-        updatedAt: serverTimestamp()
-      };
-      
-      if (incrementVersion) {
-        // Get current version for conflict detection
-        const currentDoc = await getDoc(docRef);
-        if (currentDoc.exists()) {
-          const currentVersion = currentDoc.data().version || 1;
-          enhancedUpdates.version = currentVersion + 1;
-        }
-      }
-      
-      await updateDoc(docRef, enhancedUpdates);
-      console.log('✏️ Document updated:', docRef.path);
-      
-      return { success: true, data: enhancedUpdates };
-    } catch (error) {
-      console.error('❌ Document update failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-};
-
-// Enhanced storage helpers
-const storageHelpers = {
-  // Upload file with progress tracking
-  async uploadFile(file, path, options = {}) {
-    const { 
-      onProgress, 
-      maxSize = 10 * 1024 * 1024, // 10MB default
-      allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-    } = options;
-    
-    try {
-      // Validate file
-      if (file.size > maxSize) {
-        throw new Error(`File too large. Maximum size is ${maxSize / 1024 / 1024}MB`);
-      }
-      
-      if (!allowedTypes.includes(file.type)) {
-        throw new Error(`File type not allowed. Allowed types: ${allowedTypes.join(', ')}`);
-      }
-      
-      const storageRef = ref(storage, path);
-      
-      // Upload with metadata
-      const metadata = {
-        contentType: file.type,
-        customMetadata: {
-          uploadedAt: new Date().toISOString(),
-          originalName: file.name,
-          size: file.size.toString()
-        }
-      };
-      
-      const snapshot = await uploadBytes(storageRef, file, metadata);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      console.log('📤 File uploaded:', path);
-      
-      return {
-        success: true,
-        downloadURL,
-        metadata: snapshot.metadata,
-        path: snapshot.ref.fullPath
-      };
-    } catch (error) {
-      console.error('❌ File upload failed:', error);
-      return { success: false, error: error.message };
-    }
-  },
-
-  // Delete file with error handling
-  async deleteFile(path) {
-    try {
-      const storageRef = ref(storage, path);
-      await deleteObject(storageRef);
-      console.log('🗑️ File deleted:', path);
-      return { success: true };
-    } catch (error) {
-      console.error('❌ File deletion failed:', error);
-      return { success: false, error: error.message };
-    }
-  }
-};
-
 // Enhanced error boundary for Firebase operations
 const handleFirebaseError = (error, operation = 'Firebase operation') => {
   console.error(`❌ ${operation} failed:`, error);
-  
+
   // Map common Firebase errors to user-friendly messages
   const errorMessages = {
     'auth/user-not-found': 'No account found with this email address.',
@@ -770,9 +579,9 @@ const handleFirebaseError = (error, operation = 'Firebase operation') => {
     'internal': 'Internal server error. Please try again.',
     'data-loss': 'Data loss detected. Please refresh and try again.'
   };
-  
+
   const userMessage = errorMessages[error.code] || 'An unexpected error occurred. Please try again.';
-  
+
   // Log to analytics for monitoring
   logAnalyticsEvent('firebase_error', {
     error_code: error.code,
@@ -780,7 +589,7 @@ const handleFirebaseError = (error, operation = 'Firebase operation') => {
     operation: operation,
     timestamp: Date.now()
   });
-  
+
   return {
     code: error.code,
     message: userMessage,
@@ -792,11 +601,11 @@ const handleFirebaseError = (error, operation = 'Firebase operation') => {
 // Development mode helpers
 if (import.meta.env.DEV) {
   console.log('🔧 Development mode detected');
-  
+
   // Connect to emulators if available
   if (import.meta.env.VITE_USE_FIREBASE_EMULATOR === 'true') {
     console.log('🔧 Connecting to Firebase emulators...');
-    
+
     try {
       connectAuthEmulator(auth, 'http://localhost:9099');
       connectFirestoreEmulator(db, 'localhost', 8080);
@@ -820,8 +629,6 @@ export {
   logAnalyticsEvent,
   setAnalyticsUser,
   createPerformanceTrace,
-  firestoreHelpers,
-  storageHelpers,
   handleFirebaseError,
   requestNotificationPermission
 };
@@ -830,15 +637,15 @@ export {
 const cleanupFirebase = async () => {
   try {
     console.log('🧹 Cleaning up Firebase resources...');
-    
+
     // Disable network to flush pending writes
     await disableNetwork(db);
-    
+
     // Clear IndexedDB if needed
     if (import.meta.env.VITE_CLEAR_CACHE_ON_RELOAD === 'true') {
       await clearIndexedDbPersistence(db);
     }
-    
+
     console.log('✅ Firebase cleanup completed');
   } catch (error) {
     console.error('❌ Firebase cleanup failed:', error);

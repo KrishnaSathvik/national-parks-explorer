@@ -1,4 +1,4 @@
-// firebase-messaging-sw.js - Enhanced with Error Handling and Performance
+// firebase-messaging-sw.js - Fixed for your project structure
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
@@ -34,20 +34,21 @@ if (messaging) {
             const notificationTitle = notification.title || 'Trip Planner Update';
             const notificationOptions = {
                 body: notification.body || 'You have a new notification about your trips',
+                // ✅ Use your actual icon files
                 icon: notification.icon || '/icons/icon-192x192.png',
-                badge: '/icons/icon-72x72.png',
+                badge: '/favicon.ico',
                 tag: data.tag || `notification-${Date.now()}`,
                 data: {
                     ...data,
                     timestamp: new Date().toISOString(),
                     clickAction: data.clickAction || '/',
-                    originalPayload: JSON.stringify(payload) // Store original for debugging
+                    originalPayload: JSON.stringify(payload)
                 },
                 actions: [],
                 requireInteraction: false,
                 silent: false,
-                vibrate: [200, 100, 200], // Enhanced vibration pattern
-                renotify: true // Allow re-notification with same tag
+                vibrate: [200, 100, 200],
+                renotify: true
             };
 
             // Add custom actions based on notification type
@@ -55,8 +56,7 @@ if (messaging) {
                 notificationOptions.actions = [
                     {
                         action: 'view-trip',
-                        title: '👁️ View Trip',
-                        icon: '/icons/icon-72x72.png'
+                        title: '👁️ View Trip'
                     },
                     {
                         action: 'dismiss',
@@ -70,8 +70,7 @@ if (messaging) {
                 notificationOptions.actions = [
                     {
                         action: 'view-weather',
-                        title: '🌤️ Check Weather',
-                        icon: '/icons/icon-72x72.png'
+                        title: '🌤️ Check Weather'
                     },
                     {
                         action: 'update-trip',
@@ -89,8 +88,7 @@ if (messaging) {
                 notificationOptions.actions = [
                     {
                         action: 'update-app',
-                        title: '🔄 Update App',
-                        icon: '/icons/icon-72x72.png'
+                        title: '🔄 Update App'
                     },
                     {
                         action: 'later',
@@ -104,8 +102,7 @@ if (messaging) {
                 notificationOptions.actions = [
                     {
                         action: 'view-park',
-                        title: '🏞️ View Park',
-                        icon: '/icons/icon-72x72.png'
+                        title: '🏞️ View Park'
                     },
                     {
                         action: 'add-to-favorites',
@@ -122,8 +119,7 @@ if (messaging) {
                 notificationOptions.actions = [
                     {
                         action: 'view-social',
-                        title: '👥 View',
-                        icon: '/icons/icon-72x72.png'
+                        title: '👥 View'
                     },
                     {
                         action: 'dismiss',
@@ -138,11 +134,7 @@ if (messaging) {
 
         } catch (error) {
             console.error('❌ Error processing background message:', error);
-
-            // Store error for later reporting
             storeNotificationError(error, payload);
-
-            // Show fallback notification
             return showFallbackNotification('Trip Planner', 'You have a new notification');
         }
     });
@@ -161,7 +153,6 @@ async function showNotificationWithRetry(title, options, maxRetries = 3) {
             console.error(`❌ Failed to show notification (attempt ${attempt}):`, error);
 
             if (attempt === maxRetries) {
-                // Final attempt with simplified options
                 try {
                     return await showFallbackNotification(title, options.body || 'New notification');
                 } catch (fallbackError) {
@@ -170,7 +161,6 @@ async function showNotificationWithRetry(title, options, maxRetries = 3) {
                 }
             }
 
-            // Wait before retry
             await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
         }
     }
@@ -181,103 +171,92 @@ async function showFallbackNotification(title, body) {
     try {
         return await self.registration.showNotification(title, {
             body: body || 'You have a new notification',
-      icon: '/icons/icon-192x192.png',
-            badge: '/icons/icon-72x72.png',
+            // ✅ Use your actual icon files
+            icon: '/icons/icon-192x192.png',
+            badge: '/favicon.ico',
             tag: `fallback-${Date.now()}`,
             requireInteraction: false,
             silent: false
-    });
+        });
     } catch (error) {
         console.error('❌ Fallback notification also failed:', error);
         throw error;
-  }
+    }
 }
 
-// ✅ Enhanced notification click handler with comprehensive actions
+// ✅ Enhanced notification click handler
 self.addEventListener('notificationclick', (event) => {
     console.log('🔔 Notification clicked:', event.notification.tag, 'Action:', event.action);
-  
-  event.notification.close();
-  
-  try {
-    const data = event.notification.data || {};
-    const action = event.action;
 
-      // Track notification interaction
-      trackNotificationInteraction(event.notification.tag, action, data);
+    event.notification.close();
 
-      let urlToOpen = '/';
-      let shouldOpenWindow = true;
-    
-    // Handle different actions
-    switch (action) {
-      case 'view-trip':
-          urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}` : '/trip-planner';
-        break;
-        
-      case 'view-weather':
-          urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}&tab=weather` : '/seasonal';
-        break;
-        
-      case 'update-trip':
-          urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}&edit=true` : '/trip-planner';
-          break;
+    try {
+        const data = event.notification.data || {};
+        const action = event.action;
 
-        case 'view-park':
-            urlToOpen = data.parkId ? `/park/${data.parkId}` : '/';
-            break;
+        trackNotificationInteraction(event.notification.tag, action, data);
 
-        case 'add-to-favorites':
-            // Handle adding to favorites
-            handleAddToFavorites(data.parkId);
-            shouldOpenWindow = false;
-            break;
+        let urlToOpen = '/';
+        let shouldOpenWindow = true;
 
-        case 'view-social':
-            urlToOpen = data.socialUrl || '/account';
-        break;
-        
-      case 'update-app':
-        // Trigger app update
-        handleAppUpdate();
-          shouldOpenWindow = false;
-          break;
-        
-      case 'dismiss':
-      case 'later':
-          console.log('🚫 Notification dismissed by user action');
-          shouldOpenWindow = false;
-          break;
-        
-      default:
-          // Default click action (no action button clicked)
-        urlToOpen = data.clickAction || '/';
+        // Handle different actions
+        switch (action) {
+            case 'view-trip':
+                urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}` : '/trip-planner';
+                break;
 
-          // Special handling for different notification types
-          if (data.type === 'trip-reminder' && data.tripId) {
-              urlToOpen = `/trip-planner?trip=${data.tripId}`;
-          } else if (data.type === 'weather-alert' && data.locationId) {
-              urlToOpen = `/seasonal?location=${data.locationId}`;
-          } else if (data.type === 'park-alert' && data.parkId) {
-              urlToOpen = `/park/${data.parkId}`;
-          }
+            case 'view-weather':
+                urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}&tab=weather` : '/seasonal';
+                break;
+
+            case 'update-trip':
+                urlToOpen = data.tripId ? `/trip-planner?trip=${data.tripId}&edit=true` : '/trip-planner';
+                break;
+
+            case 'view-park':
+                urlToOpen = data.parkId ? `/park/${data.parkId}` : '/';
+                break;
+
+            case 'add-to-favorites':
+                handleAddToFavorites(data.parkId);
+                shouldOpenWindow = false;
+                break;
+
+            case 'view-social':
+                urlToOpen = data.socialUrl || '/account';
+                break;
+
+            case 'update-app':
+                handleAppUpdate();
+                shouldOpenWindow = false;
+                break;
+
+            case 'dismiss':
+            case 'later':
+                console.log('🚫 Notification dismissed by user action');
+                shouldOpenWindow = false;
+                break;
+
+            default:
+                urlToOpen = data.clickAction || '/';
+
+                if (data.type === 'trip-reminder' && data.tripId) {
+                    urlToOpen = `/trip-planner?trip=${data.tripId}`;
+                } else if (data.type === 'weather-alert' && data.locationId) {
+                    urlToOpen = `/seasonal?location=${data.locationId}`;
+                } else if (data.type === 'park-alert' && data.parkId) {
+                    urlToOpen = `/park/${data.parkId}`;
+                }
+        }
+
+        if (shouldOpenWindow) {
+            event.waitUntil(openOrFocusApp(urlToOpen, data));
+        }
+
+    } catch (error) {
+        console.error('❌ Error handling notification click:', error);
+        event.waitUntil(openOrFocusApp('/', {}));
     }
-
-      if (shouldOpenWindow) {
-          // Open or focus the app
-          event.waitUntil(
-              openOrFocusApp(urlToOpen, data)
-          );
-      }
-    
-  } catch (error) {
-    console.error('❌ Error handling notification click:', error);
-    
-    // Fallback: just open the app
-      event.waitUntil(
-          openOrFocusApp('/', {})
-      );
-  }
 });
 
 // ✅ Enhanced app opening/focusing logic
@@ -296,7 +275,6 @@ async function openOrFocusApp(urlToOpen, data = {}) {
                 console.log('📱 Focusing existing window with matching URL');
                 await client.focus();
 
-                // Send navigation message if URL has parameters
                 if (urlToOpen.includes('?')) {
                     client.postMessage({
                         type: 'NAVIGATE_TO',
@@ -316,7 +294,6 @@ async function openOrFocusApp(urlToOpen, data = {}) {
                 console.log('🔄 Navigating existing window to new URL');
                 await client.focus();
 
-                // Send navigation message
                 client.postMessage({
                     type: 'NAVIGATE_TO',
                     url: urlToOpen,
@@ -329,10 +306,10 @@ async function openOrFocusApp(urlToOpen, data = {}) {
         }
 
         // Open new window if no app window is open
-    if (self.clients.openWindow) {
-        console.log('🆕 Opening new window:', urlToOpen);
-        return await self.clients.openWindow(urlToOpen);
-    }
+        if (self.clients.openWindow) {
+            console.log('🆕 Opening new window:', urlToOpen);
+            return await self.clients.openWindow(urlToOpen);
+        }
 
     } catch (error) {
         console.error('❌ Failed to open/focus app:', error);
@@ -345,10 +322,9 @@ async function handleAddToFavorites(parkId) {
     if (!parkId) {
         console.warn('⚠️ No park ID provided for favorites');
         return;
-  }
+    }
 
     try {
-        // Send message to all open clients to add to favorites
         const clients = await self.clients.matchAll({type: 'window'});
 
         const message = {
@@ -362,7 +338,6 @@ async function handleAddToFavorites(parkId) {
             client.postMessage(message);
         });
 
-        // Show confirmation notification
         await showFallbackNotification(
             '❤️ Added to Favorites!',
             'The park has been added to your favorites list.'
@@ -378,7 +353,6 @@ async function handleAddToFavorites(parkId) {
 // ✅ Handle app update action
 async function handleAppUpdate() {
     try {
-        // Send message to main app to trigger update
         const clients = await self.clients.matchAll({type: 'window'});
 
         const message = {
@@ -388,17 +362,14 @@ async function handleAppUpdate() {
         };
 
         if (clients.length > 0) {
-            // Send to existing clients
             clients.forEach(client => {
                 client.postMessage(message);
-      });
+            });
 
             console.log('📤 Update message sent to existing clients');
         } else {
-            // No clients open, store update request
             await storeUpdateRequest();
 
-            // Show notification that app will update when opened
             await showFallbackNotification(
                 '🔄 Update Ready',
                 'The app will update when you next open it.'
@@ -445,7 +416,6 @@ function trackNotificationInteraction(tag, action, data) {
             userAgent: self.navigator.userAgent
         };
 
-        // Store interaction data for analytics
         caches.open('analytics-v1').then(cache => {
             const key = `interaction-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             cache.put(
@@ -462,35 +432,34 @@ function trackNotificationInteraction(tag, action, data) {
     }
 }
 
-// ✅ Enhanced error storage with categorization
+// ✅ Enhanced error storage
 function storeNotificationError(error, payload) {
-  try {
-    const errorData = {
-      type: 'notification-error',
-      error: error.message || error.toString(),
-        stack: error.stack || 'No stack trace',
-      payload: JSON.stringify(payload),
-      timestamp: new Date().toISOString(),
-        userAgent: self.navigator.userAgent,
-        errorType: error.name || 'Unknown',
-        severity: determineSeverity(error)
-    };
-    
-    // Store in cache for later retrieval
-      caches.open('error-reports-v1').then(cache => {
-          const errorKey = `notification-error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      cache.put(
-        new Request(errorKey),
-        new Response(JSON.stringify(errorData), {
-          headers: { 'Content-Type': 'application/json' }
-        })
-      );
-    });
+    try {
+        const errorData = {
+            type: 'notification-error',
+            error: error.message || error.toString(),
+            stack: error.stack || 'No stack trace',
+            payload: JSON.stringify(payload),
+            timestamp: new Date().toISOString(),
+            userAgent: self.navigator.userAgent,
+            errorType: error.name || 'Unknown',
+            severity: determineSeverity(error)
+        };
 
-      console.log('📝 Notification error stored for analysis');
-  } catch (storeError) {
-    console.error('❌ Failed to store notification error:', storeError);
-  }
+        caches.open('error-reports-v1').then(cache => {
+            const errorKey = `notification-error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            cache.put(
+                new Request(errorKey),
+                new Response(JSON.stringify(errorData), {
+                    headers: { 'Content-Type': 'application/json' }
+                })
+            );
+        });
+
+        console.log('📝 Notification error stored for analysis');
+    } catch (storeError) {
+        console.error('❌ Failed to store notification error:', storeError);
+    }
 }
 
 // ✅ Determine error severity
@@ -510,15 +479,12 @@ function determineSeverity(error) {
 
 // ✅ Enhanced notification close handler
 self.addEventListener('notificationclose', (event) => {
-  console.log('🔕 Notification closed:', event.notification.tag);
+    console.log('🔕 Notification closed:', event.notification.tag);
 
     try {
-        // Track notification dismissal for analytics
         const data = event.notification.data || {};
-
         trackNotificationInteraction(event.notification.tag, 'close', data);
 
-        // Send analytics event to app if open
         self.clients.matchAll({type: 'window'}).then(clients => {
             clients.forEach(client => {
                 client.postMessage({
@@ -534,135 +500,58 @@ self.addEventListener('notificationclose', (event) => {
     }
 });
 
-// ✅ Enhanced error handling for messaging service worker
-self.addEventListener('error', (event) => {
-  console.error('🔥 Firebase Messaging SW Error:', event.error);
-  
-  storeNotificationError(event.error, {
-    type: 'service-worker-error',
-      filename: event.filename || 'unknown',
-      lineno: event.lineno || 0,
-      colno: event.colno || 0,
-      source: 'firebase-messaging-sw'
-  });
+// ✅ Handle push subscription changes - REMOVE HARDCODED VAPID KEY
+self.addEventListener('pushsubscriptionchange', (event) => {
+    console.log('🔄 Push subscription changed');
+
+    event.waitUntil(
+        (async () => {
+            try {
+                // ✅ FIX: Don't hardcode VAPID key - get from your Firebase console
+                console.log('⚠️ Push subscription changed - manual resubscription needed');
+
+                // Notify app about subscription change
+                const clients = await self.clients.matchAll({type: 'window'});
+                clients.forEach(client => {
+                    client.postMessage({
+                        type: 'PUSH_SUBSCRIPTION_CHANGED',
+                        timestamp: new Date().toISOString(),
+                        action: 'resubscribe_needed'
+                    });
+                });
+
+            } catch (error) {
+                console.error('❌ Failed to handle subscription change:', error);
+                storeNotificationError(error, {
+                    type: 'subscription-change-error',
+                    source: 'pushsubscriptionchange'
+                });
+            }
+        })()
+    );
 });
 
-// ✅ Handle unhandled promise rejections
+// ✅ Error handling
+self.addEventListener('error', (event) => {
+    console.error('🔥 Firebase Messaging SW Error:', event.error);
+
+    storeNotificationError(event.error, {
+        type: 'service-worker-error',
+        filename: event.filename || 'unknown',
+        lineno: event.lineno || 0,
+        colno: event.colno || 0,
+        source: 'firebase-messaging-sw'
+    });
+});
+
 self.addEventListener('unhandledrejection', (event) => {
     console.error('🔥 Unhandled promise rejection in messaging SW:', event.reason);
 
     storeNotificationError(event.reason, {
         type: 'promise-rejection',
         source: 'firebase-messaging-sw'
-  });
+    });
 });
-
-// ✅ Handle push subscription changes with better error handling
-self.addEventListener('pushsubscriptionchange', (event) => {
-  console.log('🔄 Push subscription changed');
-  
-  event.waitUntil(
-      (async () => {
-          try {
-              // Get current VAPID key from environment or config
-              const vapidKey = 'BEl62iUYgUivxIkv69yViEuiBIa40iEawdyiLUFY2iUUYgUivxIkv69yViEuiBIa40iEawdyiLUFY'; // Replace with your actual VAPID key
-
-              // Re-subscribe user
-              const subscription = await self.registration.pushManager.subscribe({
-                  userVisibleOnly: true,
-                  applicationServerKey: vapidKey
-              });
-
-              console.log('✅ New push subscription created');
-
-              // Send new subscription to server
-              const response = await fetch('/api/push-subscription', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify({
-                      subscription: subscription,
-                      timestamp: new Date().toISOString(),
-                      reason: 'subscription-change'
-                  })
-              });
-
-              if (!response.ok) {
-                  throw new Error(`Server returned ${response.status}: ${response.statusText}`);
-              }
-
-              console.log('✅ New subscription sent to server');
-
-              // Notify app about subscription change
-              const clients = await self.clients.matchAll({type: 'window'});
-              clients.forEach(client => {
-                  client.postMessage({
-                      type: 'PUSH_SUBSCRIPTION_CHANGED',
-                      subscription: subscription,
-                      timestamp: new Date().toISOString()
-                  });
-              });
-
-          } catch (error) {
-              console.error('❌ Failed to handle subscription change:', error);
-
-              // Store error for later analysis
-              storeNotificationError(error, {
-                  type: 'subscription-change-error',
-                  source: 'pushsubscriptionchange'
-              });
-
-              // Try to inform user about the issue
-              try {
-                  await showFallbackNotification(
-                      '⚠️ Notification Issue',
-                      'There was a problem with notifications. Please check app settings.'
-                  );
-              } catch (notifError) {
-                  console.error('❌ Could not show error notification:', notifError);
-              }
-          }
-      })()
-  );
-});
-
-// ✅ Periodic cleanup of stored data
-setInterval(() => {
-    cleanupStoredData();
-}, 60 * 60 * 1000); // Every hour
-
-async function cleanupStoredData() {
-    try {
-        const cacheNames = ['error-reports-v1', 'analytics-v1', 'app-updates-v1'];
-        const maxAge = 7 * 24 * 60 * 60 * 1000; // 7 days
-        const cutoff = Date.now() - maxAge;
-
-        for (const cacheName of cacheNames) {
-            try {
-                const cache = await caches.open(cacheName);
-                const requests = await cache.keys();
-
-                for (const request of requests) {
-                    // Extract timestamp from request URL if possible
-                    const timestampMatch = request.url.match(/(\d{13})/);
-                    if (timestampMatch) {
-                        const timestamp = parseInt(timestampMatch[1]);
-                        if (timestamp < cutoff) {
-                            await cache.delete(request);
-                        }
-                    }
-                }
-            } catch (error) {
-                console.warn(`⚠️ Failed to cleanup cache ${cacheName}:`, error);
-            }
-        }
-
-        console.log('🧹 Periodic cleanup completed');
-    } catch (error) {
-        console.error('❌ Failed to perform cleanup:', error);
-    }
-}
 
 // ✅ Message handling from main app
 self.addEventListener('message', (event) => {
@@ -693,7 +582,6 @@ self.addEventListener('message', (event) => {
     }
 });
 
-// ✅ Check for pending updates
 async function checkPendingUpdates() {
     try {
         const cache = await caches.open('app-updates-v1');
@@ -705,7 +593,6 @@ async function checkPendingUpdates() {
     }
 }
 
-// ✅ Clear all notifications
 async function clearAllNotifications() {
     try {
         const notifications = await self.registration.getNotifications();
@@ -716,7 +603,6 @@ async function clearAllNotifications() {
     }
 }
 
-// ✅ Get notification statistics
 async function getNotificationStats() {
     try {
         const cache = await caches.open('analytics-v1');

@@ -1,23 +1,18 @@
-// ✨ Enhanced main.jsx - Advanced Application Setup and Bootstrap
+// ✨ FIXED - Correct import order
 import React, {StrictMode} from "react";
 import ReactDOM from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
+
+// ✅ CSS imports in correct order - CRITICAL
+import './styles/reset.css';        // 1. Reset first
+import 'leaflet/dist/leaflet.css';  // 2. External libraries
+import './styles.css';              // 3. Base styles + Tailwind
+import './App.css';                 // 4. Component styles last
+
 import App from "./App";
-
-// Enhanced CSS imports with proper order
-import 'leaflet/dist/leaflet.css';
-import './styles.css';
-import './App.css';
-
-// Enhanced context providers
 import {AuthProvider} from "./context/AuthContext";
 import {ToastProvider} from "./context/ToastContext";
-
-// Enhanced error boundary for the entire app
 import {ErrorBoundary} from "react-error-boundary";
-
-// Enhanced performance monitoring
-import {createPerformanceTrace, logAnalyticsEvent} from "./firebase";
 
 // Global error handler component
 function ErrorFallback({error, resetErrorBoundary}) {

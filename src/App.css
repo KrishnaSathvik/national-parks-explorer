@@ -1,200 +1,76 @@
-/* ✨ Enhanced App.css - Component-Specific Styles for National Parks Explorer */
+/* ✨ Enhanced App.css - Component-Specific Styles */
 
-/* ============================================
-   Reset & Modern Foundation
-============================================ */
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
-  touch-action: manipulation;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #fff;
-    scroll-behavior: smooth;
-}
-
+/* ✅ Root container optimization */
 #root {
-  height: 100vh;
-  width: 100vw;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    max-width: 100%;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
     background: linear-gradient(135deg, #fdf2f8 0%, #faf5ff 50%, #eff6ff 100%);
 }
 
-/* ============================================
-   Enhanced Leaflet Map Integration
-============================================ */
+/* ✅ Enhanced Leaflet map integration */
 .leaflet-container {
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 0;
-  flex: 1;
-    border-radius: 1rem;
-    overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 1rem !important;
+    overflow: hidden !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    z-index: 0 !important;
 }
 
 .leaflet-popup-content-wrapper {
     border-radius: 1rem !important;
     padding: 0 !important;
-    overflow: hidden;
+    overflow: hidden !important;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
 }
 
 .leaflet-popup-content {
     margin: 0 !important;
     padding: 1rem !important;
     font-family: 'Inter', sans-serif !important;
+    line-height: 1.5 !important;
 }
 
 .leaflet-control-zoom {
     border: none !important;
     border-radius: 0.75rem !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    overflow: hidden !important;
 }
 
 .leaflet-control-zoom a {
-    border-radius: 0.375rem !important;
+    border-radius: 0 !important;
     border: none !important;
     background: white !important;
     color: #374151 !important;
     font-weight: 600 !important;
-    transition: all 0.2s !important;
+    transition: all 0.2s ease !important;
+    width: 30px !important;
+    height: 30px !important;
+    line-height: 28px !important;
 }
 
 .leaflet-control-zoom a:hover {
     background: #f3f4f6 !important;
     transform: scale(1.05) !important;
+    color: #ec4899 !important;
 }
 
-@media (max-width: 640px) {
-  .leaflet-container {
-      height: calc(100vh - 64px); /* Account for bottom nav */
-      border-radius: 0.5rem;
-  }
-}
-
-/* ============================================
-   Enhanced Animation System
-============================================ */
-.fade-in {
-  opacity: 0;
-  animation: fade-in 0.8s ease-out forwards;
-}
-
-@keyframes fade-in {
-  to {
-    opacity: 1;
-  }
-}
-
-.slide-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: slide-in 0.6s ease-out forwards;
-}
-
-@keyframes slide-in {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.scale-in {
-    opacity: 0;
-    transform: scale(0.95);
-    animation: scale-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
-}
-
-@keyframes scale-in {
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Enhanced stagger animations */
-.stagger-children > * {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fade-in 0.6s ease-out forwards;
-}
-
-.stagger-children > *:nth-child(1) {
-    animation-delay: 0.1s;
-}
-
-.stagger-children > *:nth-child(2) {
-    animation-delay: 0.2s;
-}
-
-.stagger-children > *:nth-child(3) {
-    animation-delay: 0.3s;
-}
-
-.stagger-children > *:nth-child(4) {
-    animation-delay: 0.4s;
-}
-
-.stagger-children > *:nth-child(5) {
-    animation-delay: 0.5s;
-}
-
-.stagger-children > *:nth-child(6) {
-    animation-delay: 0.6s;
-}
-
-/* ============================================
-   Enhanced Card Components
-============================================ */
-.card-rounded {
-    border-radius: 1.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    background: white;
-    border: 1px solid rgba(243, 244, 246, 0.8);
-}
-
-.card-rounded:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    border-color: rgba(236, 72, 153, 0.2);
-}
-
-.hover-zoom {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-zoom:hover {
-  transform: scale(1.03);
-}
-
-.hover-lift {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hover-lift:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-/* Enhanced park card animations */
-.park-card {
+/* ✅ Enhanced park card animations */
+.park-card-enhanced {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    background: white;
+    border-radius: 1.5rem;
+    border: 1px solid rgba(243, 244, 246, 0.8);
 }
 
-.park-card::before {
+.park-card-enhanced::before {
     content: '';
     position: absolute;
     top: 0;
@@ -202,280 +78,48 @@ body {
     width: 100%;
     height: 100%;
     background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    transition: left 0.5s;
+    transition: left 0.5s ease;
     z-index: 1;
     pointer-events: none;
 }
 
-.park-card:hover::before {
+.park-card-enhanced:hover::before {
     left: 100%;
 }
 
-.park-card:hover {
+.park-card-enhanced:hover {
     transform: translateY(-8px) scale(1.02);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border-color: rgba(236, 72, 153, 0.3);
 }
 
-/* ============================================
-   Enhanced Ripple Effects
-============================================ */
-.ripple {
-  position: relative;
-  overflow: hidden;
-    transform: translate3d(0, 0, 0);
+/* ✅ Enhanced form styling with better accessibility */
+input[type="date"],
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+    font-size: 16px !important; /* Prevents iOS zoom */
+    background: white !important;
+    color: #374151 !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem 1rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.ripple::after {
-  content: '';
-  position: absolute;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-  width: 100px;
-  height: 100px;
-  transform: translate(-50%, -50%) scale(0);
-  opacity: 1;
-  pointer-events: none;
-    left: var(--ripple-x, 50%);
-    top: var(--ripple-y, 50%);
-    animation: ripple-animation 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: #ec4899 !important;
+    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1) !important;
 }
 
-@keyframes ripple-animation {
-  to {
-    transform: translate(-50%, -50%) scale(4);
-    opacity: 0;
-  }
-}
-
-/* Enhanced button ripples */
-.btn-ripple {
-    position: relative;
-    overflow: hidden;
-}
-
-.btn-ripple::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.btn-ripple:active::before {
-    width: 300px;
-    height: 300px;
-}
-
-/* ============================================
-   Enhanced Form Styling
-============================================ */
-
-/* Enhanced date input styling */
-input[type="date"] {
-  position: relative;
-  background: white !important;
-  color: #374151 !important;
-    border: 2px solid #e5e7eb;
-    border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    font-family: 'Inter', sans-serif;
-}
-
-input[type="date"]:focus {
-    outline: none;
-    border-color: #ec4899;
-    box-shadow: 0 0 0 4px rgba(236, 72, 153, 0.1);
-}
-
-input[type="date"]::-webkit-datetime-edit {
-  color: #374151;
-  padding: 0;
-}
-
-input[type="date"]::-webkit-datetime-edit-fields-wrapper {
-  color: #374151;
-}
-
-input[type="date"]::-webkit-datetime-edit-month-field,
-input[type="date"]::-webkit-datetime-edit-day-field,
-input[type="date"]::-webkit-datetime-edit-year-field {
-  color: #374151;
-  font-weight: 500;
-    padding: 0.25rem;
-    border-radius: 0.25rem;
-    transition: background-color 0.2s;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-    opacity: 0.7;
-  position: absolute;
-  right: 12px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23374151'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z'/%3e%3c/svg%3e");
-    background-size: contain;
-    background-repeat: no-repeat;
-    filter: none;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-    opacity: 1;
-    transform: scale(1.1);
-}
-
-/* Firefox date input styling */
-input[type="date"]::-moz-focus-inner {
-  border: 0;
-  padding: 0;
-}
-
-/* Enhanced focus states for date inputs */
-input[type="date"]:focus::-webkit-datetime-edit-month-field,
-input[type="date"]:focus::-webkit-datetime-edit-day-field,
-input[type="date"]:focus::-webkit-datetime-edit-year-field {
-  background-color: rgba(236, 72, 153, 0.1);
-    border-radius: 0.25rem;
-}
-
-/* Enhanced select styling */
-select {
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
-    background-position: right 0.75rem center;
-    background-repeat: no-repeat;
-    background-size: 1.5em 1.5em;
-    padding-right: 2.5rem;
-    appearance: none;
-}
-
-/* ============================================
-   Enhanced Mobile Responsive Design
-============================================ */
-
-/* Touch-friendly mobile optimizations */
-@media (max-width: 768px) {
-    .desktop-only {
-        display: none !important;
-    }
-
-    /* Enhanced mobile touch targets */
-    button,
-    .touch-target {
-        min-height: 48px;
-        min-width: 48px;
-        position: relative;
-  }
-
-    /* Enhanced mobile text readability */
-  .text-responsive {
-      font-size: 16px; /* Prevents zoom on iOS */
-    line-height: 1.5;
-  }
-
-    /* Enhanced mobile card spacing */
-  .card-mobile {
-    padding: 1rem;
-    margin-bottom: 1rem;
-      border-radius: 1rem;
-  }
-
-    /* Enhanced mobile form inputs */
-    input,
-    textarea,
-    select {
-    font-size: 16px; /* Prevents zoom on iOS */
-        padding: 0.875rem 1rem;
-        border-radius: 0.75rem;
-    }
-
-    /* Enhanced mobile navigation */
-    .mobile-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border-top: 1px solid rgba(229, 231, 235, 0.8);
-        z-index: 1000;
-        padding: env(safe-area-inset-bottom);
-  }
-
-    /* Enhanced mobile grid adjustments */
-  .mobile-grid {
-    grid-template-columns: 1fr;
-      gap: 1rem;
-  }
-
-    .mobile-grid.cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-        gap: 0.75rem;
-    }
-
-    /* Enhanced mobile spacing */
-  .mobile-spacing {
-      padding: 1rem;
-  }
-
-    /* Enhanced mobile hero sections */
-    .mobile-hero {
-        padding: 2rem 1rem;
-        text-align: center;
-    }
-
-    .mobile-hero h1 {
-        font-size: 2rem;
-        line-height: 1.2;
-    }
-}
-
-/* Enhanced tablet optimizations */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .tablet-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-
-    .tablet-spacing {
-    padding: 1.5rem;
-  }
-}
-
-/* Enhanced desktop optimizations */
-@media (min-width: 1025px) {
-    .mobile-hidden {
-        display: none !important;
-    }
-
-    .desktop-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
-    }
-
-    .desktop-spacing {
-    padding: 2rem;
-  }
-
-    /* Enhanced hover effects for desktop */
-    .desktop-hover:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    }
-}
-
-/* ============================================
-   Enhanced Navigation Components
-============================================ */
-
-/* Enhanced bottom navigation */
-.bottom-nav {
+/* ✅ Enhanced mobile navigation */
+.bottom-nav-enhanced {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -486,29 +130,29 @@ select {
     border-top: 1px solid rgba(229, 231, 235, 0.8);
     z-index: 1000;
     padding-bottom: env(safe-area-inset-bottom);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-.bottom-nav-hidden {
-    transform: translateY(100%);
-}
-
-.bottom-nav-item {
+.bottom-nav-item-enhanced {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 0.75rem 0.5rem;
-    text-decoration: none;
     color: #6b7280;
     font-size: 0.75rem;
     font-weight: 500;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    overflow: hidden;
+    min-height: 44px; /* Touch target */
 }
 
-.bottom-nav-item::before {
+.bottom-nav-item-enhanced.active {
+    color: #ec4899;
+    transform: scale(1.05);
+}
+
+.bottom-nav-item-enhanced::before {
     content: '';
     position: absolute;
     top: 0;
@@ -520,90 +164,19 @@ select {
     transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.bottom-nav-item.active::before {
+.bottom-nav-item-enhanced.active::before {
     width: 80%;
 }
 
-.bottom-nav-item.active {
-    color: #ec4899;
-    transform: scale(1.05);
-}
-
-.bottom-nav-item:active {
-    transform: scale(0.95);
-}
-
-.bottom-nav-icon {
-    font-size: 1.25rem;
-    margin-bottom: 0.25rem;
-    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bottom-nav-item.active .bottom-nav-icon {
-    transform: scale(1.1);
-}
-
-/* ============================================
-   Enhanced Scroll Components
-============================================ */
-
-/* Enhanced scroll-to-top button */
-.scroll-to-top {
-    position: fixed;
-    bottom: 6rem;
-    right: 1.5rem;
-    background: linear-gradient(135deg, #ec4899, #8b5cf6);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 3rem;
-    height: 3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 999;
-    opacity: 0;
-    transform: translateY(20px);
-}
-
-.scroll-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.scroll-to-top:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.15);
-}
-
-.scroll-to-top:active {
-    transform: scale(0.95);
-}
-
-@media (max-width: 768px) {
-    .scroll-to-top {
-        bottom: 5rem;
-        right: 1rem;
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-}
-
-/* ============================================
-   Enhanced Loading States
-============================================ */
-
-/* Enhanced skeleton loading animations */
-.skeleton-shimmer {
+/* ✅ Enhanced loading states */
+.skeleton-enhanced {
     position: relative;
     overflow: hidden;
     background: #f3f4f6;
+    border-radius: 0.75rem;
 }
 
-.skeleton-shimmer::after {
+.skeleton-enhanced::after {
     content: '';
     position: absolute;
     top: 0;
@@ -614,17 +187,7 @@ select {
     animation: shimmer 2s infinite;
 }
 
-@keyframes shimmer {
-    0% {
-        left: -100%;
-    }
-    100% {
-        left: 100%;
-    }
-}
-
-/* Enhanced loading spinner */
-.loading-spinner {
+.loading-spinner-enhanced {
     display: inline-block;
     width: 2rem;
     height: 2rem;
@@ -635,364 +198,81 @@ select {
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
+    to { transform: rotate(360deg); }
+}
+
+/* ✅ Enhanced responsive utilities */
+@media (max-width: 640px) {
+    .mobile-padding { padding: 1rem !important; }
+    .mobile-text-sm { font-size: 0.875rem !important; }
+    .mobile-gap-sm { gap: 0.5rem !important; }
+
+    .leaflet-container {
+        height: calc(100vh - 64px) !important;
+        border-radius: 0.5rem !important;
     }
 }
 
-.loading-dots {
-    display: inline-flex;
-    gap: 0.25rem;
+@media (min-width: 641px) and (max-width: 1024px) {
+    .tablet-padding { padding: 1.5rem !important; }
+    .tablet-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
 }
 
-.loading-dots > div {
-    width: 0.5rem;
-    height: 0.5rem;
-    background: #ec4899;
-    border-radius: 50%;
-    animation: pulse-dots 1.4s infinite ease-in-out both;
-}
+@media (min-width: 1025px) {
+    .desktop-padding { padding: 2rem !important; }
+    .desktop-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
 
-.loading-dots > div:nth-child(1) {
-    animation-delay: -0.32s;
-}
-
-.loading-dots > div:nth-child(2) {
-    animation-delay: -0.16s;
-}
-
-@keyframes pulse-dots {
-    0%, 80%, 100% {
-        transform: scale(0);
-    }
-    40% {
-        transform: scale(1);
+    .hover-lift-desktop:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     }
 }
 
-/* ============================================
-   Enhanced Toast Notifications
-============================================ */
+/* ✅ Enhanced print styles */
+@media print {
+    .no-print { display: none !important; }
+    .print-break { page-break-before: always; }
+    .print-avoid-break { page-break-inside: avoid; }
 
-/* Enhanced toast positioning */
-.toast-container {
-    position: fixed;
-    z-index: 1080;
-    pointer-events: none;
-}
-
-.toast-container.top-right {
-    top: 1rem;
-    right: 1rem;
-}
-
-.toast-container.top-left {
-    top: 1rem;
-    left: 1rem;
-}
-
-.toast-container.bottom-right {
-    bottom: 1rem;
-    right: 1rem;
-}
-
-.toast-container.bottom-left {
-    bottom: 1rem;
-    left: 1rem;
-}
-
-.toast-container.top-center {
-    top: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.toast-container.bottom-center {
-    bottom: 1rem;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-@media (max-width: 768px) {
-    .toast-container {
-        top: 1rem;
-        left: 1rem;
-        right: 1rem;
-    }
-
-    .toast-container.top-center,
-    .toast-container.bottom-center {
-        transform: none;
-        left: 1rem;
-    }
-
-    .toast-container.bottom-right,
-    .toast-container.bottom-left,
-    .toast-container.bottom-center {
-        bottom: 5rem; /* Account for bottom nav */
+    * {
+        background: transparent !important;
+        color: black !important;
+        box-shadow: none !important;
     }
 }
 
-/* Enhanced toast animations */
-.toast-enter {
-    opacity: 0;
-    transform: translateX(100%);
+/* ✅ Enhanced accessibility */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
 }
 
-.toast-enter-active {
-    opacity: 1;
-    transform: translateX(0);
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-}
-
-.toast-exit {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.toast-exit-active {
-    opacity: 0;
-    transform: translateX(100%);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============================================
-   Enhanced Accessibility Features
-============================================ */
-
-/* Enhanced focus indicators */
-.focus-ring-pink:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3);
-}
-
-.focus-ring-blue:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
-}
-
-/* Enhanced high contrast mode support */
 @media (prefers-contrast: high) {
-    .card-rounded {
-        border: 2px solid #000;
+    .card-enhanced {
+        border: 2px solid #000 !important;
     }
 
     .btn-primary {
-        border: 2px solid #000;
-    }
-
-    .form-input {
-        border: 2px solid #000;
+        border: 2px solid #000 !important;
     }
 }
 
-/* Enhanced reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-    .fade-in,
-    .slide-in,
-    .scale-in,
-    .park-card,
-    .hover-zoom,
-    .hover-lift,
-    .loading-spinner,
-    .skeleton-shimmer::after {
-        animation: none !important;
-        transition: none !important;
-    }
-
-    .park-card:hover,
-    .hover-zoom:hover,
-    .hover-lift:hover {
-        transform: none !important;
-    }
-}
-
-/* ============================================
-   Enhanced Print Styles
-============================================ */
-@media print {
-    .no-print,
-    .bottom-nav,
-    .scroll-to-top,
-    .toast-container {
-        display: none !important;
-    }
-
-    .print-break {
-        page-break-before: always;
-    }
-
-    .print-avoid-break {
-        page-break-inside: avoid;
-    }
-
-    .card-rounded {
-        box-shadow: none;
-        border: 1px solid #ccc;
-    }
-
-    a {
-        text-decoration: underline;
-    }
-
-    .text-white {
-        color: #000 !important;
-    }
-
-    .bg-gradient-to-r {
-        background: #f3f4f6 !important;
-    }
-}
-
-/* ============================================
-   Enhanced Safe Area Support for iOS
-============================================ */
-.safe-area-padding {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-  padding-left: env(safe-area-inset-left);
-  padding-right: env(safe-area-inset-right);
-}
-
-.safe-area-margin {
-    margin-top: env(safe-area-inset-top);
-    margin-bottom: env(safe-area-inset-bottom);
-    margin-left: env(safe-area-inset-left);
-    margin-right: env(safe-area-inset-right);
-}
-
-/* ============================================
-   Enhanced Performance Optimizations
-============================================ */
-
-/* GPU acceleration for animations */
+/* ✅ Performance optimizations */
 .gpu-accelerated {
     transform: translateZ(0);
     backface-visibility: hidden;
     perspective: 1000px;
 }
 
-/* Optimize repaints for frequently animated elements */
-.optimized-animation {
-    will-change: transform, opacity;
+.will-change-transform {
+    will-change: transform;
 }
 
-.optimized-animation:not(:hover):not(:focus):not(:active) {
-    will-change: auto;
-}
-
-/* ============================================
-   Enhanced Debug Utilities (Development)
-============================================ */
-.debug-grid {
-    background-image: linear-gradient(rgba(255, 0, 0, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 0, 0, 0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
-}
-
-.debug-outline * {
-    outline: 1px solid red !important;
-}
-
-.debug-spacing * {
-    background: rgba(255, 0, 0, 0.1) !important;
-}
-
-/* Hide debug utilities in production */
-body:not(.debug-mode) .debug-grid,
-body:not(.debug-mode) .debug-outline,
-body:not(.debug-mode) .debug-spacing {
-    background-image: none !important;
-    outline: none !important;
-    background: transparent !important;
-}
-
-/* ============================================
-   Enhanced Component Animation Delays
-============================================ */
-.delay-75 {
-    animation-delay: 75ms;
-}
-
-.delay-100 {
-    animation-delay: 100ms;
-}
-
-.delay-150 {
-    animation-delay: 150ms;
-}
-
-.delay-200 {
-    animation-delay: 200ms;
-}
-
-.delay-300 {
-    animation-delay: 300ms;
-}
-
-.delay-500 {
-    animation-delay: 500ms;
-}
-
-.delay-700 {
-    animation-delay: 700ms;
-}
-
-.delay-1000 {
-    animation-delay: 1000ms;
-}
-
-/* ============================================
-   Enhanced Utility Classes
-============================================ */
-.pointer-events-none {
-    pointer-events: none;
-}
-
-.pointer-events-auto {
-    pointer-events: auto;
-}
-
-.select-none {
-    user-select: none;
-}
-
-.select-text {
-    user-select: text;
-}
-
-.select-all {
-    user-select: all;
-}
-
-.cursor-pointer {
-    cursor: pointer;
-}
-
-.cursor-not-allowed {
-    cursor: not-allowed;
-}
-
-.cursor-grab {
-    cursor: grab;
-}
-
-.cursor-grabbing {
-    cursor: grabbing;
-}
-
-.resize-none {
-    resize: none;
-}
-
-.resize-both {
-    resize: both;
-}
-
-.resize-x {
-    resize: horizontal;
-}
-
-.resize-y {
-    resize: vertical;
+.will-change-opacity {
+    will-change: opacity;
 }

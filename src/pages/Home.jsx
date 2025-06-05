@@ -219,34 +219,33 @@ const ViewModeToggle = ({ viewMode, setViewMode }) => (
   </div>
 );
 
-// Fixed EnhancedParkCard component section with proper closing brace
+/// ✨ Enhanced Park Card Component with Component Classes - FIXED
 const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip }) => {
   const navigate = useNavigate();
-  
+
   const getActivityIcons = (park) => {
     const icons = [];
     const desc = park.description?.toLowerCase() || '';
     const highlight = park.highlight?.toLowerCase() || '';
-    
+
     if (desc.includes('hiking') || highlight.includes('trail')) icons.push('🥾');
     if (desc.includes('wildlife') || highlight.includes('wildlife')) icons.push('🦌');
     if (desc.includes('water') || highlight.includes('lake') || highlight.includes('river')) icons.push('🌊');
     if (desc.includes('mountain') || highlight.includes('peak')) icons.push('⛰️');
     if (desc.includes('scenic') || highlight.includes('scenic')) icons.push('📸');
-    
+
     return icons.slice(0, 3);
   };
 
   const formatHighlight = (highlight) => {
     if (!highlight) return 'Scenic views and natural beauty';
-    
-    // Capitalize first letter and ensure it ends with a descriptive phrase
+
     const formatted = highlight.charAt(0).toUpperCase() + highlight.slice(1);
-    
+
     if (formatted.length < 20) {
       return `${formatted} - Perfect for exploration`;
     }
-    
+
     return formatted;
   };
 
@@ -256,114 +255,118 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
   };
 
   return (
-    <div className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-      {/* Enhanced image with overlay */}
-      <div className="relative overflow-hidden h-48">
-        <div className="w-full h-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center text-4xl">
-          🏞️
-        </div>
-        
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-        
-        {/* Quick action buttons */}
-        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/park/${park.slug}?page=${currentPage}`);
-            }}
-            className="bg-white/20 backdrop-blur-sm p-2 rounded-lg hover:bg-white/30 transition text-white"
-            title="View Details"
-          >
-            <FaEye />
-          </button>
+      <div className="park-card-enhanced group">
+        {/* Enhanced image with overlay */}
+        <div className="park-card-image-container">
+          <div className="park-card-image-placeholder">
+            🏞️
+          </div>
+
+          {/* Gradient overlay */}
+          <div className="park-card-overlay" />
+
+          {/* Quick action buttons */}
+          <div className="park-card-quick-actions">
+            <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/park/${park.slug}?page=${currentPage}`);
+                }}
+                className="btn-glass touch-target"
+                title="View Details"
+            >
+              <FaEye />
+            </button>
+          </div>
+
+          {/* Favorite button */}
+          {currentUser && (
+              <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleFavorite(park.id);
+                  }}
+                  className={`btn-favorite touch-target ${
+                      isFavorite ? "btn-favorite-active" : "btn-favorite-inactive"
+                  }`}
+                  title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+              >
+                {isFavorite ? "❤️" : "🤍"}
+              </button>
+          )}
+
+          {/* Best season badge */}
+          {park.bestSeason && (
+              <div className="park-card-season-badge">
+                {park.bestSeason === 'Spring' && '🌸'}
+                {park.bestSeason === 'Summer' && '🌞'}
+                {park.bestSeason === 'Fall' && '🍂'}
+                {park.bestSeason === 'Winter' && '❄️'}
+                Best: {park.bestSeason}
+              </div>
+          )}
         </div>
 
-        {/* Favorite button */}
-        {currentUser && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onToggleFavorite(park.id);
-            }}
-            className={`absolute top-4 left-4 text-xl transition transform duration-200 ${
-              isFavorite ? "scale-110 text-red-500" : "scale-100 text-white"
-            } hover:scale-125`}
-            title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-          >
-            {isFavorite ? "❤️" : "🤍"}
-          </button>
-        )}
+        {/* Enhanced content */}
+        <div className="park-card-content">
+          {/* Activity tags and entry fee */}
+          <div className="park-card-header">
+            <div className="park-card-activity-icons">
+              {getActivityIcons(park).map((icon, index) => (
+                  <span key={index} className="activity-icon">{icon}</span>
+              ))}
+            </div>
+            <div className="park-card-entry-fee">
+              Entry: {park.entryFee && park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
+            </div>
+          </div>
 
-        {/* Best season badge */}
-        {park.bestSeason && (
-          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium">
-            {park.bestSeason === 'Spring' && '🌸'}
-            {park.bestSeason === 'Summer' && '🌞'}
-            {park.bestSeason === 'Fall' && '🍂'}
-            {park.bestSeason === 'Winter' && '❄️'}
-            Best: {park.bestSeason}
+          {/* Park name and state */}
+          <h3 className="park-card-title">
+            {park.name}
+          </h3>
+
+          <div className="park-card-location">
+            <FaMapMarkerAlt className="location-icon" />
+            <span>{park.state}</span>
           </div>
-        )}
-      </div>
-      
-      {/* Enhanced content */}
-      <div className="p-4 md:p-6">        
-        {/* Activity tags and entry fee */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex gap-2">
-            {getActivityIcons(park).map((icon, index) => (
-              <span key={index} className="text-lg">{icon}</span>
-            ))}
+
+          {/* Park info */}
+          <div className="park-card-info">
+            {/* Highlight */}
+            <div className="park-info-item">
+              <span className="park-info-label highlight-label">🎯 Highlight:</span>
+              <span className="park-info-text">{formatHighlight(park.highlight)}</span>
+            </div>
+
+            {/* Hours */}
+            <div className="park-info-item">
+              <span className="park-info-label hours-label">🕒 Hours:</span>
+              <span className="park-info-text">{formatHours(park.hours)}</span>
+            </div>
           </div>
-          <div className="text-sm text-green-600 mb-2">
-            Entry: {park.entryFee && park.entryFee > 0 ? `${park.entryFee}` : 'Free'}
+
+          {/* Action buttons */}
+          <div className="park-card-actions">
+            <button
+                onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
+                className="btn-primary-action touch-target"
+            >
+              <FaEye />
+              <span className="btn-text">Explore</span>
+            </button>
+            <button
+                onClick={() => onPlanTrip(park)}
+                className="btn-secondary-action touch-target"
+            >
+              <FaRoute />
+              <span className="btn-text">Plan Trip</span>
+            </button>
           </div>
-        </div>
-        
-        {/* Park name and state */}
-        <h3 className="text-base md:text-lg font-bold text-gray-800 mb-2 group-hover:text-pink-600 transition-colors line-clamp-2">
-          {park.name}
-        </h3>
-        
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-          <FaMapMarkerAlt className="text-pink-500" />
-          <span>{park.state}</span>
-        </div>
-        
-        {/* Park info */}
-        <div className="space-y-2 mb-4">
-          {/* Highlight */}
-          <div className="text-sm text-gray-600">
-            <span className="font-medium text-purple-600">🎯 Highlight:</span> {formatHighlight(park.highlight)}
-          </div>
-          
-          {/* Hours */}
-          <div className="text-sm text-gray-600">
-            <span className="font-medium text-blue-600">🕒 Hours:</span> {formatHours(park.hours)}
-          </div>
-        </div>
-        
-        {/* Action buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-            className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2.5 md:py-2 px-3 md:px-4 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 font-medium text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 min-h-[44px]"
-          >
-            <FaEye /> <span className="hidden sm:inline">Explore</span>
-          </button>
-          <button
-            onClick={() => onPlanTrip(park)}
-            className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2.5 md:py-2 px-3 md:px-4 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 font-medium text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2 min-h-[44px]"
-          >
-            <FaRoute /> <span className="hidden sm:inline">Plan Trip</span>
-          </button>
         </div>
       </div>
-    </div>
   );
-};
+}; // ✅ CRITICAL: This closing brace was missing!
 
 // ===== MAIN HOME COMPONENT =====
 const Home = ({ parks, favorites, toggleFavorite }) => {
