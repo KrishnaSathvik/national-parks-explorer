@@ -153,7 +153,6 @@ const initializeAnalytics = async () => {
   }
 };
 
-// Enhanced performance monitoring initialization
 const initializePerformance = async () => {
   try {
     const isSupported = await isPerformanceSupported();
@@ -162,9 +161,9 @@ const initializePerformance = async () => {
       return null;
     }
 
-    performance = getPerformance(app);
+    const perf = getPerformance(app);
     console.log('✅ Firebase Performance initialized');
-    return performance;
+    return perf;
   } catch (error) {
     console.error('❌ Failed to initialize Firebase Performance:', error);
     return null;
