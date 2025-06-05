@@ -1,4 +1,4 @@
-// ✨ FIXED - Correct import order
+// ✨ FIXED - Correct import order with proper function definitions
 import React, {StrictMode} from "react";
 import ReactDOM from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
@@ -13,6 +13,42 @@ import App from "./App";
 import {AuthProvider} from "./context/AuthContext";
 import {ToastProvider} from "./context/ToastContext";
 import {ErrorBoundary} from "react-error-boundary";
+
+// ✅ FIXED: Import Firebase functions properly with fallbacks
+import {logAnalyticsEvent as firebaseLogAnalyticsEvent, createPerformanceTrace as firebaseCreatePerformanceTrace} from "./firebase";
+
+// ✅ FIXED: Create safe wrapper functions to prevent undefined errors
+const logAnalyticsEvent = (eventName, parameters = {}) => {
+    try {
+        if (typeof firebaseLogAnalyticsEvent === 'function') {
+            firebaseLogAnalyticsEvent(eventName, parameters);
+        } else {
+            console.log('📊 Analytics (mock):', eventName, parameters);
+        }
+    } catch (error) {
+        console.warn('⚠️ Analytics event failed:', eventName, error);
+    }
+};
+
+const createPerformanceTrace = (traceName) => {
+    try {
+        if (typeof firebaseCreatePerformanceTrace === 'function') {
+            return firebaseCreatePerformanceTrace(traceName);
+        } else {
+            console.log('⏱️ Performance trace (mock):', traceName);
+            return {
+                start: () => console.log(`Started trace: ${traceName}`),
+                stop: () => console.log(`Stopped trace: ${traceName}`)
+            };
+        }
+    } catch (error) {
+        console.warn('⚠️ Performance trace failed:', traceName, error);
+        return {
+            start: () => {},
+            stop: () => {}
+        };
+    }
+};
 
 // Global error handler component
 function ErrorFallback({error, resetErrorBoundary}) {
@@ -76,7 +112,7 @@ function ErrorFallback({error, resetErrorBoundary}) {
 // Enhanced initialization function
 const initializeApp = async () => {
     // Start performance monitoring
-    const initTrace = createPerformanceTrace?.('app_initialization');
+    const initTrace = createPerformanceTrace('app_initialization');
     initTrace?.start();
 
     try {
@@ -99,7 +135,7 @@ const initializeApp = async () => {
             console.warn('⚠️ Missing browser features:', missingFeatures);
 
             // Log unsupported browser
-            logAnalyticsEvent?.('unsupported_browser', {
+            logAnalyticsEvent('unsupported_browser', {
                 missing_features: missingFeatures,
                 user_agent: navigator.userAgent,
                 browser_name: navigator.appName,
@@ -241,7 +277,7 @@ const initializeApp = async () => {
             const entries = list.getEntries();
             entries.forEach((entry) => {
                 if (entry.entryType === 'navigation') {
-                    logAnalyticsEvent?.('app_performance', {
+                    logAnalyticsEvent('app_performance', {
                         load_time: entry.loadEventEnd - entry.loadEventStart,
                         dom_content_loaded: entry.domContentLoadedEventEnd - entry.domContentLoadedEventStart,
                         dns_lookup: entry.domainLookupEnd - entry.domainLookupStart,
@@ -263,7 +299,7 @@ const initializeApp = async () => {
         }
 
         // Log successful initialization
-        logAnalyticsEvent?.('app_initialized', {
+        logAnalyticsEvent('app_initialized', {
             timestamp: Date.now(),
             environment: import.meta.env.MODE,
             has_touch: hasTouch,
@@ -280,7 +316,7 @@ const initializeApp = async () => {
     } catch (error) {
         console.error('❌ App initialization failed:', error);
 
-        logAnalyticsEvent?.('app_init_error', {
+        logAnalyticsEvent('app_init_error', {
             error_message: error.message,
             error_stack: error.stack
         });
@@ -294,7 +330,7 @@ const reportError = (error, errorInfo) => {
     console.error('🔥 React Error Boundary caught an error:', error, errorInfo);
 
     // Log to analytics
-    logAnalyticsEvent?.('react_error_boundary', {
+    logAnalyticsEvent('react_error_boundary', {
         error_message: error.message,
         error_stack: error.stack,
         component_stack: errorInfo?.componentStack,
@@ -398,7 +434,7 @@ if (import.meta.env.PROD) {
 
     // Add global error handler for unhandled errors
     window.addEventListener('error', (event) => {
-        logAnalyticsEvent?.('global_error', {
+        logAnalyticsEvent('global_error', {
             error_message: event.error?.message || event.message,
             error_filename: event.filename,
             error_lineno: event.lineno,
@@ -410,7 +446,7 @@ if (import.meta.env.PROD) {
 
     // Add global handler for unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {
-        logAnalyticsEvent?.('unhandled_promise_rejection', {
+        logAnalyticsEvent('unhandled_promise_rejection', {
             error_message: event.reason?.message || String(event.reason),
             error_stack: event.reason?.stack,
             timestamp: Date.now()
@@ -421,11 +457,11 @@ if (import.meta.env.PROD) {
 // Performance monitoring for Core Web Vitals
 if ('web-vitals' in window) {
     import('web-vitals').then(({getCLS, getFID, getFCP, getLCP, getTTFB}) => {
-        getCLS((metric) => logAnalyticsEvent?.('core_web_vital_cls', metric));
-        getFID((metric) => logAnalyticsEvent?.('core_web_vital_fid', metric));
-        getFCP((metric) => logAnalyticsEvent?.('core_web_vital_fcp', metric));
-        getLCP((metric) => logAnalyticsEvent?.('core_web_vital_lcp', metric));
-        getTTFB((metric) => logAnalyticsEvent?.('core_web_vital_ttfb', metric));
+        getCLS((metric) => logAnalyticsEvent('core_web_vital_cls', metric));
+        getFID((metric) => logAnalyticsEvent('core_web_vital_fid', metric));
+        getFCP((metric) => logAnalyticsEvent('core_web_vital_fcp', metric));
+        getLCP((metric) => logAnalyticsEvent('core_web_vital_lcp', metric));
+        getTTFB((metric) => logAnalyticsEvent('core_web_vital_ttfb', metric));
     }).catch(() => {
         // Web vitals not available, silently continue
     });
