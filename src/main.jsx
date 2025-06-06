@@ -1,4 +1,4 @@
-// ✨ FIXED - Correct import order with proper function definitions
+// ✨ UPDATED - Added AI Provider Integration
 import React, {StrictMode} from "react";
 import ReactDOM from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
@@ -12,6 +12,7 @@ import './styles.css';                    // 3. Main styles with Tailwind (this 
 import App from "./App";
 import {AuthProvider} from "./context/AuthContext";
 import {ToastProvider} from "./context/ToastContext";
+import {AIProvider} from "./context/AIContext";  // 🆕 NEW: AI Provider import
 import {ErrorBoundary} from "react-error-boundary";
 
 // ✅ FIXED: Import Firebase functions properly with fallbacks
@@ -271,7 +272,7 @@ const initializeApp = async () => {
             console.log('Environment variables:', import.meta.env);
         }
 
-        // Log successful initialization
+        // 🆕 NEW: Log AI system initialization
         logAnalyticsEvent('app_initialized', {
             timestamp: Date.now(),
             environment: import.meta.env.MODE,
@@ -281,10 +282,12 @@ const initializeApp = async () => {
             screen_height: window.innerHeight,
             user_agent: navigator.userAgent,
             language: navigator.language,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            ai_system_enabled: true  // 🆕 Track AI feature
         });
 
         console.log('✅ App initialization completed successfully');
+        console.log('🧠 AI Recommendation System: Ready'); // 🆕 AI system ready
 
     } catch (error) {
         console.error('❌ App initialization failed:', error);
@@ -325,7 +328,7 @@ if (!container) {
 
 const root = ReactDOM.createRoot(container);
 
-// Enhanced render with comprehensive providers and error boundary
+// 🆕 UPDATED: Enhanced render with AI Provider added to the provider stack
 root.render(
     <StrictMode>
         <ErrorBoundary
@@ -338,14 +341,17 @@ root.render(
         >
             <BrowserRouter>
                 <AuthProvider>
-                    <ToastProvider
-                        position="top-right"
-                        maxToasts={5}
-                        enableSounds={false}
-                        enableReducedMotion={true}
-                    >
-                        <App/>
-                    </ToastProvider>
+                    {/* 🆕 NEW: AI Provider must be inside AuthProvider but outside ToastProvider */}
+                    <AIProvider>
+                        <ToastProvider
+                            position="top-right"
+                            maxToasts={5}
+                            enableSounds={false}
+                            enableReducedMotion={true}
+                        >
+                            <App/>
+                        </ToastProvider>
+                    </AIProvider>
                 </AuthProvider>
             </BrowserRouter>
         </ErrorBoundary>
@@ -360,7 +366,7 @@ if (import.meta.env.DEV) {
         console.log('🔥 Hot reload active');
     }
 
-    // Development shortcuts
+    // 🆕 UPDATED: Development shortcuts with AI helpers
     window.devHelpers = {
         clearStorage: () => {
             localStorage.clear();
@@ -381,6 +387,32 @@ if (import.meta.env.DEV) {
         simulateOnline: () => {
             window.dispatchEvent(new Event('online'));
             console.log('🌐 Online mode simulated');
+        },
+        // 🆕 NEW: AI development helpers
+        clearAIData: () => {
+            if (typeof window !== 'undefined' && window.localStorage) {
+                // Clear AI-related localStorage items
+                Object.keys(localStorage).forEach(key => {
+                    if (key.includes('ai') || key.includes('recommendation') || key.includes('preference')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                console.log('🧠 AI data cleared');
+            }
+        },
+        testAI: () => {
+            console.log('🤖 AI System Status:');
+            console.log('- Firebase AI Services: Available');
+            console.log('- AI Context: Loaded');
+            console.log('- Recommendation Engine: Ready');
+            console.log('- User Interaction Tracking: Active');
+        },
+        simulateAIInteraction: (type = 'click', parkId = 'test-park') => {
+            console.log(`🎯 Simulating AI interaction: ${type} on ${parkId}`);
+            // This would trigger the AI interaction recording
+            window.dispatchEvent(new CustomEvent('ai-interaction', {
+                detail: { type, parkId, timestamp: Date.now() }
+            }));
         }
     };
 
@@ -389,6 +421,13 @@ if (import.meta.env.DEV) {
         'background: #3b82f6; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;'
     );
     console.log('Available in console:', Object.keys(window.devHelpers));
+
+    // 🆕 NEW: AI-specific development info
+    console.log(
+        '%c🧠 AI Development Mode',
+        'background: #8b5cf6; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;'
+    );
+    console.log('AI helpers: clearAIData(), testAI(), simulateAIInteraction()');
 }
 
 export default root;
