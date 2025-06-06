@@ -3,11 +3,11 @@ import React, {StrictMode} from "react";
 import ReactDOM from "react-dom/client";
 import {BrowserRouter} from "react-router-dom";
 
-// ✅ CSS imports in correct order - CRITICAL
-import './styles/reset.css';        // 1. Reset first
-import 'leaflet/dist/leaflet.css';  // 2. External libraries
-import './styles.css';              // 3. Base styles + Tailwind
-import './App.css';                 // 4. Component styles last
+// ✅ CSS imports in CORRECT order - CRITICAL FOR UI TO WORK
+import './styles/reset.css';              // 1. Reset first
+import 'leaflet/dist/leaflet.css';        // 2. External libraries
+import './styles.css';                    // 3. Main styles with Tailwind (this contains @tailwind directives)
+// Remove App.css import to avoid conflicts - move styles to components or styles.css
 
 import App from "./App";
 import {AuthProvider} from "./context/AuthContext";
@@ -50,11 +50,10 @@ const createPerformanceTrace = (traceName) => {
     }
 };
 
-// Global error handler component
+// Enhanced error handler component
 function ErrorFallback({error, resetErrorBoundary}) {
     return (
-        <div
-            className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 flex items-center justify-center p-4">
             <div className="max-w-lg w-full bg-white rounded-3xl shadow-2xl p-8 text-center border border-red-100">
                 <div className="text-6xl mb-6">💥</div>
                 <h1 className="text-3xl font-bold text-gray-800 mb-4">
@@ -77,8 +76,8 @@ function ErrorFallback({error, resetErrorBoundary}) {
                             </p>
                             {error.stack && (
                                 <pre className="mt-2 text-xs text-red-700 overflow-auto max-h-32">
-                  {error.stack}
-                </pre>
+                                    {error.stack}
+                                </pre>
                             )}
                         </div>
                     </details>
@@ -153,51 +152,51 @@ const initializeApp = async () => {
 
                 if (!shouldContinue) {
                     document.body.innerHTML = `
-            <div style="
-              min-height: 100vh; 
-              display: flex; 
-              align-items: center; 
-              justify-content: center; 
-              font-family: system-ui, sans-serif;
-              background: linear-gradient(135deg, #fdf2f8 0%, #faf5ff 50%, #eff6ff 100%);
-              padding: 2rem;
-            ">
-              <div style="
-                max-width: 500px; 
-                text-align: center; 
-                background: white; 
-                padding: 3rem; 
-                border-radius: 1.5rem; 
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-              ">
-                <div style="font-size: 4rem; margin-bottom: 1.5rem;">🌐</div>
-                <h1 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937;">
-                  Browser Update Required
-                </h1>
-                <p style="color: #6b7280; margin-bottom: 2rem; line-height: 1.6;">
-                  To use National Parks Explorer, please update your browser or switch to a modern browser for the best experience.
-                </p>
-                <a 
-                  href="https://browsehappy.com/" 
-                  target="_blank"
-                  style="
-                    display: inline-block;
-                    background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
-                    color: white;
-                    padding: 0.75rem 2rem;
-                    border-radius: 0.75rem;
-                    text-decoration: none;
-                    font-weight: 600;
-                    transition: transform 0.2s;
-                  "
-                  onmouseover="this.style.transform='scale(1.05)'"
-                  onmouseout="this.style.transform='scale(1)'"
-                >
-                  Update Browser
-                </a>
-              </div>
-            </div>
-          `;
+                        <div style="
+                            min-height: 100vh; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            font-family: system-ui, sans-serif;
+                            background: linear-gradient(135deg, #fdf2f8 0%, #faf5ff 50%, #eff6ff 100%);
+                            padding: 2rem;
+                        ">
+                            <div style="
+                                max-width: 500px; 
+                                text-align: center; 
+                                background: white; 
+                                padding: 3rem; 
+                                border-radius: 1.5rem; 
+                                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+                            ">
+                                <div style="font-size: 4rem; margin-bottom: 1.5rem;">🌐</div>
+                                <h1 style="font-size: 1.75rem; font-weight: bold; margin-bottom: 1rem; color: #1f2937;">
+                                    Browser Update Required
+                                </h1>
+                                <p style="color: #6b7280; margin-bottom: 2rem; line-height: 1.6;">
+                                    To use National Parks Explorer, please update your browser or switch to a modern browser for the best experience.
+                                </p>
+                                <a 
+                                    href="https://browsehappy.com/" 
+                                    target="_blank"
+                                    style="
+                                        display: inline-block;
+                                        background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+                                        color: white;
+                                        padding: 0.75rem 2rem;
+                                        border-radius: 0.75rem;
+                                        text-decoration: none;
+                                        font-weight: 600;
+                                        transition: transform 0.2s;
+                                    "
+                                    onmouseover="this.style.transform='scale(1.05)'"
+                                    onmouseout="this.style.transform='scale(1)'"
+                                >
+                                    Update Browser
+                                </a>
+                            </div>
+                        </div>
+                    `;
                     return;
                 }
             }
@@ -272,32 +271,6 @@ const initializeApp = async () => {
             console.log('Environment variables:', import.meta.env);
         }
 
-        // Performance monitoring
-        const performanceObserver = new PerformanceObserver((list) => {
-            const entries = list.getEntries();
-            entries.forEach((entry) => {
-                if (entry.entryType === 'navigation') {
-                    logAnalyticsEvent('app_performance', {
-                        load_time: entry.loadEventEnd - entry.loadEventStart,
-                        dom_content_loaded: entry.domContentLoadedEventEnd - entry.domContentLoadedEventStart,
-                        dns_lookup: entry.domainLookupEnd - entry.domainLookupStart,
-                        tcp_connect: entry.connectEnd - entry.connectStart,
-                        server_response: entry.responseEnd - entry.requestStart,
-                        dom_parse: entry.domContentLoadedEventStart - entry.responseEnd,
-                        resource_load: entry.loadEventStart - entry.domContentLoadedEventEnd
-                    });
-                }
-            });
-        });
-
-        if ('PerformanceObserver' in window) {
-            try {
-                performanceObserver.observe({entryTypes: ['navigation', 'measure']});
-            } catch (error) {
-                console.warn('⚠️ Performance monitoring unavailable:', error);
-            }
-        }
-
         // Log successful initialization
         logAnalyticsEvent('app_initialized', {
             timestamp: Date.now(),
@@ -338,9 +311,6 @@ const reportError = (error, errorInfo) => {
         url: window.location.href,
         user_agent: navigator.userAgent
     });
-
-    // Additional error reporting could be added here
-    // e.g., Sentry, LogRocket, or other error tracking services
 };
 
 // Initialize the app
@@ -419,52 +389,6 @@ if (import.meta.env.DEV) {
         'background: #3b82f6; color: white; padding: 6px 12px; border-radius: 4px; font-weight: bold;'
     );
     console.log('Available in console:', Object.keys(window.devHelpers));
-}
-
-// Enhanced production optimizations
-if (import.meta.env.PROD) {
-    // Disable console.log in production (keep errors and warnings)
-    const originalLog = console.log;
-    console.log = (...args) => {
-        // Only log in development or for important messages
-        if (args[0]?.includes?.('✅') || args[0]?.includes?.('❌') || args[0]?.includes?.('⚠️')) {
-            originalLog.apply(console, args);
-        }
-    };
-
-    // Add global error handler for unhandled errors
-    window.addEventListener('error', (event) => {
-        logAnalyticsEvent('global_error', {
-            error_message: event.error?.message || event.message,
-            error_filename: event.filename,
-            error_lineno: event.lineno,
-            error_colno: event.colno,
-            error_stack: event.error?.stack,
-            timestamp: Date.now()
-        });
-    });
-
-    // Add global handler for unhandled promise rejections
-    window.addEventListener('unhandledrejection', (event) => {
-        logAnalyticsEvent('unhandled_promise_rejection', {
-            error_message: event.reason?.message || String(event.reason),
-            error_stack: event.reason?.stack,
-            timestamp: Date.now()
-        });
-    });
-}
-
-// Performance monitoring for Core Web Vitals
-if ('web-vitals' in window) {
-    import('web-vitals').then(({getCLS, getFID, getFCP, getLCP, getTTFB}) => {
-        getCLS((metric) => logAnalyticsEvent('core_web_vital_cls', metric));
-        getFID((metric) => logAnalyticsEvent('core_web_vital_fid', metric));
-        getFCP((metric) => logAnalyticsEvent('core_web_vital_fcp', metric));
-        getLCP((metric) => logAnalyticsEvent('core_web_vital_lcp', metric));
-        getTTFB((metric) => logAnalyticsEvent('core_web_vital_ttfb', metric));
-    }).catch(() => {
-        // Web vitals not available, silently continue
-    });
 }
 
 export default root;
