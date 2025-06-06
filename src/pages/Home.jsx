@@ -1,67 +1,34 @@
-import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import FadeInWrapper from "../components/FadeInWrapper";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import ParkCardFlip from "../components/ParkCardFlip";
-import { useToast } from "../context/ToastContext";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
+import {Link, useNavigate, useSearchParams} from "react-router-dom";
+import {useAuth} from "../context/AuthContext";
+import {useToast} from "../context/ToastContext";
 import useIsMobile from "../hooks/useIsMobile";
-import SkeletonLoader from "../components/SkeletonLoader";
+import FadeInWrapper from "../components/FadeInWrapper";
 import Fuse from 'fuse.js';
-import { debounce } from 'lodash';
-import { createTripFromPark } from '../utils/tripPlannerHelpers';
+import {debounce} from 'lodash';
 
 import {
-  FaCalendarAlt,
-  FaNewspaper,
-  FaBookOpen,
-  FaUser,
-  FaLock,
-  FaCogs,
-  FaRoute,
-  FaSearch,
-  FaFilter,
-  FaHeart,
-  FaMapMarkerAlt,
-  FaStar,
-  FaChartBar,
-  FaEye,
-  FaTimes,
-  FaBrain,
-  FaCamera,
-  FaHiking,
-  FaCampground,
-  FaTree,
-  FaWater,
-  FaMountain,
-  FaSun,
-  FaSnowflake,
-  FaLeaf,
-  FaCloudRain,
-  FaExpand,
-  FaList,
-  FaTh,
-  FaGlobe,
-  FaFire,
-  FaPlus,
-  FaClock,
-  FaMoneyBillWave
+    FaArrowRight,
+    FaBookOpen,
+    FaCalendarAlt,
+    FaCogs,
+    FaEye,
+    FaFilter,
+    FaHeart,
+    FaLock,
+    FaMapMarkerAlt,
+    FaNewspaper,
+    FaRoute,
+    FaSearch,
+    FaTimes,
+    FaUser
 } from "react-icons/fa";
 
-// Fix Leaflet icons
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png",
-  iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png",
-});
-
-
-// Updated QuickActions component in Home.jsx
+// Enhanced QuickActions component with better mobile design
 const QuickActions = ({ favorites, onActionClick, currentUser }) => {
-  const actions = [
+    const {isMobile} = useIsMobile();
+
+    const actions = [
     {
       id: 'plan-trip',
       icon: '🎯',
@@ -89,139 +56,269 @@ const QuickActions = ({ favorites, onActionClick, currentUser }) => {
   ];
 
   return (
-    <FadeInWrapper delay={0.2}>
-      <div className="flex justify-center mb-6 md:mb-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 w-full max-w-4xl">
-          {actions.map((action, index) => (
-            <FadeInWrapper key={action.id} delay={index * 0.1}>
-              <button 
-                onClick={action.action}
-                className="group bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 min-h-[140px] md:min-h-[160px] w-full flex flex-col items-center justify-center"
-              >
-                <div className="text-4xl md:text-5xl mb-4 group-hover:scale-110 transition-transform">
-                  {action.icon}
-                </div>
-                <div className="font-semibold text-gray-800 text-base md:text-lg mb-2">{action.title}</div>
-                <div className="text-sm md:text-base text-gray-600 text-center">{action.description}</div>
-              </button>
-            </FadeInWrapper>
-          ))}
-        </div>
-      </div>
-    </FadeInWrapper>
+      <FadeInWrapper delay={0.2}>
+          <div className="mb-6">
+              <div
+                  className={`grid gap-4 w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'} max-w-4xl mx-auto`}>
+                  {actions.map((action, index) => (
+                      <FadeInWrapper key={action.id} delay={index * 0.1}>
+                          <button
+                              onClick={action.action}
+                              className={`group bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 w-full flex flex-col items-center justify-center ${isMobile ? 'min-h-[120px]' : 'min-h-[140px]'}`}
+                          >
+                              <div
+                                  className={`${isMobile ? 'text-3xl' : 'text-4xl md:text-5xl'} mb-3 group-hover:scale-110 transition-transform`}>
+                                  {action.icon}
+                              </div>
+                              <div
+                                  className={`font-semibold text-gray-800 ${isMobile ? 'text-base' : 'text-base md:text-lg'} mb-2`}>{action.title}</div>
+                              <div
+                                  className={`text-gray-600 text-center ${isMobile ? 'text-sm' : 'text-sm md:text-base'}`}>{action.description}</div>
+                          </button>
+                      </FadeInWrapper>
+                  ))}
+              </div>
+          </div>
+      </FadeInWrapper>
   );
 };
 
-// ===== ENHANCED FILTER SIDEBAR =====
-const FilterSidebar = ({ onFilterChange, filters, parks }) => {
-  const activities = ['Hiking', 'Wildlife', 'Photography', 'Camping', 'Water Sports', 'Rock Climbing'];
+// Enhanced Mobile-First Park Discovery Component
+const MobileEnhancedSearch = ({
+                                  search,
+                                  onSearchChange,
+                                  selectedState,
+                                  setSelectedState,
+                                  selectedSeason,
+                                  setSelectedSeason,
+                                  uniqueStates,
+                                  seasons,
+                                  showAdvancedFilters,
+                                  setShowAdvancedFilters,
+                                  filters,
+                                  onFilterChange,
+                                  filtered,
+                                  currentPage,
+                                  totalPages,
+                                  searchResults,
+                                  showSearchDropdown,
+                                  setShowSearchDropdown
+                              }) => {
+    const {isMobile} = useIsMobile();
+    const navigate = useNavigate();
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 sticky top-4">
-      <div className="flex items-center justify-between mb-4">
-        <h4 className="font-bold text-gray-800">Filter & Discover</h4>
-        <button 
-          onClick={() => onFilterChange('reset')}
-          className="text-xs text-pink-600 hover:text-pink-800 transition"
-        >
-          Reset All
-        </button>
-      </div>
-      
-      {/* Activity Type Filters */}
-      <div className="mb-6">
-        <h5 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <FaHiking className="text-green-500" />
-          Activities
-        </h5>
-        <div className="space-y-2">
-          {activities.map(activity => (
-            <label key={activity} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-2 rounded">
-              <input 
-                type="checkbox" 
-                checked={filters.activities?.includes(activity) || false}
-                onChange={(e) => onFilterChange('activity', activity, e.target.checked)}
-                className="rounded text-pink-500 focus:ring-pink-400" 
-              />
-              <span>{activity}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-      
-      {/* Entry Fee Range */}
-      <div className="mb-6">
-        <h5 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <FaMoneyBillWave className="text-yellow-500" />
-          Entry Fee
-        </h5>
-        <div className="space-y-2">
-          {['Free', 'Under $15', '$15-30', 'Over $30'].map(range => (
-            <label key={range} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-2 rounded">
-              <input 
-                type="radio" 
-                name="feeRange"
-                checked={filters.feeRange === range}
-                onChange={() => onFilterChange('feeRange', range)}
-                className="text-pink-500 focus:ring-pink-400" 
-              />
-              <span>{range}</span>
-            </label>
-          ))}
-        </div>
-      </div>
+      <FadeInWrapper delay={0.5}>
+          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 mb-6 overflow-hidden">
+              {/* Compact Header for Mobile */}
+              <div className="p-4 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                          <div
+                              className="bg-gradient-to-r from-pink-500 to-purple-500 p-2 md:p-3 rounded-xl text-white">
+                              <FaSearch className={isMobile ? "text-lg" : "text-xl"}/>
+                          </div>
+                          <div>
+                              <h3 className={`font-bold text-gray-800 ${isMobile ? 'text-lg' : 'text-xl'}`}>Discover
+                                  Parks</h3>
+                              <p className="text-gray-600 text-sm">Find your perfect adventure</p>
+                          </div>
+                      </div>
 
-      {/* Popular Features */}
-      <div className="mb-6">
-        <h5 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
-          <FaStar className="text-purple-500" />
-          Features
-        </h5>
-        <div className="space-y-2">
-          {['Waterfalls', 'Desert', 'Mountains', 'Lakes', 'Forests', 'Geysers'].map(feature => (
-            <label key={feature} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 p-2 rounded">
-              <input 
-                type="checkbox" 
-                checked={filters.features?.includes(feature) || false}
-                onChange={(e) => onFilterChange('feature', feature, e.target.checked)}
-                className="rounded text-pink-500 focus:ring-pink-400" 
+                      {!isMobile && (
+                          <button
+                              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
+                                  showAdvancedFilters
+                                      ? 'bg-pink-500 text-white'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              }`}
+                          >
+                              <FaFilter/>
+                              <span className="hidden md:inline">Filters</span>
+                          </button>
+                      )}
+                  </div>
+
+                  {/* Mobile-Optimized Search Bar */}
+                  <div className="relative mb-4">
+                      <input
+                          type="text"
+                          placeholder="Search parks..."
+                          value={search}
+                          onChange={onSearchChange}
+                          onFocus={() => setShowSearchDropdown(search.length > 0)}
+                          onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
+                          className="w-full p-3 pl-10 pr-10 border-2 border-gray-200 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
+                          style={{fontSize: '16px'}} // Prevents iOS zoom
               />
-              <span>{feature}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-    </div>
+                      <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"/>
+                      {search && (
+                          <button
+                              onClick={() => {
+                                  onSearchChange({target: {value: ''}});
+                                  setShowSearchDropdown(false);
+                              }}
+                              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+                          >
+                              <FaTimes/>
+                          </button>
+                      )}
+                  </div>
+
+                  {/* Search Dropdown for Mobile */}
+                  {showSearchDropdown && searchResults.length > 0 && (
+                      <div className="mb-4 bg-gray-50 border border-gray-200 rounded-xl p-3 max-h-64 overflow-y-auto">
+                          <div className="text-sm font-medium text-gray-700 mb-2">Quick Results</div>
+                          {searchResults.slice(0, isMobile ? 4 : 6).map(park => (
+                              <button
+                                  key={park.id}
+                                  onClick={() => {
+                                      navigate(`/park/${park.slug}?page=${currentPage}`);
+                                      setShowSearchDropdown(false);
+                                  }}
+                                  className="w-full p-2 text-left hover:bg-white rounded-lg transition flex items-center gap-3 mb-2 last:mb-0"
+                              >
+                                  <div className="text-lg">🏞️</div>
+                                  <div className="flex-1 min-w-0">
+                                      <div className="font-medium text-gray-800 truncate">{park.name}</div>
+                                      <div className="text-sm text-gray-600 truncate">{park.state}</div>
+                                  </div>
+                                  <FaArrowRight className="text-gray-400 text-sm"/>
+                              </button>
+                          ))}
+                      </div>
+                  )}
+
+                  {/* Mobile-First Filters */}
+                  <div className="space-y-3">
+                      {/* State and Season in a row on larger screens, stacked on mobile */}
+                      <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                          <select
+                              value={selectedState}
+                              onChange={(e) => setSelectedState(e.target.value)}
+                              className="border-2 border-gray-200 px-3 py-2 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all bg-white"
+                              style={{fontSize: '16px'}}
+                          >
+                              {uniqueStates.map((state) => (
+                                  <option key={state} value={state}>{state === 'All' ? 'All States' : state}</option>
+                              ))}
+                          </select>
+
+                          {/* Mobile Filters Button */}
+                          {isMobile && (
+                              <button
+                                  onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                                  className={`flex items-center justify-center gap-2 px-3 py-2 rounded-xl transition ${
+                                      showAdvancedFilters
+                                          ? 'bg-pink-500 text-white'
+                                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  }`}
+                              >
+                                  <FaFilter/>
+                                  Filters
+                              </button>
+                          )}
+                      </div>
+
+                      {/* Season Filter Chips */}
+                      <div className="flex flex-wrap gap-2">
+                          {seasons.map((season) => (
+                              <button
+                                  key={season}
+                                  onClick={() => setSelectedSeason(season)}
+                                  className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                                      selectedSeason === season
+                                          ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg"
+                                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                  }`}
+                              >
+                                  {season === "Spring" && "🌸 "}
+                                  {season === "Summer" && "🌞 "}
+                                  {season === "Fall" && "🍂 "}
+                                  {season === "Winter" && "❄️ "}
+                                  {season}
+                              </button>
+                          ))}
+                      </div>
+
+                      {/* Advanced Filters Expandable Section */}
+                      {showAdvancedFilters && (
+                          <div className="border-t border-gray-200 pt-4 mt-4">
+                              <div className="space-y-4">
+                                  {/* Entry Fee Filter */}
+                                  <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-2">Entry Fee</label>
+                                      <div className="grid grid-cols-2 gap-2">
+                                          {['Free', 'Under $15', '$15-30', 'Over $30'].map(range => (
+                                              <label key={range}
+                                                     className="flex items-center gap-2 text-sm cursor-pointer">
+                                                  <input
+                                                      type="radio"
+                                                      name="feeRange"
+                                                      checked={filters.feeRange === range}
+                                                      onChange={() => onFilterChange('feeRange', range)}
+                                                      className="text-pink-500 focus:ring-pink-400"
+                                                  />
+                                                  <span>{range}</span>
+                                              </label>
+                                          ))}
+                                      </div>
+                                  </div>
+
+                                  {/* Quick Activities */}
+                                  <div>
+                                      <label className="block text-sm font-medium text-gray-700 mb-2">Activities</label>
+                                      <div className="flex flex-wrap gap-2">
+                                          {['Hiking', 'Wildlife', 'Photography', 'Camping'].map(activity => (
+                                              <button
+                                                  key={activity}
+                                                  onClick={() => onFilterChange('activity', activity, !filters.activities?.includes(activity))}
+                                                  className={`px-3 py-1 rounded-full text-sm transition ${
+                                                      filters.activities?.includes(activity)
+                                                          ? 'bg-pink-100 text-pink-700 border-2 border-pink-300'
+                                                          : 'bg-gray-100 text-gray-600 border-2 border-transparent hover:bg-gray-200'
+                                                  }`}
+                                              >
+                                                  {activity}
+                                              </button>
+                                          ))}
+                                      </div>
+                                  </div>
+
+                                  {/* Reset Filters */}
+                                  <button
+                                      onClick={() => onFilterChange('reset')}
+                                      className="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition text-sm"
+                                  >
+                                      Reset All Filters
+                                  </button>
+                              </div>
+                          </div>
+                      )}
+                  </div>
+
+                  {/* Results Summary */}
+                  <div
+                      className="flex items-center justify-between text-sm text-gray-600 border-t border-gray-100 pt-4 mt-4">
+                      <div>
+                          Showing {filtered.length} parks
+                          {search && ` for "${search}"`}
+                      </div>
+                      <div>
+                          Page {currentPage} of {totalPages}
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </FadeInWrapper>
   );
 };
 
-// ===== VIEW MODE TOGGLE =====
-const ViewModeToggle = ({ viewMode, setViewMode }) => (
-  <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
-    {[
-      { mode: 'grid', icon: FaTh, label: 'Grid' },
-      { mode: 'list', icon: FaList, label: 'List' },
-      { mode: 'map', icon: FaGlobe, label: 'Map' }
-    ].map(({ mode, icon: Icon, label }) => (
-      <button
-        key={mode}
-        onClick={() => setViewMode(mode)}
-        className={`flex items-center gap-2 px-3 py-2 text-sm transition ${
-          viewMode === mode 
-            ? 'bg-pink-500 text-white' 
-            : 'bg-white text-gray-600 hover:bg-gray-50'
-        }`}
-      >
-        <Icon />
-        <span className="hidden md:inline">{label}</span>
-      </button>
-    ))}
-  </div>
-);
-
-/// ✨ Enhanced Park Card Component with Complete Data Display - FIXED
-const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip }) => {
+// Enhanced Mobile Park Card without the large eye icon
+const EnhancedMobileParkCard = ({park, isFavorite, onToggleFavorite, currentUser, currentPage, onPlanTrip}) => {
   const navigate = useNavigate();
+    const {isMobile} = useIsMobile();
 
   const getActivityIcons = (park) => {
     const icons = [];
@@ -232,174 +329,110 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
     if (desc.includes('wildlife') || highlight.includes('wildlife')) icons.push('🦌');
     if (desc.includes('water') || highlight.includes('lake') || highlight.includes('river')) icons.push('🌊');
     if (desc.includes('mountain') || highlight.includes('peak')) icons.push('⛰️');
-    if (desc.includes('scenic') || highlight.includes('scenic')) icons.push('📸');
-    if (desc.includes('desert')) icons.push('🏜️');
-    if (desc.includes('forest')) icons.push('🌲');
-    if (desc.includes('canyon')) icons.push('🏔️');
 
-    return icons.slice(0, 4);
-  };
-
-  const formatHighlight = (highlight) => {
-    if (!highlight) return 'Scenic views and natural beauty';
-    const formatted = highlight.charAt(0).toUpperCase() + highlight.slice(1);
-    if (formatted.length < 20) {
-      return `${formatted} - Perfect for exploration`;
-    }
-    return formatted;
-  };
-
-  const formatSize = (size) => {
-    if (!size) return 'Size varies';
-    if (typeof size === 'number') {
-      if (size > 1000) return `${(size / 1000).toFixed(1)}k acres`;
-      return `${size} acres`;
-    }
-    return size;
-  };
-
-  const formatVisitors = (visitors) => {
-    if (!visitors) return 'Popular destination';
-    if (typeof visitors === 'number') {
-      if (visitors > 1000000) return `${(visitors / 1000000).toFixed(1)}M visitors/year`;
-      if (visitors > 1000) return `${(visitors / 1000).toFixed(0)}k visitors/year`;
-      return `${visitors} visitors/year`;
-    }
-    return visitors;
-  };
-
-  const formatEstablished = (established) => {
-    if (!established) return 'Historic park';
-    if (typeof established === 'number') return `Est. ${established}`;
-    return established;
-  };
-
-  const formatHours = (hours) => {
-    if (!hours) return '24 hours (typical)';
-    return hours;
+      return icons.slice(0, 3);
   };
 
   return (
-      <div className="park-card-enhanced group">
-        {/* Enhanced image with overlay */}
-        <div className="park-card-image-container">
-          <div className="park-card-image-placeholder">
-            🏞️
-          </div>
+      <div
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+          {/* Image Section */}
+          <div className="relative h-48 bg-gradient-to-br from-pink-200 to-purple-300 flex items-center justify-center">
+              <div className="text-5xl">🏞️</div>
 
-          {/* Gradient overlay */}
-          <div className="park-card-overlay" />
-
-          {/* Quick action buttons */}
-          <div className="park-card-quick-actions">
-            <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate(`/park/${park.slug}?page=${currentPage}`);
-                }}
-                className="btn-glass touch-target"
-                title="View Details"
-            >
-              <FaEye />
-            </button>
-          </div>
-
-          {/* Favorite button */}
+              {/* Favorite Button */}
           {currentUser && (
               <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onToggleFavorite(park.id);
                   }}
-                  className={`btn-favorite touch-target ${
-                      isFavorite ? "btn-favorite-active" : "btn-favorite-inactive"
+                  className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 ${
+                      isFavorite
+                          ? "bg-red-500 text-white"
+                          : "bg-white/80 text-gray-600 hover:bg-white"
                   }`}
-                  title={isFavorite ? "Remove from favorites" : "Add to favorites"}
               >
-                {isFavorite ? "❤️" : "🤍"}
+                  <FaHeart className="text-sm"/>
               </button>
           )}
 
-          {/* Best season badge */}
+              {/* Best Season Badge */}
           {park.bestSeason && (
-              <div className="park-card-season-badge">
+              <div
+                  className="absolute bottom-3 left-3 bg-white/90 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
                 {park.bestSeason === 'Spring' && '🌸'}
                 {park.bestSeason === 'Summer' && '🌞'}
                 {park.bestSeason === 'Fall' && '🍂'}
                 {park.bestSeason === 'Winter' && '❄️'}
-                Best: {park.bestSeason}
+                  {park.bestSeason}
               </div>
           )}
         </div>
 
-        {/* Enhanced content */}
-        <div className="park-card-content">
-          {/* Activity tags and entry fee */}
-          <div className="park-card-header">
-            <div className="park-card-activity-icons">
+          {/* Content Section */}
+          <div className="p-4">
+              {/* Header with Activities */}
+              <div className="flex items-center justify-between mb-3">
+                  <div className="flex gap-1">
               {getActivityIcons(park).map((icon, index) => (
-                  <span key={index} className="activity-icon">{icon}</span>
+                  <span key={index} className="text-lg">{icon}</span>
               ))}
             </div>
-            <div className="park-card-entry-fee">
-              Entry: {park.entryFee && park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
+                  <div className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                      {park.entryFee && park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
             </div>
           </div>
 
-          {/* Park name and state */}
-          <h3 className="park-card-title">
+              {/* Park Name */}
+              <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
             {park.name}
           </h3>
 
-          <div className="park-card-location">
-            <FaMapMarkerAlt className="location-icon" />
-            <span>{park.state}</span>
+              {/* Location */}
+              <div className="flex items-center gap-2 text-gray-600 mb-3">
+                  <FaMapMarkerAlt className="text-pink-500 text-sm"/>
+                  <span className="text-sm">{park.state}</span>
           </div>
 
-          {/* Enhanced Stats Grid */}
-          <div className="park-card-stats">
-            <div className="park-stat-item">
-              <div className="park-stat-label">Established</div>
-              <div className="park-stat-value">{formatEstablished(park.established)}</div>
+              {/* Quick Stats */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                      <div className="text-xs text-gray-600">Established</div>
+                      <div className="text-sm font-bold text-gray-800">
+                          {park.established || 'Historic'}
+                      </div>
             </div>
-            <div className="park-stat-item">
-              <div className="park-stat-label">Size</div>
-              <div className="park-stat-value">{formatSize(park.size)}</div>
-            </div>
-            <div className="park-stat-item">
-              <div className="park-stat-label">Annual Visitors</div>
-              <div className="park-stat-value">{formatVisitors(park.annualVisitors)}</div>
-            </div>
-            <div className="park-stat-item">
-              <div className="park-stat-label">Hours</div>
-              <div className="park-stat-value">{formatHours(park.hours)}</div>
+                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                      <div className="text-xs text-gray-600">Visitors</div>
+                      <div className="text-sm font-bold text-gray-800">
+                          {park.annualVisitors ? `${park.annualVisitors}M` : 'Popular'}
+                      </div>
             </div>
           </div>
 
-          {/* Park info */}
-          <div className="park-card-info">
-            {/* Highlight */}
-            <div className="park-info-item">
-              <span className="park-info-label highlight-label">🎯 Highlight</span>
-              <span className="park-info-text">{formatHighlight(park.highlight)}</span>
-            </div>
-          </div>
+              {/* Highlight */}
+              {park.highlight && (
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {park.highlight}
+                  </p>
+              )}
 
-          {/* Action buttons */}
-          <div className="park-card-actions">
+              {/* Action Buttons */}
+              <div className="flex gap-2">
             <button
                 onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-                className="btn-primary-action touch-target"
+                className="flex-1 bg-gradient-to-r from-blue-500 to-cyan-500 text-white py-2 px-3 rounded-lg hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
             >
               <FaEye />
-              <span className="btn-text">Explore</span>
+                View
             </button>
             <button
                 onClick={() => onPlanTrip(park)}
-                className="btn-secondary-action touch-target"
+                className="flex-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white py-2 px-3 rounded-lg hover:from-pink-600 hover:to-purple-600 transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2"
             >
               <FaRoute />
-              <span className="btn-text">Plan Trip</span>
+                Plan
             </button>
           </div>
         </div>
@@ -407,15 +440,14 @@ const EnhancedParkCard = ({ park, isFavorite, onToggleFavorite, currentUser, cur
   );
 };
 
-// ===== MAIN HOME COMPONENT =====
-const Home = ({ parks, favorites, toggleFavorite }) => {
-  // ===== STATE MANAGEMENT =====
+// Main Enhanced Home Component
+const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
+    // State Management
   const [search, setSearch] = useState("");
   const [selectedState, setSelectedState] = useState("All");
   const [selectedSeason, setSelectedSeason] = useState("All");
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
-  const [viewMode, setViewMode] = useState('grid');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
@@ -428,15 +460,15 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     difficulty: ''
   });
 
-  // ===== HOOKS =====
+    // Hooks
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { currentUser, userRole, logout } = useAuth();
-  const isMobile = useIsMobile();
+    const {isMobile, isTablet} = useIsMobile();
 
-  const parksPerPage = 9;
+    const parksPerPage = isMobile ? 6 : 9;
 
-  // ===== FUZZY SEARCH SETUP =====
+    // Fuzzy Search Setup
   const fuse = useMemo(() => new Fuse(parks, {
     keys: [
       { name: 'name', weight: 0.4 },
@@ -449,33 +481,24 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     minMatchCharLength: 2
   }), [parks]);
 
-  // ===== EFFECTS =====
-  useEffect(() => {
-    setSearchParams({ page: currentPage });
-  }, [currentPage]);
-
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
-
-  // ===== DEBOUNCED SEARCH =====
+    // Debounced Search
   const debouncedSearch = useMemo(
-    () => debounce((searchValue) => {
-      if (searchValue.length < 2) {
-        setSearchResults([]);
-        return;
-      }
+      () => debounce((searchValue) => {
+          if (searchValue.length < 2) {
+              setSearchResults([]);
+              return;
+          }
 
-      const results = fuse.search(searchValue)
-        .slice(0, 8)
-        .map(result => ({
-          ...result.item,
-          relevanceScore: Math.round((1 - result.score) * 100)
-        }));
-      
-      setSearchResults(results);
-    }, 300),
-    [fuse]
+          const results = fuse.search(searchValue)
+              .slice(0, 8)
+              .map(result => ({
+                  ...result.item,
+                  relevanceScore: Math.round((1 - result.score) * 100)
+              }));
+
+          setSearchResults(results);
+      }, 300),
+      [fuse]
   );
 
   const handleSearchChange = useCallback((e) => {
@@ -491,7 +514,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     }
   }, [debouncedSearch]);
 
-  // ===== EVENT HANDLERS =====
+    // Event Handlers
   const handleLogout = async () => {
     await logout();
     showToast("👋 Logged out successfully", "success");
@@ -511,7 +534,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
 
     setFilters(prev => {
       const newFilters = { ...prev };
-      
+
       if (type === 'activity' || type === 'feature') {
         const arrayKey = type === 'activity' ? 'activities' : 'features';
         if (checked) {
@@ -522,13 +545,11 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
       } else {
         newFilters[type] = value;
       }
-      
+
       return newFilters;
     });
     setCurrentPage(1);
   };
-
-  // Update the handleQuickAction function in Home.jsx
 
   const handleQuickAction = (action) => {
     switch(action) {
@@ -543,26 +564,32 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
         navigate('/recommendations');
         showToast('🧠 AI recommendations loading...', 'info');
         break;
-      case 'analytics':
-        showToast('Analytics feature coming soon!', 'info');
-        break;
-      case 'map':
-        setViewMode('map');
-        showToast('Switched to map view', 'info');
-        break;
       default:
         break;
     }
   };
 
   const handlePlanTrip = (park) => {
-    createTripFromPark(park, navigate, showToast);
+      navigate('/trip-planner', {
+          state: {
+              preloadedTrip: {
+                  title: `Trip to ${park.name}`,
+                  parks: [{
+                      parkId: park.id,
+                      parkName: park.name,
+                      state: park.state,
+                      coordinates: park.coordinates
+                  }]
+              }
+          }
+      });
+      showToast(`🎯 Planning trip to ${park.name}!`, 'success');
   };
 
-  // ===== COMPUTED VALUES =====
+    // Computed Values
   const allStates = useMemo(
-    () => parks.flatMap((p) => p.state?.split(",").map((s) => s.trim()) || []),
-    [parks]
+      () => parks.flatMap((p) => p.state?.split(",").map((s) => s.trim()) || []),
+      [parks]
   );
   const uniqueStates = useMemo(() => ["All", ...Array.from(new Set(allStates))], [allStates]);
   const seasons = ["All", "Spring", "Summer", "Fall", "Winter"];
@@ -574,29 +601,24 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     const season = p.bestSeason?.toLowerCase() || "";
     const description = p.description?.toLowerCase() || "";
 
-    // Basic filters
-    const matchesSearch = search.length < 2 || 
-      name.includes(search.toLowerCase()) ||
-      state.includes(search.toLowerCase()) ||
-      description.includes(search.toLowerCase());
-    
-    const matchesState = selectedState === "All" || state.includes(selectedState.toLowerCase());
+      const matchesSearch = search.length < 2 ||
+          name.includes(search.toLowerCase()) ||
+          state.includes(search.toLowerCase()) ||
+          description.includes(search.toLowerCase());
+
+      const matchesState = selectedState === "All" || state.includes(selectedState.toLowerCase());
     const matchesSeason = selectedSeason === "All" || season === selectedSeason.toLowerCase();
 
-    // Advanced filters
-    const matchesActivities = filters.activities.length === 0 || 
-      filters.activities.some(activity => description.includes(activity.toLowerCase()));
-    
-    const matchesFeatures = filters.features.length === 0 ||
-      filters.features.some(feature => description.includes(feature.toLowerCase()));
+      const matchesActivities = filters.activities.length === 0 ||
+          filters.activities.some(activity => description.includes(activity.toLowerCase()));
 
-    const matchesFeeRange = !filters.feeRange || 
-      (filters.feeRange === 'Free' && (!p.entryFee || p.entryFee === 0)) ||
-      (filters.feeRange === 'Under $15' && p.entryFee && p.entryFee < 15) ||
-      (filters.feeRange === '$15-30' && p.entryFee && p.entryFee >= 15 && p.entryFee <= 30) ||
-      (filters.feeRange === 'Over $30' && p.entryFee && p.entryFee > 30);
+      const matchesFeeRange = !filters.feeRange ||
+          (filters.feeRange === 'Free' && (!p.entryFee || p.entryFee === 0)) ||
+          (filters.feeRange === 'Under $15' && p.entryFee && p.entryFee < 15) ||
+          (filters.feeRange === '$15-30' && p.entryFee && p.entryFee >= 15 && p.entryFee <= 30) ||
+          (filters.feeRange === 'Over $30' && p.entryFee && p.entryFee > 30);
 
-    return matchesSearch && matchesState && matchesSeason && matchesActivities && matchesFeatures && matchesFeeRange;
+      return matchesSearch && matchesState && matchesSeason && matchesActivities && matchesFeeRange;
   });
 
   const indexLast = currentPage * parksPerPage;
@@ -604,7 +626,7 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
   const currentParks = filtered.slice(indexFirst, indexLast);
   const totalPages = Math.ceil(filtered.length / parksPerPage);
 
-  // ===== STATS CALCULATIONS =====
+    // Stats calculations
   const stats = {
     totalParks: parks.length,
     totalStates: uniqueStates.length - 1,
@@ -612,559 +634,309 @@ const Home = ({ parks, favorites, toggleFavorite }) => {
     filteredParks: filtered.length
   };
 
-  // ===== RENDER METHODS =====
+    // Render Methods
   const renderHeroSection = () => (
-    <div className="relative bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 p-6 md:p-8 text-white overflow-hidden rounded-2xl mb-8">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 bg-black/10"></div>
-      <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-      <div className="absolute -top-2 -left-2 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
-      
-      <div className="relative z-10">
-        <FadeInWrapper delay={0.1}>
-          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
+      <div
+          className="relative bg-gradient-to-r from-pink-600 via-purple-600 to-blue-600 p-4 md:p-6 text-white overflow-hidden rounded-2xl mb-6">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+          <div className="absolute -top-2 -left-2 w-24 h-24 bg-white/10 rounded-full blur-lg"></div>
+
+          <div className="relative z-10">
+              <FadeInWrapper delay={0.1}>
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-extrabold mb-4">
+                <h1 className={`font-extrabold mb-4 ${isMobile ? 'text-2xl' : 'text-3xl lg:text-5xl'}`}>
                 🌍 National Parks Explorer
               </h1>
-              <p className="text-base md:text-lg lg:text-xl text-purple-100 max-w-2xl">
-                Explore {parks.length} magnificent national parks with interactive maps, smart recommendations, and personalized insights.
+                <p className={`text-purple-100 ${isMobile ? 'text-sm' : 'text-base lg:text-xl'}`}>
+                    Explore {parks.length} magnificent national parks with smart recommendations.
               </p>
             </div>
+              </FadeInWrapper>
           </div>
-        </FadeInWrapper>
       </div>
-    </div>
   );
 
   const renderStatsCards = () => (
-    <FadeInWrapper delay={0.2}>
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-        {[
-          { 
-            label: 'Total Parks', 
-            value: stats.totalParks, 
-            icon: '🏞️', 
-            color: 'from-pink-500 to-rose-500',
-            description: 'National treasures to explore'
-          },
-          { 
-            label: 'States Covered', 
-            value: stats.totalStates, 
-            icon: '🗺️', 
-            color: 'from-blue-500 to-cyan-500',
-            description: 'Coast to coast adventures'
-          },
-          { 
-            label: 'Your Favorites', 
-            value: stats.userFavorites, 
-            icon: '❤️', 
-            color: 'from-red-500 to-pink-500',
-            description: currentUser ? 'Parks you love' : 'Sign in to save favorites'
-          },
-          { 
-            label: 'Filtered Results', 
-            value: stats.filteredParks, 
-            icon: '🔍', 
-            color: 'from-green-500 to-emerald-500',
-            description: 'Matching your search'
-          }
-        ].map((stat, index) => (
-          <FadeInWrapper key={stat.label} delay={index * 0.1}>
-            <div className={`group bg-gradient-to-br ${stat.color} p-4 md:p-6 rounded-2xl text-white shadow-lg transform hover:scale-105 transition-all duration-300`}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="text-2xl md:text-3xl">{stat.icon}</div>
-                <div className="text-xs bg-white/20 px-2 py-1 rounded-full">
-                  Live
-                </div>
-              </div>
-              <div className="text-2xl md:text-3xl font-bold mb-1">{stat.value}</div>
-              <div className="text-white/90 font-medium text-sm md:text-base">{stat.label}</div>
-              <div className="text-white/70 text-xs mt-1">{stat.description}</div>
-            </div>
-          </FadeInWrapper>
-        ))}
-      </div>
-    </FadeInWrapper>
+      <FadeInWrapper delay={0.2}>
+          <div className={`grid gap-4 mb-6 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+              {[
+                  {
+                      label: 'Total Parks',
+                      value: stats.totalParks,
+                      icon: '🏞️',
+                      color: 'from-pink-500 to-rose-500',
+                  },
+                  {
+                      label: 'States',
+                      value: stats.totalStates,
+                      icon: '🗺️',
+                      color: 'from-blue-500 to-cyan-500',
+                  },
+                  {
+                      label: 'Favorites',
+                      value: stats.userFavorites,
+                      icon: '❤️',
+                      color: 'from-red-500 to-pink-500',
+                  },
+                  {
+                      label: 'Results',
+                      value: stats.filteredParks,
+                      icon: '🔍',
+                      color: 'from-green-500 to-emerald-500',
+                  }
+              ].map((stat, index) => (
+                  <FadeInWrapper key={stat.label} delay={index * 0.1}>
+                      <div className={`bg-gradient-to-br ${stat.color} p-4 rounded-2xl text-white shadow-lg`}>
+                          <div className="flex items-center justify-between mb-2">
+                              <div className={isMobile ? "text-xl" : "text-2xl"}>{stat.icon}</div>
+                          </div>
+                          <div className={`font-bold mb-1 ${isMobile ? 'text-xl' : 'text-2xl'}`}>{stat.value}</div>
+                          <div
+                              className={`text-white/90 font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>{stat.label}</div>
+                      </div>
+                  </FadeInWrapper>
+              ))}
+          </div>
+      </FadeInWrapper>
   );
-
-  // Update the renderNavigationLinks function in Home.jsx
 
   const renderNavigationLinks = () => (
-    <div className="flex flex-wrap justify-center gap-2 md:gap-3 text-sm font-medium mb-6">
-      
-      <Link
-        to="/calendar"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300 transition-all duration-200 shadow-sm hover:shadow-md"
-      >
-        <FaCalendarAlt /> Park Events
-      </Link>
-      
-      <Link
-        to="/blog"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md"
-      >
-        <FaNewspaper /> Blog Stories
-      </Link>
-
-      <Link
-        to="/about"
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
-      >
-        <FaBookOpen /> About
-      </Link>
-
-      {currentUser && (
-        <Link
-          to="/account"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
-        >
-          <FaUser />
-          My Account
-        </Link>
-      )}
-
-      {currentUser ? (
-        <>
-          {userRole === "admin" && (
-            <a
-              href="/admin"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
-            >
-              <FaCogs /> Admin Panel
-            </a>
-          )}
-
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-800 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all duration-200"
+      <div className={`flex flex-wrap justify-center gap-2 text-sm font-medium mb-6 ${isMobile ? 'px-2' : ''}`}>
+          <Link
+              to="/calendar"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300 transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            Logout
-          </button>
-        </>
-      ) : (
-        <Link
-          to="/login"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-        >
-          <FaLock /> Login
-        </Link>
-      )}
-    </div>
-  );
+              <FaCalendarAlt/> Events
+          </Link>
 
-  const renderEnhancedSearch = () => (
-    <FadeInWrapper delay={0.5}>
-      <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-8">
-        {/* Search Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-3 rounded-xl text-white">
-              <FaSearch className="text-xl" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-800">Enhanced Park Discovery</h3>
-              <p className="text-gray-600">Find your perfect adventure</p>
-            </div>
-          </div>
-          
-          <button
-            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-              showAdvancedFilters 
-                ? 'bg-pink-500 text-white' 
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-            }`}
+          <Link
+              to="/blog"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            <FaFilter />
-            <span className="hidden md:inline">Advanced Filters</span>
-          </button>
-        </div>
+              <FaNewspaper/> Blog
+          </Link>
 
-        {/* Enhanced Search Bar */}
-        <div className="relative mb-6">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="Search parks by name, state, features..."
-              value={search}
-              onChange={handleSearchChange}
-              onFocus={() => setShowSearchDropdown(search.length > 0)}
-              onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
-              className="w-full p-3 md:p-4 pl-10 md:pl-12 pr-10 md:pr-12 border-2 border-gray-200 rounded-xl text-sm md:text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
-            />
-            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            {search && (
-              <button
-                onClick={() => {
-                  setSearch('');
-                  setShowSearchDropdown(false);
-                  setSearchResults([]);
-                }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+          <Link
+              to="/about"
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+              <FaBookOpen/> About
+          </Link>
+
+          {currentUser && (
+              <Link
+                  to="/account"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
               >
-                <FaTimes />
-              </button>
-            )}
-          </div>
-
-          {/* Search Dropdown */}
-          {showSearchDropdown && searchResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 bg-white border-2 border-gray-100 rounded-xl shadow-xl max-h-64 overflow-y-auto z-20 mt-2">
-              <div className="p-2">
-                {searchResults.map(park => (
-                  <button
-                    key={park.id}
-                    onClick={() => {
-                      navigate(`/park/${park.slug}?page=${currentPage}`);
-                      setShowSearchDropdown(false);
-                    }}
-                    className="w-full p-3 hover:bg-pink-50 cursor-pointer rounded-lg transition-all text-left flex items-center gap-3"
-                  >
-                    <div className="text-xl">🏞️</div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-gray-800">{park.name}</div>
-                      <div className="text-sm text-gray-600">{park.state}</div>
-                    </div>
-                    <div className="bg-pink-100 text-pink-700 px-2 py-1 rounded-full text-xs">
-                      {park.relevanceScore}% match
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+                  <FaUser/>
+                  Account
+              </Link>
           )}
-        </div>
 
-        {/* Basic Filters Row */}
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <select
-            value={selectedState}
-            onChange={(e) => {
-              setSelectedState(e.target.value);
-              setCurrentPage(1);
-            }}
-            className="flex-1 border-2 border-gray-200 px-4 py-3 rounded-xl text-base focus:outline-none focus:border-pink-400 focus:ring-4 focus:ring-pink-100 transition-all"
-          >
-            {uniqueStates.map((state) => (
-              <option key={state} value={state}>{state === 'All' ? 'All States' : state}</option>
-            ))}
-          </select>
+          {currentUser ? (
+              <>
+                  {userRole === "admin" && (
+                      <a
+                          href="/admin"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-lg"
+                      >
+                          <FaCogs/> Admin
+                      </a>
+                  )}
 
-          <ViewModeToggle viewMode={viewMode} setViewMode={setViewMode} />
-        </div>
-
-        {/* Season Filter Buttons */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {seasons.map((season) => (
-            <button
-              key={season}
-              onClick={() => {
-                setSelectedSeason(season);
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                selectedSeason === season
-                  ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg transform scale-105"
-                  : "bg-white text-pink-600 border-2 border-pink-200 hover:bg-pink-50 hover:border-pink-300"
-              }`}
-            >
-              {season === "Spring" && "🌸 "}
-              {season === "Summer" && "🌞 "}
-              {season === "Fall" && "🍂 "}
-              {season === "Winter" && "❄️ "}
-              {season}
-            </button>
-          ))}
-        </div>
-
-        {/* Results Summary */}
-        <div className="flex items-center justify-between text-sm text-gray-600 border-t border-gray-100 pt-4">
-          <div className="text-sm text-gray-600">
-            Showing {currentParks.length} of {filtered.length} parks
-            {search && ` matching "${search}"`}
-          </div>
-          <div>
-            Page {currentPage} of {totalPages}
-          </div>
-        </div>
+                  <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gray-100 text-gray-800 border border-gray-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all duration-200"
+                  >
+                      Logout
+                  </button>
+              </>
+          ) : (
+              <Link
+                  to="/login"
+                  className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                  <FaLock/> Login
+              </Link>
+          )}
       </div>
-    </FadeInWrapper>
   );
 
   const renderParkContent = () => {
-    if (viewMode === 'map') {
-      return (
-        <FadeInWrapper delay={0.6}>
-          <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 mb-8">
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="text-xl font-bold text-gray-800">Interactive Park Map</h3>
-              <p className="text-gray-600">Click on any marker to learn more about that park</p>
-            </div>
-            <div className="h-96 md:h-[500px]">
-              <MapContainer center={[39.5, -98.35]} zoom={4} scrollWheelZoom={true} className="w-full h-full">
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                {filtered.map((park) => {
-                  if (!park.coordinates?.includes(",")) return null;
-                  const [lat, lng] = park.coordinates.split(",").map((val) => parseFloat(val.trim()));
-                  if (isNaN(lat) || isNaN(lng)) return null;
-                  return (
-                    <Marker key={park.id} position={[lat, lng]}>
-                      <Popup>
-                        <div className="text-center p-2">
-                          <strong className="text-lg">{park.name}</strong><br />
-                          <div className="text-sm text-gray-600 my-2">{park.state}</div>
-                          {park.entryFee && (
-                            <div className="text-sm text-green-600 mb-2">Entry: ${park.entryFee}</div>
-                          )}
-                          <button
-                            onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-                            className="bg-pink-500 text-white px-4 py-2 rounded-lg hover:bg-pink-600 transition text-sm font-medium"
-                          >
-                            View Park →
-                          </button>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  );
-                })}
-              </MapContainer>
-            </div>
-          </div>
-        </FadeInWrapper>
-      );
-    }
-
-    // Grid or List view
-    const isListView = viewMode === 'list';
-    
     return (
-      <FadeInWrapper delay={0.6}>
-        <div className={isListView ? "space-y-4 md:space-y-6" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6"}>
-          {parks.length === 0 ? (
-            Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="animate-pulse bg-gray-200 rounded-xl h-48 w-full shadow-sm" />
-            ))
-          ) : currentParks.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-semibold text-gray-600 mb-2">No parks match your search</h3>
-              <p className="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
-              <button
-                onClick={() => {
-                  setSearch('');
-                  setSelectedState('All');
-                  setSelectedSeason('All');
-                  setFilters({
-                    activities: [],
-                    features: [],
-                    feeRange: '',
-                    difficulty: ''
-                  });
-                }}
-                className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition"
-              >
-                Clear All Filters
-              </button>
-            </div>
-          ) : (
-            currentParks.map((park, idx) => (
-              <FadeInWrapper key={park.id} delay={idx * 0.1}>
-                {isListView ? (
-                  // List view component
-                  <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 flex items-center gap-6">
-                    <div className="w-20 h-20 bg-gradient-to-br from-pink-200 to-purple-200 rounded-xl flex items-center justify-center text-3xl flex-shrink-0">
-                      🏞️
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">{park.name}</h3>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                        <span className="flex items-center gap-1">
-                          <FaMapMarkerAlt className="text-pink-500" />
-                          {park.state}
-                        </span>
-                        {park.bestSeason && (
-                          <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                            Best: {park.bestSeason}
-                          </span>
-                        )}
-                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-medium">
-                          Entry: {park.entryFee && park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
-                        </span>
-                        {park.hours && (
-                          <span className="bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                            <FaClock className="inline mr-1" />
-                            {park.hours}
-                          </span>
-                        )}
-                      </div>
-                      {park.highlight && (
-                        <p className="text-gray-600 text-sm line-clamp-2">
-                          <span className="font-medium text-purple-600">Highlight:</span> {park.highlight}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2 flex-shrink-0">
-                      <button
-                        onClick={() => navigate(`/park/${park.slug}?page=${currentPage}`)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-sm font-medium"
-                      >
-                        <FaEye className="inline mr-2" />
-                        View
-                      </button>
-                      <button
-                        onClick={() => handlePlanTrip(park)}
-                        className="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition text-sm font-medium"
-                      >
-                        <FaRoute className="inline mr-2" />
-                        Plan Trip
-                      </button>
-                      {currentUser && (
+        <FadeInWrapper delay={0.6}>
+            <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}>
+                {parks.length === 0 ? (
+                    Array.from({length: isMobile ? 3 : 6}).map((_, i) => (
+                        <div key={i} className="animate-pulse bg-gray-200 rounded-xl h-48 w-full shadow-sm"/>
+                    ))
+                ) : currentParks.length === 0 ? (
+                    <div className="col-span-full text-center py-12">
+                        <div className="text-6xl mb-4">🔍</div>
+                        <h3 className="text-xl font-semibold text-gray-600 mb-2">No parks match your search</h3>
+                        <p className="text-gray-500 mb-4">Try adjusting your filters or search terms</p>
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleFavorite(park.id);
-                          }}
-                          className={`px-4 py-2 rounded-lg transition text-sm font-medium ${
-                            favorites.includes(park.id)
-                              ? "bg-red-100 text-red-600 hover:bg-red-200"
-                              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                          }`}
+                            onClick={() => {
+                                setSearch('');
+                                setSelectedState('All');
+                                setSelectedSeason('All');
+                                setFilters({
+                                    activities: [],
+                                    features: [],
+                                    feeRange: '',
+                                    difficulty: ''
+                                });
+                            }}
+                            className="px-6 py-3 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition"
                         >
-                          <FaHeart className="inline mr-2" />
-                          {favorites.includes(park.id) ? 'Saved' : 'Save'}
+                            Clear All Filters
                         </button>
-                      )}
                     </div>
-                  </div>
                 ) : (
-                  // Grid view - use enhanced park card
-                  <EnhancedParkCard
-                    park={park}
-                    isFavorite={favorites.includes(park.id)}
-                    onToggleFavorite={toggleFavorite}
-                    currentUser={currentUser}
-                    currentPage={currentPage}
-                    onPlanTrip={handlePlanTrip}
-                  />
+                    currentParks.map((park, idx) => (
+                        <FadeInWrapper key={park.id} delay={idx * 0.1}>
+                            <EnhancedMobileParkCard
+                                park={park}
+                                isFavorite={favorites.includes(park.id)}
+                                onToggleFavorite={toggleFavorite}
+                                currentUser={currentUser}
+                                currentPage={currentPage}
+                                onPlanTrip={handlePlanTrip}
+                            />
+                        </FadeInWrapper>
+                    ))
                 )}
-              </FadeInWrapper>
-            ))
-          )}
-        </div>
-      </FadeInWrapper>
+            </div>
+        </FadeInWrapper>
     );
   };
 
   const renderPagination = () => {
     if (totalPages <= 1) return null;
-    
+
     return (
-      <FadeInWrapper delay={0.7}>
-        <div className="flex flex-wrap justify-center items-center gap-2 mt-10 mb-16 px-4">
-          {/* Previous button */}
-          <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-white text-pink-600 border-pink-400 hover:bg-pink-50 disabled:hover:bg-white"
-          >
-            Previous
-          </button>
+        <FadeInWrapper delay={0.7}>
+            <div className="flex flex-wrap justify-center items-center gap-2 mt-8 mb-8 px-4">
+                {/* Previous button */}
+                <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-white text-pink-600 border-pink-400 hover:bg-pink-50 disabled:hover:bg-white min-h-[44px]"
+                >
+                    Previous
+                </button>
 
-          {/* Page numbers */}
-          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-            let pageNum;
-            if (totalPages <= 7) {
-              pageNum = i + 1;
-            } else if (currentPage <= 4) {
-              pageNum = i + 1;
-            } else if (currentPage >= totalPages - 3) {
-              pageNum = totalPages - 6 + i;
-            } else {
-              pageNum = currentPage - 3 + i;
-            }
+                {/* Page numbers - show fewer on mobile */}
+                {Array.from({length: Math.min(totalPages, isMobile ? 5 : 7)}, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= (isMobile ? 5 : 7)) {
+                        pageNum = i + 1;
+                    } else if (currentPage <= (isMobile ? 3 : 4)) {
+                        pageNum = i + 1;
+                    } else if (currentPage >= totalPages - (isMobile ? 2 : 3)) {
+                        pageNum = totalPages - (isMobile ? 4 : 6) + i;
+                    } else {
+                        pageNum = currentPage - (isMobile ? 2 : 3) + i;
+                    }
 
-            return (
-              <button
-                key={pageNum}
-                onClick={() => setCurrentPage(pageNum)}
-                className={`min-w-[44px] px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out ${
-                  currentPage === pageNum
-                    ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white border-transparent shadow-lg transform scale-105"
-                    : "bg-white text-pink-600 border-pink-300 hover:bg-pink-50 hover:border-pink-400"
-                }`}
-              >
-                {pageNum}
-              </button>
-            );
-          })}
+                    return (
+                        <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`min-w-[44px] px-3 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out ${
+                                currentPage === pageNum
+                                    ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white border-transparent shadow-lg transform scale-105"
+                                    : "bg-white text-pink-600 border-pink-300 hover:bg-pink-50 hover:border-pink-400"
+                            }`}
+                        >
+                            {pageNum}
+                        </button>
+                    );
+                })}
 
-          {/* Next button */}
-          <button
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-white text-pink-600 border-pink-400 hover:bg-pink-50 disabled:hover:bg-white"
-          >
-            Next
-          </button>
-        </div>
-      </FadeInWrapper>
+                {/* Next button */}
+                <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 rounded-full text-sm font-semibold shadow-sm border transition duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed bg-white text-pink-600 border-pink-400 hover:bg-pink-50 disabled:hover:bg-white min-h-[44px]"
+                >
+                    Next
+                </button>
+            </div>
+        </FadeInWrapper>
     );
   };
 
-  // ===== MAIN RENDER =====
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
-          
-          {/* Hero Section */}
-          <div className="p-6 md:p-8">
-            {renderHeroSection()}
-            
-            {/* Navigation Links */}
-            {renderNavigationLinks()}
-                        
-            {/* Quick Actions */}
-            <QuickActions 
-              favorites={favorites} 
-              onActionClick={handleQuickAction}
-              currentUser={currentUser}
-            />
-          </div>
+    // Effects
+    useEffect(() => {
+        setSearchParams({page: currentPage});
+    }, [currentPage, setSearchParams]);
 
-          {/* Main Content Area */}
-          <div className="p-6 md:p-8">
-            {/* Enhanced Search & Filters */}
-            {renderEnhancedSearch()}
-            
-            {/* Advanced Filters Sidebar */}
-            <div className="flex gap-8">
-              {showAdvancedFilters && (
-                <div className="w-80 flex-shrink-0 hidden lg:block">
-                  <FilterSidebar 
-                    onFilterChange={handleFilterChange}
-                    filters={filters}
-                    parks={parks}
-                  />
-                </div>
-              )}
-              
-              {/* Parks Content */}
-              <div className="flex-1">
-                {renderParkContent()}
-                
-                {/* Pagination */}
-                {renderPagination()}
+    useEffect(() => {
+        window.scrollTo({top: 0, behavior: "smooth"});
+    }, []);
+
+    // Main Render
+  return (
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+              <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
+
+                  {/* Hero Section */}
+                  <div className="p-4 md:p-6">
+                      {renderHeroSection()}
+
+                      {/* Navigation Links */}
+                      {renderNavigationLinks()}
+
+                      {/* Stats Cards */}
+                      {renderStatsCards()}
+
+                      {/* Quick Actions */}
+                      <QuickActions
+                          favorites={favorites}
+                          onActionClick={handleQuickAction}
+                          currentUser={currentUser}
+                      />
+                  </div>
+
+                  {/* Main Content Area */}
+                  <div className="p-4 md:p-6">
+                      {/* Enhanced Search & Filters */}
+                      <MobileEnhancedSearch
+                          search={search}
+                          onSearchChange={handleSearchChange}
+                          selectedState={selectedState}
+                          setSelectedState={setSelectedState}
+                          selectedSeason={selectedSeason}
+                          setSelectedSeason={setSelectedSeason}
+                          uniqueStates={uniqueStates}
+                          seasons={seasons}
+                          showAdvancedFilters={showAdvancedFilters}
+                          setShowAdvancedFilters={setShowAdvancedFilters}
+                          filters={filters}
+                          onFilterChange={handleFilterChange}
+                          filtered={filtered}
+                          currentPage={currentPage}
+                          totalPages={totalPages}
+                          searchResults={searchResults}
+                          showSearchDropdown={showSearchDropdown}
+                          setShowSearchDropdown={setShowSearchDropdown}
+                      />
+
+                      {/* Parks Content */}
+                      {renderParkContent()}
+
+                      {/* Pagination */}
+                      {renderPagination()}
+                  </div>
               </div>
-            </div>
           </div>
-        </div>
       </div>
-    </div>
   );
 };
 
-export default Home;
+export default EnhancedMobileHome;
