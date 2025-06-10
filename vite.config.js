@@ -7,18 +7,15 @@ export default defineConfig({
     plugins: [
         react(),
         VitePWA({
-            // ✅ FIX: Use generateSW strategy for simpler setup
             strategies: 'generateSW',
             registerType: 'autoUpdate',
             injectRegister: 'auto',
 
-            // ✅ FIX: Correct file paths and names
             includeAssets: ['favicon.ico', 'robots.txt'],
 
-            // ✅ FIX: Use standard manifest.json (not .webmanifest)
-            manifestFilename: 'manifest.json',
+            // ✅ FIX: Change to match Vercel config
+            manifestFilename: 'manifest.webmanifest',
 
-            // ✅ FIX: Working directory structure
             workbox: {
                 globPatterns: [
                     '**/*.{js,css,html,ico,png,svg,json,woff2}',
@@ -31,9 +28,9 @@ export default defineConfig({
                     '**/.git/**/*',
                     '**/coverage/**/*',
                     '**/*.map',
-                    '**/firebase-messaging-sw.js' // Keep Firebase SW separate
+                    '**/firebase-messaging-sw.js'
                 ],
-                maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+                maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
                 runtimeCaching: [
                     {
                         urlPattern: /^https:\/\/api\.nps\.gov\/.*/,
@@ -42,7 +39,7 @@ export default defineConfig({
                             cacheName: 'nps-api-cache',
                             expiration: {
                                 maxEntries: 100,
-                                maxAgeSeconds: 24 * 60 * 60, // 24 hours
+                                maxAgeSeconds: 24 * 60 * 60,
                             },
                         },
                     },
@@ -53,14 +50,13 @@ export default defineConfig({
                             cacheName: 'firestore-cache',
                             expiration: {
                                 maxEntries: 50,
-                                maxAgeSeconds: 5 * 60, // 5 minutes
+                                maxAgeSeconds: 5 * 60,
                             },
                         },
                     },
                 ],
             },
 
-            // ✅ FIX: Simplified and working manifest
             manifest: {
                 name: 'National Parks Trip Planner',
                 short_name: 'Trip Planner',
@@ -72,7 +68,6 @@ export default defineConfig({
                 theme_color: '#ec4899',
                 orientation: 'portrait-primary',
 
-                // ✅ Icons using your actual files
                 icons: [
                     {
                         src: '/favicon.ico',
@@ -93,7 +88,6 @@ export default defineConfig({
                     }
                 ],
 
-                // ✅ Screenshots using your actual files
                 screenshots: [
                     {
                         src: '/screenshots/screen1.png',
@@ -111,7 +105,6 @@ export default defineConfig({
                     }
                 ],
 
-                // ✅ FIX: Basic shortcuts for existing routes
                 shortcuts: [
                     {
                         name: 'Explore Parks',
@@ -127,7 +120,6 @@ export default defineConfig({
                 ]
             },
 
-            // ✅ FIX: Development options
             devOptions: {
                 enabled: process.env.NODE_ENV === 'development',
                 type: 'module',
@@ -136,7 +128,6 @@ export default defineConfig({
         })
     ],
 
-    // ✅ FIX: Simplified define options
     define: {
         global: 'globalThis',
         __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
@@ -144,7 +135,6 @@ export default defineConfig({
         __DEV__: JSON.stringify(process.env.NODE_ENV === 'development')
     },
 
-    // ✅ FIX: Build configuration
     build: {
         sourcemap: true,
         target: 'es2015',
@@ -170,7 +160,6 @@ export default defineConfig({
         }
     },
 
-    // ✅ FIX: Server configuration
     server: {
         port: 3000,
         host: true,
