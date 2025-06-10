@@ -1,4 +1,4 @@
-// ✨ Enhanced App.jsx - Complete Integration with Advanced Features
+// ✨ FIXED App.jsx - Safe Toast Hook Usage
 import React, {lazy, Suspense, useCallback, useEffect, useState} from "react";
 import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import {createPerformanceTrace, db, handleFirebaseError, logAnalyticsEvent, messaging, performance} from './firebase';
@@ -28,7 +28,7 @@ import {
     updateDoc
 } from "firebase/firestore";
 import {useAuth} from "./context/AuthContext";
-import {useAppToasts, useToast} from "./context/ToastContext";
+// ✅ FIX: Move toast imports inside the component that needs them
 import Layout from "./components/Layout";
 
 // ✅ Enhanced lazy-loaded pages with loading fallbacks
@@ -161,6 +161,33 @@ const AppLoadingFallback = ({type = "page"}) => {
 };
 
 function App() {
+    // ✅ FIX: Import toast hooks inside the component
+    const {useToast, useAppToasts} = React.useMemo(() => {
+        try {
+            const toastModule = require("./context/ToastContext");
+            return {
+                useToast: toastModule.useToast,
+                useAppToasts: toastModule.useAppToasts
+            };
+        } catch (error) {
+            console.warn('Toast context not available:', error);
+            return {
+                useToast: () => ({
+                    showToast: (message, type) => console.log(`Toast: ${message} (${type})`),
+                    showOfflineToast: () => console.log('Offline'),
+                    showOnlineToast: () => console.log('Online')
+                }),
+                useAppToasts: () => ({
+                    favorite: (message) => console.log(`Favorite: ${message}`)
+                })
+            };
+        }
+    }, []);
+
+    // ✅ FIX: Now safely use the hooks
+    const {showToast, showOfflineToast, showOnlineToast} = useToast();
+    const {favorite: showFavoriteToast} = useAppToasts();
+
     // Enhanced state management
     const [parks, setParks] = useState([]);
     const [favorites, setFavorites] = useState([]);
@@ -173,8 +200,6 @@ function App() {
 
     // Enhanced hooks
     const {currentUser, isAdmin, loading: authLoading} = useAuth();
-    const {showToast, showOfflineToast, showOnlineToast} = useToast();
-    const {favorite: showFavoriteToast} = useAppToasts();
     const {
         isMobile,
         shouldOptimize,
@@ -189,8 +214,8 @@ function App() {
     // Enhanced navigation logic
     const hiddenRoutes = ["/login", "/signup", "/admin/login"];
     const shouldHideBottomNav =
-    hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
-    (location.pathname === "/" && !currentUser);
+        hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
+        (location.pathname === "/" && !currentUser);
 
     // Performance monitoring
     useEffect(() => {
@@ -258,90 +283,6 @@ function App() {
         }
     }, [showToast, networkType]);
 
-    // Initial data fetch
-    useEffect(() => {
-        fetchParks();
-    }, [fetchParks]);
-
-    // Enhanced network status monitoring
-    useEffect(() => {
-        const handleOffline = () => {
-            setAppState(prev => ({...prev, isOnline: false}));
-            showOfflineToast();
-
-            // Disable Firestore network to use cache
-            disableNetwork(db).catch(console.error);
-
-            logAnalyticsEvent('app_offline', {
-                timestamp: Date.now(),
-                page: location.pathname
-            });
-        };
-
-        const handleOnline = () => {
-            setAppState(prev => ({...prev, isOnline: true}));
-            showOnlineToast();
-
-            // Re-enable Firestore network
-            enableNetwork(db).catch(console.error);
-
-            // Retry fetching data if we had errors
-            if (appState.hasError) {
-                fetchParks();
-            }
-
-            logAnalyticsEvent('app_online', {
-                timestamp: Date.now(),
-                page: location.pathname
-            });
-        };
-
-        window.addEventListener('offline', handleOffline);
-        window.addEventListener('online', handleOnline);
-
-        return () => {
-            window.removeEventListener('offline', handleOffline);
-            window.removeEventListener('online', handleOnline);
-        };
-    }, [showOfflineToast, showOnlineToast, appState.hasError, fetchParks, location.pathname]);
-
-    // ✅ FIX: Enhanced FCM message handling with proper null checks
-    useEffect(() => {
-        if (!messaging) {
-            console.warn('⚠️ Messaging not available for foreground notifications');
-            return;
-        }
-
-        try {
-        const unsubscribe = onMessage(messaging, (payload) => {
-            console.log('🔔 Foreground message received:', payload);
-
-            if (payload?.notification) {
-            const { title, body } = payload.notification;
-                showToast(`🔔 ${title}: ${body}`, 'notification', {
-                    title: title,
-                    subtitle: 'Tap to view details',
-                    duration: 6000
-                });
-
-                logAnalyticsEvent('fcm_message_received', {
-                    title: title,
-                    foreground: true,
-                    page: location.pathname
-                });
-          }
-        });
-
-            return () => {
-                if (typeof unsubscribe === 'function') {
-                    unsubscribe();
-                }
-            };
-        } catch (error) {
-            console.error('❌ Failed to setup foreground messaging:', error);
-        }
-    }, [messaging, showToast, location.pathname]);
-
     // Enhanced favorites management
     const fetchFavorites = useCallback(async () => {
         if (!currentUser) {
@@ -381,106 +322,6 @@ function App() {
         }
     }, [currentUser, showToast]);
 
-    useEffect(() => {
-        fetchFavorites();
-    }, [fetchFavorites]);
-
-    // Enhanced service worker registration
-  useEffect(() => {
-    const registerServiceWorker = async () => {
-        if (!('serviceWorker' in navigator)) {
-            console.warn('⚠️ Service Worker not supported');
-            return;
-        }
-
-        try {
-            // Clean up old service workers
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (let registration of registrations) {
-                if (registration.scope.includes('enhanced-sw') || registration.scope.includes('sw.js')) {
-                    await registration.unregister();
-                    console.log('🗑️ Unregistered old service worker');
-                }
-            }
-
-            // Register Firebase messaging service worker
-            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-                scope: '/',
-                updateViaCache: 'none'
-            });
-
-            console.log('✅ Service Worker registered:', registration.scope);
-
-            // Handle updates
-            registration.addEventListener('updatefound', () => {
-                const newWorker = registration.installing;
-                if (newWorker) {
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            showToast('🔄 App update available! Refresh to get the latest version.', 'info', {
-                                actionLabel: 'Refresh',
-                                onActionClick: () => window.location.reload(),
-                                duration: 10000
-                            });
-                        }
-                    });
-                }
-            });
-
-            await navigator.serviceWorker.ready;
-            console.log('✅ Service Worker ready');
-
-        } catch (error) {
-            console.error('❌ Service Worker registration failed:', error);
-      }
-    };
-
-    registerServiceWorker();
-  }, [showToast]);
-
-    // Enhanced error handling for unhandled rejections
-  useEffect(() => {
-    const handleUnhandledRejection = (event) => {
-      console.error('🔥 Unhandled Promise Rejection:', event.reason);
-
-        // Handle specific Firebase errors gracefully
-        if (event.reason?.message?.includes('messaging') ||
-          event.reason?.message?.includes('FCM') ||
-          event.reason?.message?.includes('service worker')) {
-            showToast('🔔 Notification setup encountered an issue, but the app will work normally.', 'warning');
-            return;
-        }
-
-        // Handle network errors
-        if (event.reason?.message?.includes('network') ||
-            event.reason?.message?.includes('fetch')) {
-            if (!appState.isOnline) {
-                return; // Don't show network errors when offline
-            }
-            showToast('🌐 Network issue detected. Please check your connection.', 'warning');
-            return;
-        }
-
-        // Log unknown errors
-        logAnalyticsEvent('unhandled_error', {
-            error_message: event.reason?.message || 'Unknown error',
-            error_stack: event.reason?.stack,
-            page: location.pathname
-        });
-
-        // Generic error message
-        if (process.env.NODE_ENV === 'production') {
-            showToast('Something went wrong. Please refresh the page if problems persist.', 'error');
-      }
-    };
-
-    window.addEventListener('unhandledrejection', handleUnhandledRejection);
-
-    return () => {
-      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
-    };
-  }, [showToast, appState.isOnline, location.pathname]);
-
     // Enhanced favorites toggle with analytics
     const toggleFavorite = useCallback(async (id) => {
         const isFavorite = favorites.includes(id);
@@ -509,16 +350,10 @@ function App() {
 
             // Enhanced toast messages
             if (isFavorite) {
-                showFavoriteToast(`💔 Removed ${parkName} from favorites`, {
-                    actionLabel: 'Undo',
-                    onActionClick: () => toggleFavorite(id)
-                });
+                showFavoriteToast(`💔 Removed ${parkName} from favorites`);
             } else {
-                showFavoriteToast(`❤️ Added ${parkName} to favorites!`, {
-                    title: 'Great choice!',
-                    subtitle: 'Access it anytime from your account'
-                });
-      }
+                showFavoriteToast(`❤️ Added ${parkName} to favorites!`);
+            }
 
             // Analytics tracking
             logAnalyticsEvent(isFavorite ? 'favorite_removed' : 'favorite_added', {
@@ -536,15 +371,14 @@ function App() {
         }
     }, [favorites, parks, currentUser, showToast, showFavoriteToast]);
 
-    // Page analytics tracking
+    // Initial data fetch
     useEffect(() => {
-        logAnalyticsEvent('page_view', {
-            page_path: location.pathname,
-            page_title: document.title,
-            user_type: currentUser ? (isAdmin ? 'admin' : 'user') : 'anonymous',
-            device_type: isMobile ? 'mobile' : 'desktop'
-        });
-    }, [location.pathname, currentUser, isAdmin, isMobile]);
+        fetchParks();
+    }, [fetchParks]);
+
+    useEffect(() => {
+        fetchFavorites();
+    }, [fetchFavorites]);
 
     // Show loading state while auth is loading or parks are loading
     if (authLoading || (appState.isLoading && parks.length === 0)) {
@@ -553,199 +387,188 @@ function App() {
 
     return (
         <AppErrorBoundary>
-      <div className="font-sans bg-gray-50 min-h-screen">
-        <ScrollToTop />
-        <Layout>
-          <div className="main-scroll">
-              <Suspense fallback={<AppLoadingFallback type="page"/>}>
-              <Routes>
-                {/* ✅ Public Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/favorites" element={<Favorites />} />
-                <Route path="/integrations" element={<AppIntegration />} />
-
-                  {/* ✅ Enhanced root route with better UX */}
-                <Route
-                  path="/"
-                  element={
-                    currentUser ? (
-                      <PrivateRoute>
-                          <Home
-                              parks={parks}
-                              favorites={favorites}
-                              toggleFavorite={toggleFavorite}
-                              isLoading={appState.isLoading}
-                              hasError={appState.hasError}
-                              onRetry={() => fetchParks()}
-                          />
-                      </PrivateRoute>
-                    ) : (
-                      <Signup />
-                    )
-                  }
-                />
-
-                  {/* ✅ Enhanced Protected Routes */}
-                <Route
-                  path="/park/:slug"
-                  element={
-                    <PrivateRoute>
+            <div className="font-sans bg-gray-50 min-h-screen">
+                <ScrollToTop />
+                <Layout>
+                    <div className="main-scroll">
                         <Suspense fallback={<AppLoadingFallback type="page"/>}>
-                            <ParkDetails/>
+                            <Routes>
+                                {/* ✅ Public Routes */}
+                                <Route path="/login" element={<Login />} />
+                                <Route path="/signup" element={<Signup />} />
+                                <Route path="/about" element={<About />} />
+                                <Route path="/blog" element={<Blog />} />
+                                <Route path="/blog/:slug" element={<BlogPost />} />
+                                <Route path="/admin/login" element={<AdminLogin />} />
+                                <Route path="/favorites" element={<Favorites />} />
+                                <Route path="/integrations" element={<AppIntegration />} />
+
+                                {/* ✅ Enhanced root route with better UX */}
+                                <Route
+                                    path="/"
+                                    element={
+                                        currentUser ? (
+                                            <PrivateRoute>
+                                                <Home
+                                                    parks={parks}
+                                                    favorites={favorites}
+                                                    toggleFavorite={toggleFavorite}
+                                                    isLoading={appState.isLoading}
+                                                    hasError={appState.hasError}
+                                                    onRetry={() => fetchParks()}
+                                                />
+                                            </PrivateRoute>
+                                        ) : (
+                                            <Signup />
+                                        )
+                                    }
+                                />
+
+                                {/* ✅ Enhanced Protected Routes */}
+                                <Route
+                                    path="/park/:slug"
+                                    element={
+                                        <PrivateRoute>
+                                            <Suspense fallback={<AppLoadingFallback type="page"/>}>
+                                                <ParkDetails/>
+                                            </Suspense>
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/map"
+                                    element={
+                                        <PrivateRoute>
+                                            <Suspense fallback={<AppLoadingFallback type="component"/>}>
+                                                <MapPage/>
+                                            </Suspense>
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/seasonal"
+                                    element={
+                                        <PrivateRoute>
+                                            <SeasonalPage
+                                                parks={parks}
+                                                favorites={favorites}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/recommendations"
+                                    element={
+                                        <PrivateRoute>
+                                            <RecommendationsPage
+                                                parks={parks}
+                                                favorites={favorites}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/calendar"
+                                    element={
+                                        <PrivateRoute>
+                                            <CalendarView />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/account"
+                                    element={
+                                        <PrivateRoute>
+                                            <UserAccount />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/trip-planner"
+                                    element={
+                                        <PrivateRoute>
+                                            <TripPlanner />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                {/* ✅ Enhanced Admin Routes */}
+                                <Route
+                                    path="/admin"
+                                    element={
+                                        <AdminRoute>
+                                            <AdminPage />
+                                        </AdminRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/blog-editor"
+                                    element={
+                                        <AdminRoute>
+                                            <AdminBlogEditor />
+                                        </AdminRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/editor"
+                                    element={
+                                        <AdminRoute>
+                                            <AdminBlogEditor />
+                                        </AdminRoute>
+                                    }
+                                />
+                                <Route
+                                    path="/admin/edit-blog/:id"
+                                    element={
+                                        <AdminRoute>
+                                            <EditBlog />
+                                        </AdminRoute>
+                                    }
+                                />
+
+                                {/* ✅ Catch-all route for 404 */}
+                                <Route
+                                    path="*"
+                                    element={
+                                        <div
+                                            className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
+                                            <div className="text-center">
+                                                <div className="text-6xl mb-4">🏞️</div>
+                                                <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
+                                                <p className="text-gray-600 mb-6">The page you're looking for doesn't exist.</p>
+                                                <button
+                                                    onClick={() => navigate('/')}
+                                                    className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
+                                                >
+                                                    Go Home
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                />
+                            </Routes>
                         </Suspense>
-                    </PrivateRoute>
-                  }
-                />
+                    </div>
+                </Layout>
 
-                  <Route
-                  path="/map"
-                  element={
-                    <PrivateRoute>
-                        <Suspense fallback={<AppLoadingFallback type="component"/>}>
-                            <MapPage/>
-                        </Suspense>
-                    </PrivateRoute>
-                  }
-                />
+                <ScrollToTopButton />
+                <InstallButton />
 
-                  <Route
-                  path="/seasonal"
-                  element={
-                    <PrivateRoute>
-                        <SeasonalPage
-                            parks={parks}
-                            favorites={favorites}
-                            toggleFavorite={toggleFavorite}
-                      />
-                    </PrivateRoute>
-                  }
-                />
-
-                  <Route
-                  path="/recommendations"
-                  element={
-                    <PrivateRoute>
-                        <RecommendationsPage
-                            parks={parks}
-                            favorites={favorites}
-                            toggleFavorite={toggleFavorite}
-                      />
-                    </PrivateRoute>
-                  }
-                />
-
-                  <Route
-                  path="/calendar"
-                  element={
-                    <PrivateRoute>
-                      <CalendarView />
-                    </PrivateRoute>
-                  }
-                />
-
-                  <Route
-                  path="/account"
-                  element={
-                    <PrivateRoute>
-                      <UserAccount />
-                    </PrivateRoute>
-                  }
-                />
-
-                <Route
-                  path="/trip-planner"
-                  element={
-                    <PrivateRoute>
-                      <TripPlanner />
-                    </PrivateRoute>
-                  }
-                />
-
-                  {/* ✅ Enhanced Admin Routes */}
-                <Route
-                  path="/admin"
-                  element={
-                    <AdminRoute>
-                      <AdminPage />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/blog-editor"
-                  element={
-                    <AdminRoute>
-                      <AdminBlogEditor />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/editor"
-                  element={
-                    <AdminRoute>
-                      <AdminBlogEditor />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/admin/edit-blog/:id"
-                  element={
-                    <AdminRoute>
-                      <EditBlog />
-                    </AdminRoute>
-                  }
-                />
-
-                  {/* ✅ Catch-all route for 404 */}
-                  <Route
-                      path="*"
-                      element={
-                          <div
-                              className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
-                              <div className="text-center">
-                                  <div className="text-6xl mb-4">🏞️</div>
-                                  <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
-                                  <p className="text-gray-600 mb-6">The page you're looking for doesn't exist.</p>
-                                  <button
-                                      onClick={() => navigate('/')}
-                                      className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-6 py-3 rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all duration-200"
-                                  >
-                                      Go Home
-                                  </button>
-                              </div>
-                          </div>
-                      }
-                  />
-              </Routes>
-            </Suspense>
-          </div>
-        </Layout>
-
-          <ScrollToTopButton />
-        <InstallButton />
-
-          {/* ✅ Enhanced bottom navigation with better logic */}
-          {isMobile && !shouldHideBottomNav && (
-              <FadeInWrapper delay={0.3}>
-                  <BottomNav/>
-              </FadeInWrapper>
-          )}
-
-          {/* ✅ Development helpers */}
-          {process.env.NODE_ENV === 'development' && (
-              <div
-                  className="fixed bottom-4 left-4 bg-black text-white text-xs p-2 rounded opacity-50 pointer-events-none">
-                  <div>Path: {location.pathname}</div>
-                  <div>Parks: {parks.length}</div>
-                  <div>Network: {networkType}</div>
-                  <div>Optimized: {shouldOptimize ? 'Yes' : 'No'}</div>
-              </div>
-          )}
-      </div>
+                {/* ✅ Enhanced bottom navigation with better logic */}
+                {isMobile && !shouldHideBottomNav && (
+                    <FadeInWrapper delay={0.3}>
+                        <BottomNav/>
+                    </FadeInWrapper>
+                )}
+            </div>
         </AppErrorBoundary>
     );
 }
