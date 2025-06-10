@@ -1,11 +1,11 @@
-// ✨ Enhanced ToastContext.jsx - Advanced Notification System
+// ✨ FIXED ToastContext.jsx - Safe useToast Hook
 import React, { createContext, useContext, useCallback, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaCheckCircle, 
-  FaExclamationTriangle, 
-  FaInfoCircle, 
-  FaTimes, 
+import {
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaInfoCircle,
+  FaTimes,
   FaExclamationCircle,
   FaHeart,
   FaStar,
@@ -19,16 +19,38 @@ import {
 } from "react-icons/fa";
 import { MdWifiOff } from "react-icons/md";
 
-const ToastContext = createContext();
+const ToastContext = createContext(null);
 
 /**
- * Hook to access the enhanced toast context
+ * ✅ FIXED: Safe hook to access the enhanced toast context
  */
 export const useToast = () => {
   const context = useContext(ToastContext);
+
+  // ✅ FIX: Return safe fallback instead of throwing error
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    console.warn('useToast called outside ToastProvider - using fallback methods');
+    return {
+      showToast: (message, type = 'info', options = {}) => {
+        console.log(`[Toast ${type.toUpperCase()}]: ${message}`, options);
+      },
+      removeToast: () => {},
+      clearAllToasts: () => {},
+      showSuccessToast: (message, options) => console.log(`[SUCCESS]: ${message}`, options),
+      showErrorToast: (message, options) => console.log(`[ERROR]: ${message}`, options),
+      showWarningToast: (message, options) => console.log(`[WARNING]: ${message}`, options),
+      showInfoToast: (message, options) => console.log(`[INFO]: ${message}`, options),
+      showFavoriteToast: (message, options) => console.log(`[FAVORITE]: ${message}`, options),
+      showTripToast: (message, options) => console.log(`[TRIP]: ${message}`, options),
+      showReviewToast: (message, options) => console.log(`[REVIEW]: ${message}`, options),
+      showLocationToast: (message, options) => console.log(`[LOCATION]: ${message}`, options),
+      showOfflineToast: () => console.log('[OFFLINE]: You are offline'),
+      showOnlineToast: () => console.log('[ONLINE]: Back online'),
+      toasts: [],
+      toastCount: 0
+    };
   }
+
   return context;
 };
 
@@ -184,26 +206,26 @@ const toastVariants = {
 };
 
 // Enhanced Toast Component
-const Toast = ({ 
-  id, 
-  message, 
-  type = "info", 
-  duration, 
-  onClose, 
-  position = "top-right",
-  showProgress = true,
-  persistent = false,
-  action,
-  actionLabel,
-  onActionClick,
-  title,
-  subtitle,
-  customIcon,
-  className = ""
-}) => {
+const Toast = ({
+                 id,
+                 message,
+                 type = "info",
+                 duration,
+                 onClose,
+                 position = "top-right",
+                 showProgress = true,
+                 persistent = false,
+                 action,
+                 actionLabel,
+                 onActionClick,
+                 title,
+                 subtitle,
+                 customIcon,
+                 className = ""
+               }) => {
   const [progress, setProgress] = useState(100);
   const [isPaused, setIsPaused] = useState(false);
-  
+
   const config = toastConfig[type] || toastConfig.info;
   const Icon = customIcon || config.icon;
   const toastDuration = duration || config.duration;
@@ -216,12 +238,12 @@ const Toast = ({
       setProgress((prev) => {
         const decrement = 100 / (toastDuration / 50);
         const newProgress = prev - decrement;
-        
+
         if (newProgress <= 0) {
           onClose(id);
           return 0;
         }
-        
+
         return newProgress;
       });
     }, 50);
@@ -237,115 +259,99 @@ const Toast = ({
   };
 
   return (
-    <motion.div
-      layout
-      variants={toastVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      custom={position}
-      className={`
+      <motion.div
+          layout
+          variants={toastVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          custom={position}
+          className={`
         relative max-w-sm w-full pointer-events-auto overflow-hidden rounded-2xl shadow-lg border-2
         ${config.bgColor} backdrop-blur-sm bg-opacity-90
         ${className}
       `}
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-    >
-      {/* Progress bar */}
-      {showProgress && !persistent && toastDuration > 0 && (
-        <div className="absolute top-0 left-0 h-1 bg-gray-200 w-full">
-          <motion.div
-            className={`h-full bg-gradient-to-r ${config.color}`}
-            style={{ width: `${progress}%` }}
-            transition={{ duration: 0.1, ease: "linear" }}
-          />
-        </div>
-      )}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+      >
+        {/* Progress bar */}
+        {showProgress && !persistent && toastDuration > 0 && (
+            <div className="absolute top-0 left-0 h-1 bg-gray-200 w-full">
+              <motion.div
+                  className={`h-full bg-gradient-to-r ${config.color}`}
+                  style={{ width: `${progress}%` }}
+                  transition={{ duration: 0.1, ease: "linear" }}
+              />
+            </div>
+        )}
 
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          {/* Icon */}
-          <div className={`flex-shrink-0 ${config.iconColor}`}>
-            <Icon className="text-xl" />
-          </div>
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            {/* Icon */}
+            <div className={`flex-shrink-0 ${config.iconColor}`}>
+              <Icon className="text-xl" />
+            </div>
 
-          {/* Content */}
-          <div className="flex-1 min-w-0">
-            {title && (
-              <h4 className={`font-semibold ${config.textColor} mb-1`}>
-                {title}
-              </h4>
-            )}
-            
-            <p className={`${config.textColor} text-sm leading-relaxed`}>
-              {message}
-            </p>
-            
-            {subtitle && (
-              <p className={`${config.textColor} text-xs opacity-75 mt-1`}>
-                {subtitle}
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+              {title && (
+                  <h4 className={`font-semibold ${config.textColor} mb-1`}>
+                    {title}
+                  </h4>
+              )}
+
+              <p className={`${config.textColor} text-sm leading-relaxed`}>
+                {message}
               </p>
-            )}
 
-            {/* Action button */}
-            {action && actionLabel && (
-              <button
-                onClick={handleActionClick}
-                className={`
+              {subtitle && (
+                  <p className={`${config.textColor} text-xs opacity-75 mt-1`}>
+                    {subtitle}
+                  </p>
+              )}
+
+              {/* Action button */}
+              {action && actionLabel && (
+                  <button
+                      onClick={handleActionClick}
+                      className={`
                   mt-3 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200
                   bg-gradient-to-r ${config.color} text-white hover:shadow-md transform hover:scale-105
                 `}
-              >
-                {actionLabel}
-              </button>
-            )}
-          </div>
+                  >
+                    {actionLabel}
+                  </button>
+              )}
+            </div>
 
-          {/* Close button */}
-          <button
-            onClick={() => onClose(id)}
-            className={`
+            {/* Close button */}
+            <button
+                onClick={() => onClose(id)}
+                className={`
               flex-shrink-0 p-1 rounded-full transition-colors duration-200
               ${config.textColor} hover:bg-black hover:bg-opacity-10
             `}
-          >
-            <FaTimes className="text-sm" />
-          </button>
+            >
+              <FaTimes className="text-sm" />
+            </button>
+          </div>
         </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Toast Container Component
-const ToastContainer = ({ position = "top-right", maxToasts = 5 }) => {
-  const positionClass = positions[position] || positions['top-right'];
-  
-  return (
-    <div 
-      className={`fixed z-50 pointer-events-none ${positionClass}`}
-      style={{ maxWidth: 'calc(100vw - 2rem)' }}
-    >
-      <div className="flex flex-col gap-3 pointer-events-none">
-        {/* Toasts will be rendered here by ToastProvider */}
-      </div>
-    </div>
+      </motion.div>
   );
 };
 
 /**
  * Enhanced ToastProvider with advanced features
  */
-export const ToastProvider = ({ 
-  children, 
-  position = "top-right", 
-  maxToasts = 5,
-  enableSounds = false,
-  enableReducedMotion = true 
-}) => {
+export const ToastProvider = ({
+                                children,
+                                position = "top-right",
+                                maxToasts = 5,
+                                enableSounds = false,
+                                enableReducedMotion = true
+                              }) => {
   const [toasts, setToasts] = useState([]);
   const [toastCounter, setToastCounter] = useState(0);
 
@@ -365,7 +371,7 @@ export const ToastProvider = ({
     setToastCounter(prev => prev + 1);
 
     const config = toastConfig[type] || toastConfig.info;
-    
+
     const newToast = {
       id,
       message,
@@ -385,74 +391,53 @@ export const ToastProvider = ({
     setToasts(prev => {
       // Remove oldest toast if we're at max capacity
       const updatedToasts = prev.length >= maxToasts ? prev.slice(1) : prev;
-      
+
       // Check for duplicate messages (prevent spam)
-      const isDuplicate = updatedToasts.some(toast => 
-        toast.message === message && 
-        toast.type === type && 
-        (Date.now() - toast.timestamp) < 1000
+      const isDuplicate = updatedToasts.some(toast =>
+          toast.message === message &&
+          toast.type === type &&
+          (Date.now() - toast.timestamp) < 1000
       );
-      
+
       if (isDuplicate) return updatedToasts;
-      
+
       return [...updatedToasts, newToast];
     });
 
-    // Play sound if enabled
-    if (enableSounds && typeof Audio !== 'undefined') {
-      try {
-        const soundMap = {
-          success: '/sounds/success.mp3',
-          error: '/sounds/error.mp3',
-          warning: '/sounds/warning.mp3',
-          info: '/sounds/info.mp3'
-        };
-        
-        const soundFile = soundMap[type];
-        if (soundFile) {
-          const audio = new Audio(soundFile);
-          audio.volume = 0.3;
-          audio.play().catch(() => {}); // Fail silently
-        }
-      } catch (error) {
-        // Fail silently
-      }
-    }
-
     return id;
-  }, [toastCounter, maxToasts, enableSounds]);
+  }, [toastCounter, maxToasts]);
 
   // Specialized toast methods
-  const showSuccessToast = useCallback((message, options) => 
-    showToast(message, "success", options), [showToast]);
-    
-  const showErrorToast = useCallback((message, options) => 
-    showToast(message, "error", options), [showToast]);
-    
-  const showWarningToast = useCallback((message, options) => 
-    showToast(message, "warning", options), [showToast]);
-    
-  const showInfoToast = useCallback((message, options) => 
-    showToast(message, "info", options), [showToast]);
+  const showSuccessToast = useCallback((message, options) =>
+      showToast(message, "success", options), [showToast]);
+
+  const showErrorToast = useCallback((message, options) =>
+      showToast(message, "error", options), [showToast]);
+
+  const showWarningToast = useCallback((message, options) =>
+      showToast(message, "warning", options), [showToast]);
+
+  const showInfoToast = useCallback((message, options) =>
+      showToast(message, "info", options), [showToast]);
 
   // Specialized app-specific toast methods
-  const showFavoriteToast = useCallback((message, options) => 
-    showToast(message, "favorite", options), [showToast]);
-    
-  const showTripToast = useCallback((message, options) => 
-    showToast(message, "trip", options), [showToast]);
-    
-  const showReviewToast = useCallback((message, options) => 
-    showToast(message, "review", options), [showToast]);
-    
-  const showLocationToast = useCallback((message, options) => 
-    showToast(message, "location", options), [showToast]);
+  const showFavoriteToast = useCallback((message, options) =>
+      showToast(message, "favorite", options), [showToast]);
 
-  const showOfflineToast = useCallback(() => 
-    showToast("You're offline. Some features may be limited.", "offline", { persistent: true }), [showToast]);
-    
-  const showOnlineToast = useCallback(() => 
-    showToast("Back online! All features restored.", "online"), [showToast]);
+  const showTripToast = useCallback((message, options) =>
+      showToast(message, "trip", options), [showToast]);
+
+  const showReviewToast = useCallback((message, options) =>
+      showToast(message, "review", options), [showToast]);
+
+  const showLocationToast = useCallback((message, options) =>
+      showToast(message, "location", options), [showToast]);
+
+  const showOfflineToast = useCallback(() =>
+      showToast("You're offline. Some features may be limited.", "offline", { persistent: true }), [showToast]);
+
+  const showOnlineToast = useCallback(() =>
+      showToast("Back online! All features restored.", "online"), [showToast]);
 
   // Network status monitoring
   useEffect(() => {
@@ -461,7 +446,7 @@ export const ToastProvider = ({
       setToasts(prev => prev.filter(toast => toast.type !== 'offline'));
       showOnlineToast();
     };
-    
+
     const handleOffline = () => {
       showOfflineToast();
     };
@@ -481,13 +466,13 @@ export const ToastProvider = ({
     showToast,
     removeToast,
     clearAllToasts,
-    
+
     // Convenience methods
     showSuccessToast,
     showErrorToast,
     showWarningToast,
     showInfoToast,
-    
+
     // Specialized methods
     showFavoriteToast,
     showTripToast,
@@ -495,35 +480,35 @@ export const ToastProvider = ({
     showLocationToast,
     showOfflineToast,
     showOnlineToast,
-    
+
     // State
     toasts,
     toastCount: toasts.length
   };
 
   return (
-    <ToastContext.Provider value={contextValue}>
-      {children}
-      
-      {/* Toast Container */}
-      <div 
-        className={`fixed z-50 pointer-events-none ${positions[position]}`}
-        style={{ maxWidth: 'calc(100vw - 2rem)' }}
-      >
-        <div className="flex flex-col gap-3">
-          <AnimatePresence mode="popLayout">
-            {toasts.map((toast) => (
-              <Toast
-                key={toast.id}
-                {...toast}
-                position={position}
-                onClose={removeToast}
-              />
-            ))}
-          </AnimatePresence>
+      <ToastContext.Provider value={contextValue}>
+        {children}
+
+        {/* Toast Container */}
+        <div
+            className={`fixed z-50 pointer-events-none ${positions[position]}`}
+            style={{ maxWidth: 'calc(100vw - 2rem)' }}
+        >
+          <div className="flex flex-col gap-3">
+            <AnimatePresence mode="popLayout">
+              {toasts.map((toast) => (
+                  <Toast
+                      key={toast.id}
+                      {...toast}
+                      position={position}
+                      onClose={removeToast}
+                  />
+              ))}
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
-    </ToastContext.Provider>
+      </ToastContext.Provider>
   );
 };
 
@@ -536,7 +521,7 @@ export const useToastActions = () => {
     showInfoToast,
     clearAllToasts
   } = useToast();
-  
+
   return {
     success: showSuccessToast,
     error: showErrorToast,
@@ -553,7 +538,7 @@ export const useAppToasts = () => {
     showReviewToast,
     showLocationToast
   } = useToast();
-  
+
   return {
     favorite: showFavoriteToast,
     trip: showTripToast,

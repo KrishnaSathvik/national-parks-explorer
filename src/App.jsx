@@ -1,4 +1,4 @@
-// ✨ FIXED App.jsx - Safe Toast Hook Usage
+// ✨ CLEAN App.jsx - Direct Toast Hook Usage
 import React, {lazy, Suspense, useCallback, useEffect, useState} from "react";
 import {Route, Routes, useLocation, useNavigate} from "react-router-dom";
 import {createPerformanceTrace, db, handleFirebaseError, logAnalyticsEvent, messaging, performance} from './firebase';
@@ -28,7 +28,7 @@ import {
     updateDoc
 } from "firebase/firestore";
 import {useAuth} from "./context/AuthContext";
-// ✅ FIX: Move toast imports inside the component that needs them
+import {useToast, useAppToasts} from "./context/ToastContext"; // ✅ Direct import
 import Layout from "./components/Layout";
 
 // ✅ Enhanced lazy-loaded pages with loading fallbacks
@@ -70,23 +70,13 @@ class AppErrorBoundary extends React.Component {
             errorInfo: errorInfo
         });
 
-        // Log error to analytics
-        if (typeof logAnalyticsEvent === 'function') {
-            logAnalyticsEvent('app_error', {
-                error_message: error.message,
-                error_stack: error.stack,
-                component_stack: errorInfo.componentStack
-            });
-        }
-
         console.error('🔥 App Error Boundary caught an error:', error, errorInfo);
     }
 
     render() {
         if (this.state.hasError) {
             return (
-                <div
-                    className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
+                <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center p-4">
                     <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
                         <div className="text-6xl mb-4">🚨</div>
                         <h2 className="text-2xl font-bold text-gray-800 mb-4">Oops! Something went wrong</h2>
@@ -99,18 +89,6 @@ class AppErrorBoundary extends React.Component {
                         >
                             Refresh Page
                         </button>
-                        {process.env.NODE_ENV === 'development' && (
-                            <details className="mt-6 text-left">
-                                <summary className="cursor-pointer text-sm text-gray-500 hover:text-gray-700">
-                                    Show Error Details (Development)
-                                </summary>
-                                <pre className="mt-2 text-xs bg-gray-100 p-4 rounded overflow-auto max-h-40">
-                  {this.state.error && this.state.error.toString()}
-                                    <br/>
-                                    {this.state.errorInfo.componentStack}
-                </pre>
-                            </details>
-                        )}
                     </div>
                 </div>
             );
@@ -120,7 +98,7 @@ class AppErrorBoundary extends React.Component {
     }
 }
 
-// Enhanced Loading Component with multiple states
+// Enhanced Loading Component
 const AppLoadingFallback = ({type = "page"}) => {
     const {isMobile} = useIsMobile();
 
@@ -139,14 +117,6 @@ const AppLoadingFallback = ({type = "page"}) => {
                 </div>
             </div>
         ),
-        component: (
-            <div className="flex items-center justify-center p-8">
-                <div className="flex items-center gap-3">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
-                    <span className="text-gray-600">Loading...</span>
-                </div>
-            </div>
-        ),
         minimal: (
             <div className="flex items-center justify-center min-h-screen">
                 <div className="animate-pulse">
@@ -161,30 +131,7 @@ const AppLoadingFallback = ({type = "page"}) => {
 };
 
 function App() {
-    // ✅ FIX: Import toast hooks inside the component
-    const {useToast, useAppToasts} = React.useMemo(() => {
-        try {
-            const toastModule = require("./context/ToastContext");
-            return {
-                useToast: toastModule.useToast,
-                useAppToasts: toastModule.useAppToasts
-            };
-        } catch (error) {
-            console.warn('Toast context not available:', error);
-            return {
-                useToast: () => ({
-                    showToast: (message, type) => console.log(`Toast: ${message} (${type})`),
-                    showOfflineToast: () => console.log('Offline'),
-                    showOnlineToast: () => console.log('Online')
-                }),
-                useAppToasts: () => ({
-                    favorite: (message) => console.log(`Favorite: ${message}`)
-                })
-            };
-        }
-    }, []);
-
-    // ✅ FIX: Now safely use the hooks
+    // ✅ Direct hook usage - now safe with fallback
     const {showToast, showOfflineToast, showOnlineToast} = useToast();
     const {favorite: showFavoriteToast} = useAppToasts();
 
@@ -200,13 +147,7 @@ function App() {
 
     // Enhanced hooks
     const {currentUser, isAdmin, loading: authLoading} = useAuth();
-    const {
-        isMobile,
-        shouldOptimize,
-        isSlowNetwork,
-        hasTouch,
-        networkType
-    } = useIsMobile();
+    const {isMobile, networkType} = useIsMobile();
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -216,16 +157,6 @@ function App() {
     const shouldHideBottomNav =
         hiddenRoutes.some(path => location.pathname.startsWith(path)) ||
         (location.pathname === "/" && !currentUser);
-
-    // Performance monitoring
-    useEffect(() => {
-        const trace = createPerformanceTrace('app_initialization');
-        trace?.start();
-
-        return () => {
-            trace?.stop();
-        };
-    }, []);
 
     // Enhanced parks data fetching with retry logic
     const fetchParks = useCallback(async (retryCount = 0) => {
@@ -243,7 +174,6 @@ function App() {
 
             // Sort parks for better user experience
             const sortedParks = enhancedData.sort((a, b) => {
-                // Prioritize parks with more complete data
                 const scoreA = (a.description ? 1 : 0) + (a.coordinates ? 1 : 0) + (a.bestSeason ? 1 : 0);
                 const scoreB = (b.description ? 1 : 0) + (b.coordinates ? 1 : 0) + (b.bestSeason ? 1 : 0);
 
@@ -256,14 +186,6 @@ function App() {
 
             console.log('✅ Enhanced parks data loaded:', sortedParks.length, 'parks');
 
-            // Analytics tracking
-            logAnalyticsEvent('parks_data_loaded', {
-                parks_count: sortedParks.length,
-                load_time: performance.now(),
-                network_type: networkType,
-                retry_count: retryCount
-            });
-
         } catch (error) {
             console.error('❌ Error fetching parks:', error);
 
@@ -273,7 +195,7 @@ function App() {
                 console.log(`🔄 Retrying parks fetch (${retryCount + 1}/${maxRetries})`);
                 setTimeout(() => {
                     fetchParks(retryCount + 1);
-                }, Math.pow(2, retryCount) * 1000); // Exponential backoff
+                }, Math.pow(2, retryCount) * 1000);
 
                 setAppState(prev => ({...prev, retryCount: retryCount + 1}));
             } else {
@@ -315,7 +237,6 @@ function App() {
             const friendlyError = handleFirebaseError(error, 'favorites loading');
             console.error("🔥 Favorites error:", friendlyError);
 
-            // Don't show error for permission issues in development
             if (error.code !== 'permission-denied') {
                 showToast(friendlyError.message, "warning");
             }
@@ -355,17 +276,9 @@ function App() {
                 showFavoriteToast(`❤️ Added ${parkName} to favorites!`);
             }
 
-            // Analytics tracking
-            logAnalyticsEvent(isFavorite ? 'favorite_removed' : 'favorite_added', {
-                park_id: id,
-                park_name: parkName,
-                total_favorites: updatedFavorites.length
-            });
-
         } catch (error) {
             // Revert state on error
             setFavorites(favorites);
-
             const friendlyError = handleFirebaseError(error, 'favorite update');
             showToast(friendlyError.message, "error");
         }
@@ -379,6 +292,33 @@ function App() {
     useEffect(() => {
         fetchFavorites();
     }, [fetchFavorites]);
+
+    // Enhanced network status monitoring
+    useEffect(() => {
+        const handleOffline = () => {
+            setAppState(prev => ({...prev, isOnline: false}));
+            showOfflineToast();
+            disableNetwork(db).catch(console.error);
+        };
+
+        const handleOnline = () => {
+            setAppState(prev => ({...prev, isOnline: true}));
+            showOnlineToast();
+            enableNetwork(db).catch(console.error);
+
+            if (appState.hasError) {
+                fetchParks();
+            }
+        };
+
+        window.addEventListener('offline', handleOffline);
+        window.addEventListener('online', handleOnline);
+
+        return () => {
+            window.removeEventListener('offline', handleOffline);
+            window.removeEventListener('online', handleOnline);
+        };
+    }, [showOfflineToast, showOnlineToast, appState.hasError, fetchParks]);
 
     // Show loading state while auth is loading or parks are loading
     if (authLoading || (appState.isLoading && parks.length === 0)) {
@@ -403,7 +343,7 @@ function App() {
                                 <Route path="/favorites" element={<Favorites />} />
                                 <Route path="/integrations" element={<AppIntegration />} />
 
-                                {/* ✅ Enhanced root route with better UX */}
+                                {/* ✅ Enhanced root route */}
                                 <Route
                                     path="/"
                                     element={
@@ -424,7 +364,7 @@ function App() {
                                     }
                                 />
 
-                                {/* ✅ Enhanced Protected Routes */}
+                                {/* ✅ Protected Routes */}
                                 <Route
                                     path="/park/:slug"
                                     element={
@@ -440,35 +380,9 @@ function App() {
                                     path="/map"
                                     element={
                                         <PrivateRoute>
-                                            <Suspense fallback={<AppLoadingFallback type="component"/>}>
+                                            <Suspense fallback={<AppLoadingFallback type="page"/>}>
                                                 <MapPage/>
                                             </Suspense>
-                                        </PrivateRoute>
-                                    }
-                                />
-
-                                <Route
-                                    path="/seasonal"
-                                    element={
-                                        <PrivateRoute>
-                                            <SeasonalPage
-                                                parks={parks}
-                                                favorites={favorites}
-                                                toggleFavorite={toggleFavorite}
-                                            />
-                                        </PrivateRoute>
-                                    }
-                                />
-
-                                <Route
-                                    path="/recommendations"
-                                    element={
-                                        <PrivateRoute>
-                                            <RecommendationsPage
-                                                parks={parks}
-                                                favorites={favorites}
-                                                toggleFavorite={toggleFavorite}
-                                            />
                                         </PrivateRoute>
                                     }
                                 />
@@ -500,7 +414,33 @@ function App() {
                                     }
                                 />
 
-                                {/* ✅ Enhanced Admin Routes */}
+                                <Route
+                                    path="/seasonal"
+                                    element={
+                                        <PrivateRoute>
+                                            <SeasonalPage
+                                                parks={parks}
+                                                favorites={favorites}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route
+                                    path="/recommendations"
+                                    element={
+                                        <PrivateRoute>
+                                            <RecommendationsPage
+                                                parks={parks}
+                                                favorites={favorites}
+                                                toggleFavorite={toggleFavorite}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                {/* ✅ Admin Routes */}
                                 <Route
                                     path="/admin"
                                     element={
@@ -534,12 +474,11 @@ function App() {
                                     }
                                 />
 
-                                {/* ✅ Catch-all route for 404 */}
+                                {/* ✅ 404 Route */}
                                 <Route
                                     path="*"
                                     element={
-                                        <div
-                                            className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
+                                        <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50 flex items-center justify-center">
                                             <div className="text-center">
                                                 <div className="text-6xl mb-4">🏞️</div>
                                                 <h1 className="text-2xl font-bold text-gray-800 mb-4">Page Not Found</h1>
@@ -562,7 +501,7 @@ function App() {
                 <ScrollToTopButton />
                 <InstallButton />
 
-                {/* ✅ Enhanced bottom navigation with better logic */}
+                {/* ✅ Bottom navigation */}
                 {isMobile && !shouldHideBottomNav && (
                     <FadeInWrapper delay={0.3}>
                         <BottomNav/>
