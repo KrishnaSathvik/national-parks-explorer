@@ -406,7 +406,7 @@ const ActivitySection = ({ title, icon, items, park }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                                        item.name + " " + park.name
+                                                        park.name + " National Park " + park.state
                                                     )}`}
                                                     target="_blank"
                                                     rel="noreferrer"
@@ -896,13 +896,6 @@ const EnhancedMobileParkDetails = () => {
                         {/* Enhanced Quick Stats */}
                         <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-4'}`}>
                             <StatCard
-                                icon="🏞️"
-                                label="Established"
-                                value={formatEstablishedYear(park.established)}
-                                color="from-green-500 to-emerald-500"
-                                delay={0.1}
-                            />
-                            <StatCard
                                 icon="⭐"
                                 label="Average Rating"
                                 value={averageRating ? `${averageRating}/5` : 'No reviews'}
@@ -916,63 +909,10 @@ const EnhancedMobileParkDetails = () => {
                                 color="from-blue-500 to-cyan-500"
                                 delay={0.3}
                             />
-                            <StatCard
-                                icon="📏"
-                                label="Park Size"
-                                value={formatParkSize(park.size)}
-                                color="from-purple-500 to-pink-500"
-                                delay={0.4}
-                            />
                         </div>
 
                         {/* Park Information Cards */}
                         <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-                            {/* Park Details Card */}
-                            <FadeInWrapper delay={0.5}>
-                                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-2xl border border-blue-200">
-                                    <h3 className={`font-bold text-gray-800 mb-4 flex items-center gap-2 ${
-                                        isMobile ? 'text-lg' : 'text-xl'
-                                    }`}>
-                                        <FaInfoCircle className="text-blue-500"/>
-                                        Park Information
-                                    </h3>
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 font-medium">Annual Visitors:</span>
-                                            <span className="text-gray-800 font-semibold">
-                                              {formatVisitorCount(park.annualVisitors)}
-                                          </span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 font-medium">Best Season:</span>
-                                            <span className="text-gray-800 font-semibold">
-                                              {park.bestSeason || 'Year-round'}
-                                          </span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-gray-600 font-medium">Entry Fee:</span>
-                                            <span className="text-gray-800 font-semibold">
-                                              {park.entryFee > 0 ? `$${park.entryFee}` : 'Free'}
-                                          </span>
-                                        </div>
-                                        {park.coordinates && (
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-gray-600 font-medium">Location:</span>
-                                                <a
-                                                    href={`https://www.google.com/maps/search/?api=1&query=${park.coordinates}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"
-                                                >
-                                                    <FaMap className="text-sm"/>
-                                                    View on Map
-                                                </a>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </FadeInWrapper>
-
                             {/* Description Card */}
                             {park.description && (
                                 <FadeInWrapper delay={0.6}>

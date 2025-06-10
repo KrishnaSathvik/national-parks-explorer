@@ -31,11 +31,14 @@ import {
   FaThumbsUp,
   FaComment,
   FaBookmark,
-  FaRegBookmark
+  FaRegBookmark,
+  FaCrown,
+  FaEdit,
+  FaPlus
 } from "react-icons/fa";
 
 // Enhanced Blog Hero Section
-const BlogHero = () => {
+const BlogHero = ({ isAdmin, onCreatePost }) => {
   const { isMobile } = useIsMobile();
 
   return (
@@ -68,18 +71,31 @@ const BlogHero = () => {
                   <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full">
                     <FaNewspaper className="text-sm" />
                     <span className={`font-medium ${isMobile ? 'text-sm' : 'text-base'}`}>
-                    Latest Adventures
-                  </span>
+                      Latest Adventures
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full">
                     <FaStar className="text-yellow-300" />
                     <span className={`font-medium ${isMobile ? 'text-sm' : 'text-base'}`}>
-                    Expert Tips
-                  </span>
+                      Expert Tips
+                    </span>
                   </div>
                 </div>
               </div>
+
+              {/* Admin Write Button */}
+              {isAdmin && (
+                  <div className="mt-4 lg:mt-0 lg:ml-6">
+                    <button
+                        onClick={onCreatePost}
+                        className="flex items-center gap-2 bg-white text-purple-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200 shadow-lg transform hover:scale-105"
+                    >
+                      <FaEdit />
+                      {isMobile ? 'Write' : 'Write Story'}
+                    </button>
+                  </div>
+              )}
             </div>
           </FadeInWrapper>
         </div>
@@ -180,9 +196,9 @@ const BlogSearchFilter = ({
                 🔥 Popular
               </button>
               <button
-                  onClick={() => setSortBy('recommended')}
+                  onClick={() => setSortBy('featured')}
                   className={`px-3 py-2 rounded-full text-sm font-medium transition ${
-                      sortBy === 'recommended'
+                      sortBy === 'featured'
                           ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
@@ -271,10 +287,16 @@ const BlogSearchFilter = ({
 };
 
 // Enhanced Blog Card Component
-const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, onPlanTrip }) => {
+const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, onPlanTrip, isAdmin }) => {
   const { isMobile } = useIsMobile();
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(blog.likes || 0);
+
+  useEffect(() => {
+    // Check if user has liked this post
+    const liked = localStorage.getItem(`liked_blog_${blog.id}`);
+    setIsLiked(liked === 'true');
+  }, [blog.id]);
 
   const contentHTML = useMemo(() => {
     try {
@@ -349,6 +371,14 @@ const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, 
                   <div className="text-6xl opacity-80">📖</div>
               )}
 
+              {/* Featured Badge */}
+              {blog.featured && (
+                  <div className="absolute top-3 left-3 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+                    <FaCrown className="text-xs" />
+                    FEATURED
+                  </div>
+              )}
+
               {/* Overlay with actions */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
@@ -358,8 +388,8 @@ const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, 
                             key={i}
                             className="px-2 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full"
                         >
-                      {tag}
-                    </span>
+                          {tag}
+                        </span>
                     ))}
                   </div>
                 </div>
@@ -382,6 +412,17 @@ const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, 
                     )}
                   </button>
               )}
+
+              {/* Admin Edit Button */}
+              {isAdmin && (
+                  <Link
+                      to={`/admin/edit-blog/${blog.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="absolute bottom-3 right-3 p-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition-all duration-200"
+                  >
+                    <FaEdit className="text-sm" />
+                  </Link>
+              )}
             </div>
 
             {/* Content */}
@@ -392,8 +433,11 @@ const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, 
                   {blog.author?.charAt(0)?.toUpperCase() || 'A'}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-gray-800 truncate">
+                  <div className="text-sm font-medium text-gray-800 truncate flex items-center gap-1">
                     {blog.author || 'Anonymous Explorer'}
+                    {isAdmin && blog.author === 'Admin' && (
+                        <FaCrown className="text-yellow-500 text-xs" />
+                    )}
                   </div>
                   <div className="text-xs text-gray-500">
                     {blog.date?.seconds
@@ -487,7 +531,7 @@ const EnhancedBlogCard = ({ blog, index, savedPosts, onToggleSave, currentUser, 
 };
 
 // Featured Posts Section
-const FeaturedPosts = ({ featuredBlogs, savedPosts, onToggleSave, currentUser, onPlanTrip }) => {
+const FeaturedPosts = ({ featuredBlogs, savedPosts, onToggleSave, currentUser, onPlanTrip, isAdmin }) => {
   const { isMobile } = useIsMobile();
 
   if (!featuredBlogs.length) return null;
@@ -517,6 +561,7 @@ const FeaturedPosts = ({ featuredBlogs, savedPosts, onToggleSave, currentUser, o
                     onToggleSave={onToggleSave}
                     currentUser={currentUser}
                     onPlanTrip={onPlanTrip}
+                    isAdmin={isAdmin}
                 />
             ))}
           </div>
@@ -539,7 +584,7 @@ const EnhancedBlog = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const { isMobile } = useIsMobile();
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -623,8 +668,12 @@ const EnhancedBlog = () => {
       case 'popular':
         filtered.sort((a, b) => (b.views || 0) - (a.views || 0));
         break;
-      case 'recommended':
-        filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
+      case 'featured':
+        filtered.sort((a, b) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return (b.likes || 0) - (a.likes || 0);
+        });
         break;
       default: // latest
         filtered.sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
@@ -633,10 +682,10 @@ const EnhancedBlog = () => {
     return filtered;
   }, [blogs, search, selectedTag, selectedAuthor, sortBy]);
 
-  // Featured blogs (high engagement)
+  // Featured blogs - blogs marked as featured OR high engagement
   const featuredBlogs = useMemo(() => {
     return blogs
-        .filter(blog => (blog.likes || 0) > 20 || (blog.views || 0) > 500)
+        .filter(blog => blog.featured || (blog.likes || 0) > 20 || (blog.views || 0) > 500)
         .slice(0, 3);
   }, [blogs]);
 
@@ -700,6 +749,14 @@ const EnhancedBlog = () => {
     showToast(`🎯 Planning trip based on "${blog.title}"!`, 'success');
   };
 
+  const handleCreatePost = () => {
+    if (!isAdmin) {
+      showToast("Only administrators can create blog posts", "error");
+      return;
+    }
+    navigate('/admin/blog-editor');
+  };
+
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
@@ -753,52 +810,6 @@ const EnhancedBlog = () => {
     );
   };
 
-  const renderQuickActions = () => (
-      <FadeInWrapper delay={0.4}>
-        <div className="mb-6">
-          <div className={`grid gap-4 w-full ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'} max-w-5xl mx-auto`}>
-            <button
-                onClick={() => navigate('/blog/create')}
-                className="group bg-white p-4 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 w-full flex flex-col items-center justify-center min-h-[100px]"
-            >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">✍️</div>
-              <div className="font-semibold text-gray-800 text-sm">Write Story</div>
-              <div className="text-gray-600 text-xs">Share your adventure</div>
-            </button>
-
-            <button
-                onClick={() => navigate('/')}
-                className="group bg-white p-4 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 w-full flex flex-col items-center justify-center min-h-[100px]"
-            >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">🏞️</div>
-              <div className="font-semibold text-gray-800 text-sm">Explore Parks</div>
-              <div className="text-gray-600 text-xs">Discover destinations</div>
-            </button>
-
-            <button
-                onClick={() => navigate('/trip-planner')}
-                className="group bg-white p-4 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 w-full flex flex-col items-center justify-center min-h-[100px]"
-            >
-              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">🎯</div>
-              <div className="font-semibold text-gray-800 text-sm">Plan Trip</div>
-              <div className="text-gray-600 text-xs">Create itinerary</div>
-            </button>
-
-            {currentUser && (
-                <Link
-                    to="/account"
-                    className="group bg-white p-4 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 text-center transform hover:scale-105 w-full flex flex-col items-center justify-center min-h-[100px]"
-                >
-                  <div className="text-3xl mb-2 group-hover:scale-110 transition-transform">👤</div>
-                  <div className="font-semibold text-gray-800 text-sm">My Stories</div>
-                  <div className="text-gray-600 text-xs">Saved & written</div>
-                </Link>
-            )}
-          </div>
-        </div>
-      </FadeInWrapper>
-  );
-
   const renderEmptyState = () => (
       <div className="text-center py-16">
         <div className="text-6xl mb-4">📚</div>
@@ -808,7 +819,7 @@ const EnhancedBlog = () => {
         <p className="text-gray-500 mb-6">
           {search || selectedTag || selectedAuthor
               ? "Try adjusting your search filters"
-              : "Be the first to share your adventure!"
+              : "No travel stories available yet."
           }
         </p>
         <div className="flex flex-wrap justify-center gap-3">
@@ -825,12 +836,14 @@ const EnhancedBlog = () => {
                 Clear Filters
               </button>
           )}
-          <button
-              onClick={() => navigate('/blog/create')}
-              className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
-          >
-            Write Your Story
-          </button>
+          {isAdmin && (
+              <button
+                  onClick={handleCreatePost}
+                  className="px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-lg hover:from-pink-600 hover:to-purple-600 transition"
+              >
+                Write First Story
+              </button>
+          )}
         </div>
       </div>
   );
@@ -875,13 +888,43 @@ const EnhancedBlog = () => {
       </div>
   );
 
+  // Admin info panel
+  const renderAdminInfo = () => {
+    if (!isAdmin) return null;
+
+    return (
+        <FadeInWrapper delay={0.2}>
+          <div className="bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-blue-500 p-2 rounded-lg text-white">
+                <FaCrown />
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-800">Admin Panel</h4>
+                <p className="text-blue-600 text-sm">You can create, edit, and manage all blog posts</p>
+              </div>
+              <div className="ml-auto">
+                <Link
+                    to="/admin/blog-editor"
+                    className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-sm font-medium"
+                >
+                  <FaPlus />
+                  New Post
+                </Link>
+              </div>
+            </div>
+          </div>
+        </FadeInWrapper>
+    );
+  };
+
   if (loading) {
     return (
         <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
           <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-xl overflow-hidden">
               <div className="p-4 md:p-6">
-                <BlogHero />
+                <BlogHero isAdmin={isAdmin} onCreatePost={handleCreatePost} />
                 {renderLoadingState()}
               </div>
             </div>
@@ -899,10 +942,10 @@ const EnhancedBlog = () => {
               {renderBreadcrumb()}
 
               {/* Hero Section */}
-              <BlogHero />
+              <BlogHero isAdmin={isAdmin} onCreatePost={handleCreatePost} />
 
-              {/* Quick Actions */}
-              {renderQuickActions()}
+              {/* Admin Info Panel */}
+              {renderAdminInfo()}
 
               {/* Search and Filter */}
               <BlogSearchFilter
@@ -929,6 +972,7 @@ const EnhancedBlog = () => {
                       onToggleSave={handleToggleSave}
                       currentUser={currentUser}
                       onPlanTrip={handlePlanTrip}
+                      isAdmin={isAdmin}
                   />
               )}
 
@@ -962,6 +1006,7 @@ const EnhancedBlog = () => {
                               onToggleSave={handleToggleSave}
                               currentUser={currentUser}
                               onPlanTrip={handlePlanTrip}
+                              isAdmin={isAdmin}
                           />
                       ))}
                     </div>
@@ -972,27 +1017,27 @@ const EnhancedBlog = () => {
               {renderPagination()}
 
               {/* Call to Action - Desktop Only */}
-              {!isMobile && (
+              {!isMobile && isAdmin && (
                   <FadeInWrapper delay={0.6}>
                     <div className="bg-gradient-to-r from-purple-500 to-pink-500 p-8 rounded-2xl text-white text-center mt-8">
-                      <h3 className="text-2xl font-bold mb-4">Share Your Adventure</h3>
+                      <h3 className="text-2xl font-bold mb-4">Share Amazing Stories</h3>
                       <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
-                        Have an amazing story from your national park adventures?
-                        Share it with our community and inspire others to explore!
+                        Create inspiring travel stories for your community.
+                        Share experiences, tips, and adventures from national parks!
                       </p>
                       <div className="flex flex-wrap justify-center gap-4">
                         <button
-                            onClick={() => navigate('/blog/create')}
+                            onClick={handleCreatePost}
                             className="bg-white text-purple-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all transform hover:scale-105 shadow-lg"
                         >
-                          ✍️ Write Your Story
+                          ✍️ Write New Story
                         </button>
-                        <button
-                            onClick={() => navigate('/')}
+                        <Link
+                            to="/admin"
                             className="bg-white/20 backdrop-blur-sm text-white px-8 py-3 rounded-xl font-semibold hover:bg-white/30 transition-all"
                         >
-                          🏞️ Explore Parks
-                        </button>
+                          🛠️ Admin Panel
+                        </Link>
                       </div>
                     </div>
                   </FadeInWrapper>

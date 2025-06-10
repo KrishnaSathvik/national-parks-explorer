@@ -638,7 +638,11 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
         const matchesSeason = selectedSeason === "All" || season === selectedSeason.toLowerCase();
 
         const matchesActivities = filters.activities.length === 0 ||
-            filters.activities.some(activity => description.includes(activity.toLowerCase()));
+            filters.activities.some(activity => {
+                const activityLower = activity.toLowerCase();
+                return description.includes(activityLower) ||
+                    (p.highlight?.toLowerCase() || '').includes(activityLower);
+            });
 
         const matchesFeeRange = !filters.feeRange ||
             (filters.feeRange === 'Free' && (!p.entryFee || p.entryFee === 0)) ||
@@ -679,12 +683,15 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
 
     const renderNavigationLinks = () => (
         <div className={`flex flex-wrap justify-center gap-2 text-sm font-medium mb-6 ${isMobile ? 'px-2' : ''}`}>
-            <Link
-                to="/calendar"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300 transition-all duration-200 shadow-sm hover:shadow-md"
-            >
-                <FaCalendarAlt/> Events
-            </Link>
+
+            {!isMobile && (
+                <Link
+                    to="/calendar"
+                    className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                    <FaCalendarAlt/> Events
+                </Link>
+            )}
 
             <Link
                 to="/blog"
@@ -700,7 +707,7 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
                 <FaBookOpen/> About
             </Link>
 
-            {currentUser && (
+            {currentUser && !isMobile && (
                 <Link
                     to="/account"
                     className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-white text-gray-800 border border-gray-200 hover:bg-green-50 hover:text-green-600 hover:border-green-300 transition-all duration-200 shadow-sm hover:shadow-md"
@@ -845,64 +852,6 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
             </FadeInWrapper>
         );
     };
-
-    // Explore More section - Hidden on mobile
-    const renderExploreMore = () => {
-        if (isMobile) return null; // Hide on mobile
-
-        return (
-            <FadeInWrapper delay={0.6}>
-                <div className="bg-gradient-to-r from-gray-50 to-white p-6 rounded-2xl border border-gray-200 mt-8">
-                    <h3 className="font-bold text-gray-800 mb-6 text-xl">
-                        Explore More
-                    </h3>
-                    <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-                        <Link
-                            to="/"
-                            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200 hover:border-pink-300 group"
-                        >
-                            <FaArrowRight
-                                className="text-pink-500 group-hover:scale-110 transition-transform"/>
-                            <div>
-                                <div className="font-semibold text-gray-800 text-base">
-                                    Back to Explorer
-                                </div>
-                                <div className="text-sm text-gray-600">Discover more parks</div>
-                            </div>
-                        </Link>
-
-                        <Link
-                            to="/seasonal"
-                            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200 hover:border-blue-300 group"
-                        >
-                            <FaCalendarAlt
-                                className="text-blue-500 group-hover:scale-110 transition-transform"/>
-                            <div>
-                                <div className="font-semibold text-gray-800 text-base">
-                                    Seasonal Guide
-                                </div>
-                                <div className="text-sm text-gray-600">Best times to visit</div>
-                            </div>
-                        </Link>
-
-                        <button
-                            onClick={() => navigate('/trip-planner')}
-                            className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-200 hover:border-purple-300 group w-full text-left"
-                        >
-                            <FaRoute className="text-purple-500 group-hover:scale-110 transition-transform"/>
-                            <div>
-                                <div className="font-semibold text-gray-800 text-base">
-                                    Plan Your Trip
-                                </div>
-                                <div className="text-sm text-gray-600">Create custom itinerary</div>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </FadeInWrapper>
-        );
-    };
-
     // Effects
     useEffect(() => {
         setSearchParams({page: currentPage});
@@ -962,9 +911,6 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
 
                         {/* Pagination */}
                         {renderPagination()}
-
-                        {/* Explore More - Desktop Only */}
-                        {renderExploreMore()}
                     </div>
                 </div>
             </div>

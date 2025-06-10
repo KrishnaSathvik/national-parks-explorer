@@ -43,10 +43,7 @@ const About = () => {
   // State for interactive features
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
   const [showLightbox, setShowLightbox] = useState(false);
-  const [activeTimelineIndex, setActiveTimelineIndex] = useState(0);
   const [statsAnimated, setStatsAnimated] = useState(false);
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
 
   // Animated stats
   const [animatedStats, setAnimatedStats] = useState({
@@ -67,8 +64,8 @@ const About = () => {
   const featuredPhotos = [
     {
       id: 1,
-      url: "https://images.unsplash.com/photo-1543059509-c9e94c51f17d?w=800",
-      title: "Milky Way over Death Valley",
+      url: "https://unsplash.com/photos/a-view-of-the-night-sky-with-the-milky-in-the-background-m38PER3GxC0",
+      title: "Milky Way over Zabriskie Point",
       location: "Death Valley National Park, California",
       camera: "Nikon Z6ii",
       settings: "14mm, f/2.8, 25s, ISO 3200",
@@ -77,68 +74,23 @@ const About = () => {
     },
     {
       id: 2,
-      url: "https://images.unsplash.com/photo-1508739826987-b79cd8b7da7b?w=800",
-      title: "Grand Canyon Astro Photography",
+      url: "https://unsplash.com/photos/the-night-sky-with-stars-above-a-city-4qjO9aE2QX4",
+      title: "Wonders of Grand Canyon",
       location: "Grand Canyon National Park, Arizona",
       camera: "Nikon Z6ii",
-      settings: "20mm, f/2.8, 30s, ISO 1600",
-      story: "Captured during my 2024 Grand Canyon astrophotography session. The canyon's depth creates incredible foreground drama against the starry sky.",
+      settings: "14mm, f/2.8, 30s, ISO 3200",
+      story: "Captured during my first astronomy event at Grand Canyon.",
       year: "2024"
     },
     {
       id: 3,
-      url: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800",
-      title: "Yellowstone Night Sky",
+      url: "https://unsplash.com/photos/a-purple-and-green-aurora-over-a-body-of-water-TsrxK7EGf1E",
+      title: "Aurora at yellowstone",
       location: "Yellowstone National Park, Wyoming",
       camera: "Nikon Z6ii",
-      settings: "24mm, f/2.8, 20s, ISO 2500",
-      story: "Yellowstone's geothermal features create unique compositions for night photography. This shot combines the natural beauty with the cosmic wonder above.",
+      settings: "24mm, f/2.8, 5s, ISO 3200",
+      story: "Captured During Double Aurora Storm at Yellowstone Last Year ",
       year: "2024"
-    }
-  ];
-
-  const timeline = [
-    {
-      year: "2020",
-      title: "First National Park Visit",
-      description: "Grand Canyon captured my heart and started my love affair with national parks",
-      icon: "🏞️",
-      color: "from-green-500 to-emerald-500"
-    },
-    {
-      year: "2022",
-      title: "Google Maps Contributor",
-      description: "Started sharing detailed reviews and photos to help fellow travelers",
-      icon: "🗺️",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      year: "2023",
-      title: "Photography Journey Begins",
-      description: "Got Nikon Z6ii and dove into astrophotography with Death Valley expedition",
-      icon: "📸",
-      color: "from-purple-500 to-pink-500"
-    },
-    {
-      year: "2024",
-      title: "Google Maps Level 8",
-      description: "Reached Level 8 contributor status with detailed park reviews and photos",
-      icon: "🏆",
-      color: "from-yellow-500 to-orange-500"
-    },
-    {
-      year: "2024",
-      title: "Yellowstone & Grand Canyon",
-      description: "Epic astrophotography expeditions capturing Milky Way over iconic landscapes",
-      icon: "🌌",
-      color: "from-indigo-500 to-purple-500"
-    },
-    {
-      year: "2025",
-      title: "Big Bend & This App",
-      description: "Latest adventure to Big Bend NP and created this platform to help fellow explorers",
-      icon: "🚀",
-      color: "from-pink-500 to-rose-500"
     }
   ];
 
@@ -164,7 +116,7 @@ const About = () => {
     {
       icon: FaEnvelope,
       label: "Email",
-      url: "mailto:hello@krishna.dev",
+      url: "mailto:travelswithkrishna@gmail.com",
       color: "from-green-500 to-emerald-500"
     }
   ];
@@ -199,14 +151,6 @@ const About = () => {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // Auto-rotate testimonials removed
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setCurrentTestimonial(prev => (prev + 1) % testimonials.length);
-  //   }, 4000);
-  //   return () => clearInterval(interval);
-  // }, [testimonials.length]);
 
   // Enhanced Hero Section
   const renderHeroSection = () => (
@@ -469,123 +413,38 @@ const About = () => {
       </FadeInWrapper>
   );
 
-  // Journey Timeline
-  const renderTimelineSection = () => (
-      <FadeInWrapper delay={0.4}>
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
-          <div className="mb-6">
-            <h3 className={`font-bold text-gray-800 flex items-center gap-3 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
-              🛣️ My Journey
-            </h3>
-            <p className="text-gray-600 text-sm">From first park visit to building this app</p>
-          </div>
-
-          <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-500 to-purple-500"></div>
-
-            {timeline.map((item, index) => (
-                <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`relative flex items-start gap-6 pb-8 ${index === timeline.length - 1 ? 'pb-0' : ''}`}
-                >
-                  {/* Timeline dot */}
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${item.color} flex items-center justify-center text-white text-xl shadow-lg z-10`}>
-                    {item.icon}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 bg-gray-50 rounded-xl p-4">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="text-sm font-bold text-gray-500">{item.year}</span>
-                      <div className="flex-1 h-px bg-gray-200"></div>
-                    </div>
-                    <h4 className="font-bold text-gray-800 mb-2">{item.title}</h4>
-                    <p className="text-gray-600 text-sm">{item.description}</p>
-                  </div>
-                </motion.div>
-            ))}
-          </div>
-        </div>
-      </FadeInWrapper>
-  );
-
   // Social Links & Contact
   const renderSocialSection = () => (
       <FadeInWrapper delay={0.5}>
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 mb-8">
-          {/* Social Links */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
-            <h3 className={`font-bold text-gray-800 mb-6 ${isMobile ? 'text-lg' : 'text-xl'}`}>
-              🌐 Connect With Me
-            </h3>
-            <div className="space-y-3">
-              {socialLinks.map((link, index) => (
-                  <motion.a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`flex items-center gap-4 p-3 bg-gradient-to-r ${link.color} text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
-                      onClick={() => showToast(`Opening ${link.label}...`, "info")}
-                  >
-                    <link.icon className="text-xl" />
-                    <div>
-                      <div className="font-semibold">{link.label}</div>
-                      <div className="text-sm opacity-90">
-                        {link.label === 'Google Maps Level 8' && 'Level 8 • 2.2M+ review views'}
-                        {link.label === 'Unsplash Portfolio' && '25+ Astrophotography shots'}
-                        {link.label === 'Instagram' && '@astrobykrishna'}
-                        {link.label === 'Email' && 'hello@krishna.dev'}
-                      </div>
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
+          <h3 className={`font-bold text-gray-800 mb-6 ${isMobile ? 'text-lg' : 'text-xl'}`}>
+            🌐 Connect With Me
+          </h3>
+          <div className="grid gap-3 grid-cols-1 md:grid-cols-2">
+            {socialLinks.map((link, index) => (
+                <motion.a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex items-center gap-4 p-3 bg-gradient-to-r ${link.color} text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105`}
+                    onClick={() => showToast(`Opening ${link.label}...`, "info")}
+                >
+                  <link.icon className="text-xl" />
+                  <div>
+                    <div className="font-semibold">{link.label}</div>
+                    <div className="text-sm opacity-90">
+                      {link.label === 'Google Maps Level 8' && 'Level 8 • 2.2M+ review views'}
+                      {link.label === 'Unsplash Portfolio' && '25+ Astrophotography shots'}
+                      {link.label === 'Instagram' && '@astrobykrishna'}
+                      {link.label === 'Email' && 'travelswithkrishna@gmail.com'}
                     </div>
-                  </motion.a>
-              ))}
-            </div>
-          </div>
-
-          {/* Photography Journey */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6">
-            <h3 className={`font-bold text-gray-800 mb-6 ${isMobile ? 'text-lg' : 'text-xl'}`}>
-              📷 Photography Journey
-            </h3>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl">
-                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-white text-xl">
-                  📷
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Camera Setup</div>
-                  <div className="text-sm text-gray-600">Nikon Z6ii with fast wide-angle lenses</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl">
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center text-white text-xl">
-                  🌌
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Specialty</div>
-                  <div className="text-sm text-gray-600">Astrophotography & National Park landscapes</div>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center text-white text-xl">
-                  🎯
-                </div>
-                <div>
-                  <div className="font-semibold text-gray-800">Mission</div>
-                  <div className="text-sm text-gray-600">Inspiring others to explore dark sky destinations</div>
-                </div>
-              </div>
-            </div>
+                  </div>
+                </motion.a>
+            ))}
           </div>
         </div>
       </FadeInWrapper>
@@ -719,9 +578,6 @@ const About = () => {
       </FadeInWrapper>
   );
 
-  // Fun Facts Section removed
-  const renderFunFactsSection = () => null;
-
   // Footer section
   const renderFooter = () => (
       <FadeInWrapper delay={0.9}>
@@ -765,10 +621,7 @@ const About = () => {
               {/* Featured Photography */}
               {renderPhotographySection()}
 
-              {/* Journey Timeline */}
-              {renderTimelineSection()}
-
-              {/* Social & Photography Journey */}
+              {/* Social & Contact */}
               {renderSocialSection()}
 
               {/* App Information */}
