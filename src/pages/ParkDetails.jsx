@@ -406,7 +406,7 @@ const ActivitySection = ({ title, icon, items, park }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                                        park.name + " National Park " + park.state
+                                                        item.name + " " + park.name
                                                     )}`}
                                                     target="_blank"
                                                     rel="noreferrer"
@@ -913,6 +913,26 @@ const EnhancedMobileParkDetails = () => {
 
                         {/* Park Information Cards */}
                         <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+                            {/* Park Details Card */}
+                            <FadeInWrapper delay={0.5}>
+                                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-2xl border border-blue-200">
+                                        {park.coordinates && (
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-600 font-medium">Location:</span>
+                                                <a
+                                                    href={`https://www.google.com/maps/search/?api=1&query=${park.coordinates}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="text-blue-600 hover:text-blue-800 font-semibold flex items-center gap-1"
+                                                >
+                                                    <FaMap className="text-sm"/>
+                                                    View on Map
+                                                </a>
+                                            </div>
+                                        )}
+                                    </div>
+                            </FadeInWrapper>
+
                             {/* Description Card */}
                             {park.description && (
                                 <FadeInWrapper delay={0.6}>
