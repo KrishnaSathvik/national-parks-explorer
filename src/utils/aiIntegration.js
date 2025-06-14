@@ -662,7 +662,9 @@ export class AIIntegrationUtils {
         }
     }
 
-// Generate tips for improving AI recommendations
+// Fix for the end of your aiIntegration.js file
+// Replace lines 719-725 with this:
+
     static generateImprovementTips(userProfile, recommendations) {
         const tips = [];
         const { interactions = [], preferences = {}, stats = {} } = userProfile;
@@ -718,10 +720,10 @@ export class AIIntegrationUtils {
             return priority[b.priority] - priority[a.priority];
         }).slice(0, 3);
     }
-// Export utility functions
-    export {
-    AIIntegrationUtils
-};
+} // ← CLOSE THE CLASS HERE
+
+// ===== EXPORTS ===== (Move exports OUTSIDE the class)
+export { AIIntegrationUtils };
 
 // Default export
 export default AIIntegrationUtils;

@@ -2,7 +2,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import { useToast } from './ToastContext';
-import { AIRecommendationService } from '../services/aiRecommendationService';
+// ✅ ADD THIS MISSING IMPORT
+import { FirebaseAIService } from '../services/aiRecommendationService';
 
 const AIContext = createContext();
 
@@ -24,6 +25,8 @@ export const AIProvider = ({ children }) => {
     const [isGeneratingRecommendations, setIsGeneratingRecommendations] = useState(false);
     const [userPreferences, setUserPreferences] = useState(null);
     const [aiPersonalizationScore, setAIPersonalizationScore] = useState(0);
+
+    // ✅ FIX: Provide default value to prevent undefined errors
     const [learningProgress, setLearningProgress] = useState({
         level: 'Beginner',
         nextMilestone: 'Make 5 interactions',
@@ -50,7 +53,13 @@ export const AIProvider = ({ children }) => {
             setAIProfile(profile);
             setUserPreferences(profile?.preferences);
             setAIPersonalizationScore(profile?.aiPersonalizationScore || 0);
-            setLearningProgress(profile?.learningProgress || learningProgress);
+
+            // ✅ FIX: Ensure learningProgress always has a default value
+            setLearningProgress(profile?.learningProgress || {
+                level: 'Beginner',
+                nextMilestone: 'Make 5 interactions',
+                progressPercentage: 0
+            });
 
             if (aiStatus.isNewUser) {
                 showToast('🧠 AI is learning your preferences! Interact with parks to get better recommendations.', 'info');
@@ -61,6 +70,13 @@ export const AIProvider = ({ children }) => {
         } catch (error) {
             console.error('❌ Failed to initialize AI:', error);
             showToast('AI services temporarily unavailable. Basic recommendations will be shown.', 'warning');
+
+            // ✅ FIX: Set safe defaults on error
+            setLearningProgress({
+                level: 'Beginner',
+                nextMilestone: 'AI initialization failed',
+                progressPercentage: 0
+            });
         }
     }, [currentUser, showToast]);
 
@@ -128,8 +144,12 @@ export const AIProvider = ({ children }) => {
                 // Update learning progress locally
                 const updatedProfile = await FirebaseAIService.getUserAIProfile(currentUser.uid);
                 if (updatedProfile) {
-                    setLearningProgress(updatedProfile.learningProgress);
-                    setAIPersonalizationScore(updatedProfile.aiPersonalizationScore);
+                    setLearningProgress(updatedProfile.learningProgress || {
+                        level: 'Beginner',
+                        nextMilestone: 'Keep interacting',
+                        progressPercentage: 0
+                    });
+                    setAIPersonalizationScore(updatedProfile.aiPersonalizationScore || 0);
                 }
 
                 // Show learning feedback occasionally
@@ -159,7 +179,12 @@ export const AIProvider = ({ children }) => {
                 const updatedProfile = await FirebaseAIService.getUserAIProfile(currentUser.uid);
                 if (updatedProfile) {
                     setAIProfile(updatedProfile);
-                    setAIPersonalizationScore(updatedProfile.aiPersonalizationScore);
+                    setAIPersonalizationScore(updatedProfile.aiPersonalizationScore || 0);
+                    setLearningProgress(updatedProfile.learningProgress || {
+                        level: 'Beginner',
+                        nextMilestone: 'Keep using the app',
+                        progressPercentage: 0
+                    });
                 }
 
                 showToast('🎯 AI preferences updated! Generating personalized recommendations...', 'success');
@@ -216,7 +241,11 @@ export const AIProvider = ({ children }) => {
             setAIProfile(profile);
             setUserPreferences(profile?.preferences);
             setAIPersonalizationScore(profile?.aiPersonalizationScore || 0);
-            setLearningProgress(profile?.learningProgress || learningProgress);
+            setLearningProgress(profile?.learningProgress || {
+                level: 'Beginner',
+                nextMilestone: 'Keep using the app',
+                progressPercentage: 0
+            });
         } catch (error) {
             console.error('❌ Failed to refresh AI profile:', error);
         }

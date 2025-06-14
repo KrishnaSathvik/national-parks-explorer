@@ -3,19 +3,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAI } from '../context/AIContext';
 import { useAuth } from '../context/AuthContext';
 
-// Move this export to module level (outside of any function)
-export const useAIInteractions = () => {
-    const { recordInteraction } = useAI();
-
-    const handleInteraction = useCallback(async (type, itemId, data = {}) => {
-        return await recordInteraction(type, itemId, data);
-    }, [recordInteraction]);
-
-    return {
-        recordInteraction: handleInteraction
-    };
-};
-
 export const useAIRecommendations = (parks, favorites) => {
     const { currentUser } = useAuth();
     const {
@@ -56,6 +43,11 @@ export const useAIRecommendations = (parks, favorites) => {
 
     // Get available categories
     const getCategories = useCallback(() => {
+        // ✅ FIX: Add null safety for recommendations
+        if (!recommendations || recommendations.length === 0) {
+            return [{ name: 'All', count: 0 }];
+        }
+
         const categories = [...new Set(recommendations.map(r => r.category))];
         return [
             { name: 'All', count: recommendations.length },
@@ -70,6 +62,12 @@ export const useAIRecommendations = (parks, favorites) => {
 
     // Handle user interactions with recommendations
     const handleRecommendationInteraction = useCallback(async (type, recommendation, additionalData = {}) => {
+        // ✅ FIX: Add null safety for recommendation
+        if (!recommendation || !recommendation.id) {
+            console.warn('⚠️ Cannot record interaction: invalid recommendation');
+            return;
+        }
+
         await recordInteraction(type, recommendation.id, {
             ...additionalData,
             recommendationId: recommendation.id,
@@ -89,7 +87,8 @@ export const useAIRecommendations = (parks, favorites) => {
 
     // Get recommendation stats
     const getStats = useCallback(() => {
-        if (recommendations.length === 0) {
+        // ✅ FIX: Add null safety for recommendations
+        if (!recommendations || recommendations.length === 0) {
             return {
                 totalRecommendations: 0,
                 categories: 0,
@@ -117,7 +116,7 @@ export const useAIRecommendations = (parks, favorites) => {
     return {
         // Data
         recommendations: filteredRecommendations(),
-        allRecommendations: recommendations,
+        allRecommendations: recommendations || [], // ✅ FIX: Provide default array
         categories: getCategories(),
         stats: getStats(),
 
@@ -133,7 +132,80 @@ export const useAIRecommendations = (parks, favorites) => {
         refreshRecommendations,
 
         // Helpers
-        hasRecommendations: recommendations.length > 0,
+        hasRecommendations: (recommendations && recommendations.length > 0), // ✅ FIX: Add null safety
         hasResults: filteredRecommendations().length > 0
+    };
+};
+
+// Move this export to module level (outside of any function)
+export const useAIInteractions = () => {
+    const { recordInteraction, aiPersonalizationScore, learningProgress } = useAI();
+
+    const handleInteraction = useCallback(async (type, itemId, data = {}) => {
+        return await recordInteraction(type, itemId, data);
+    }, [recordInteraction]);
+
+    // Track park view
+    const trackParkView = useCallback(async (parkId, viewData = {}) => {
+        return await recordInteraction('view', parkId, {
+            ...viewData,
+            source: 'park_detail',
+            timestamp: Date.now()
+        });
+    }, [recordInteraction]);
+
+    // Track park click
+    const trackParkClick = useCallback(async (parkId, clickData = {}) => {
+        return await recordInteraction('click', parkId, {
+            ...clickData,
+            source: 'recommendation_card',
+            timestamp: Date.now()
+        });
+    }, [recordInteraction]);
+
+    // Track search query
+    const trackSearch = useCallback(async (query, searchData = {}) => {
+        return await recordInteraction('search', null, {
+            query,
+            ...searchData,
+            source: 'smart_search',
+            timestamp: Date.now()
+        });
+    }, [recordInteraction]);
+
+    // Track like/dislike
+    const trackFeedback = useCallback(async (parkId, isLike, feedbackData = {}) => {
+        const type = isLike ? 'like' : 'dislike';
+        return await recordInteraction(type, parkId, {
+            ...feedbackData,
+            feedback_type: type,
+            timestamp: Date.now()
+        });
+    }, [recordInteraction]);
+
+    // Track trip planning
+    const trackTripPlanning = useCallback(async (parkId, planData = {}) => {
+        return await recordInteraction('planTrip', parkId, {
+            ...planData,
+            source: 'trip_planner',
+            timestamp: Date.now()
+        });
+    }, [recordInteraction]);
+
+    return {
+        recordInteraction: handleInteraction,
+        trackParkView,
+        trackParkClick,
+        trackSearch,
+        trackFeedback,
+        trackTripPlanning,
+
+        // ✅ FIX: Add null safety for AI status
+        aiPersonalizationScore: aiPersonalizationScore || 0,
+        learningProgress: learningProgress || {
+            level: 'Beginner',
+            nextMilestone: 'Start interacting',
+            progressPercentage: 0
+        }
     };
 };

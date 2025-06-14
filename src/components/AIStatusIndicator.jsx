@@ -6,6 +6,15 @@ import { FaBrain, FaTrophy, FaChartBar, FaUser, FaRocket, FaCog } from 'react-ic
 export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
     const { aiPersonalizationScore, learningProgress, isAIActive, recommendationCount } = useAI();
 
+    // ✅ FIX: Add null safety with default values
+    const safePersonalizationScore = aiPersonalizationScore || 0;
+    const safeLearningProgress = learningProgress || {
+        level: 'Beginner',
+        nextMilestone: 'Start using the app',
+        progressPercentage: 0
+    };
+    const safeRecommendationCount = recommendationCount || 0;
+
     if (!isAIActive) {
         return (
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
@@ -26,7 +35,7 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
         return (
             <div className="flex items-center gap-2 bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">
                 <FaBrain className="text-xs" />
-                <span>AI: {aiPersonalizationScore}%</span>
+                <span>AI: {safePersonalizationScore}%</span>
                 <div className="w-1 h-1 bg-green-400 rounded-full animate-pulse"></div>
             </div>
         );
@@ -74,12 +83,12 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
                     </div>
                     <div>
                         <div className="font-bold text-xl text-purple-800">AI Learning Status</div>
-                        <div className="text-purple-600">{getStatusMessage(aiPersonalizationScore, learningProgress.level)}</div>
+                        <div className="text-purple-600">{getStatusMessage(safePersonalizationScore, safeLearningProgress.level)}</div>
                     </div>
                 </div>
 
                 <div className="text-right">
-                    <div className="text-3xl font-bold text-purple-800">{aiPersonalizationScore}%</div>
+                    <div className="text-3xl font-bold text-purple-800">{safePersonalizationScore}%</div>
                     <div className="text-sm text-purple-600">Personalized</div>
                 </div>
             </div>
@@ -88,16 +97,16 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
             <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-2">
-                        {getLevelIcon(learningProgress.level)}
-                        <span className="font-semibold text-purple-700">{learningProgress.level}</span>
+                        {getLevelIcon(safeLearningProgress.level)}
+                        <span className="font-semibold text-purple-700">{safeLearningProgress.level}</span>
                     </div>
-                    <span className="text-sm text-purple-600">{learningProgress.progressPercentage}%</span>
+                    <span className="text-sm text-purple-600">{safeLearningProgress.progressPercentage}%</span>
                 </div>
 
                 <div className="w-full bg-purple-200 rounded-full h-3 overflow-hidden">
                     <div
-                        className={`bg-gradient-to-r ${getProgressColor(aiPersonalizationScore)} h-3 rounded-full transition-all duration-1000 ease-out relative`}
-                        style={{ width: `${aiPersonalizationScore}%` }}
+                        className={`bg-gradient-to-r ${getProgressColor(safePersonalizationScore)} h-3 rounded-full transition-all duration-1000 ease-out relative`}
+                        style={{ width: `${safePersonalizationScore}%` }}
                     >
                         <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
                     </div>
@@ -110,11 +119,11 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
                     {/* Learning Level */}
                     <div className="bg-white/80 backdrop-blur-sm p-4 rounded-lg">
                         <div className="flex items-center gap-2 mb-2">
-                            {getLevelIcon(learningProgress.level)}
+                            {getLevelIcon(safeLearningProgress.level)}
                             <span className="font-medium text-purple-800">Learning Level</span>
                         </div>
-                        <div className="text-2xl font-bold text-purple-900">{learningProgress.level}</div>
-                        <div className="text-xs text-purple-600">{learningProgress.nextMilestone}</div>
+                        <div className="text-2xl font-bold text-purple-900">{safeLearningProgress.level}</div>
+                        <div className="text-xs text-purple-600">{safeLearningProgress.nextMilestone}</div>
                     </div>
 
                     {/* Recommendations */}
@@ -123,7 +132,7 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
                             <FaRocket className="text-pink-500" />
                             <span className="font-medium text-purple-800">Recommendations</span>
                         </div>
-                        <div className="text-2xl font-bold text-purple-900">{recommendationCount}</div>
+                        <div className="text-2xl font-bold text-purple-900">{safeRecommendationCount}</div>
                         <div className="text-xs text-purple-600">AI-generated suggestions</div>
                     </div>
 
@@ -146,7 +155,7 @@ export const AIStatusIndicator = ({ compact = false, showDetails = true }) => {
                         <FaTrophy className="text-yellow-500" />
                         <span className="font-medium text-purple-800">Next Milestone</span>
                     </div>
-                    <span className="text-sm text-purple-600">{learningProgress.nextMilestone}</span>
+                    <span className="text-sm text-purple-600">{safeLearningProgress.nextMilestone}</span>
                 </div>
             </div>
         </div>

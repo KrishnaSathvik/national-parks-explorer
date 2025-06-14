@@ -41,8 +41,6 @@ const About = () => {
   const { showToast } = useToast();
 
   // State for interactive features
-  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0);
-  const [showLightbox, setShowLightbox] = useState(false);
   const [statsAnimated, setStatsAnimated] = useState(false);
 
   // Animated stats
@@ -60,39 +58,6 @@ const About = () => {
     parksVisited: 15, // Your actual national parks count
     yearsExperience: 5 // 2020-2025
   };
-
-  const featuredPhotos = [
-    {
-      id: 1,
-      url: "https://unsplash.com/photos/a-view-of-the-night-sky-with-the-milky-in-the-background-m38PER3GxC0",
-      title: "Milky Way over Zabriskie Point",
-      location: "Death Valley National Park, California",
-      camera: "Nikon Z6ii",
-      settings: "14mm, f/2.8, 25s, ISO 3200",
-      story: "My first serious astrophotography expedition in 2023. Death Valley's dark skies provided the perfect canvas for capturing the Milky Way core.",
-      year: "2023"
-    },
-    {
-      id: 2,
-      url: "https://unsplash.com/photos/the-night-sky-with-stars-above-a-city-4qjO9aE2QX4",
-      title: "Wonders of Grand Canyon",
-      location: "Grand Canyon National Park, Arizona",
-      camera: "Nikon Z6ii",
-      settings: "14mm, f/2.8, 30s, ISO 3200",
-      story: "Captured during my first astronomy event at Grand Canyon.",
-      year: "2024"
-    },
-    {
-      id: 3,
-      url: "https://unsplash.com/photos/a-purple-and-green-aurora-over-a-body-of-water-TsrxK7EGf1E",
-      title: "Aurora at yellowstone",
-      location: "Yellowstone National Park, Wyoming",
-      camera: "Nikon Z6ii",
-      settings: "24mm, f/2.8, 5s, ISO 3200",
-      story: "Captured During Double Aurora Storm at Yellowstone Last Year ",
-      year: "2024"
-    }
-  ];
 
   const socialLinks = [
     {
@@ -309,113 +274,9 @@ const About = () => {
       </FadeInWrapper>
   );
 
-  // Featured Photography
-  const renderPhotographySection = () => (
-      <FadeInWrapper delay={0.3}>
-        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h3 className={`font-bold text-gray-800 flex items-center gap-3 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
-                📸 Featured Photography
-              </h3>
-              <p className="text-gray-600 text-sm">My favorite captures from national parks</p>
-            </div>
-            <a
-                href="https://unsplash.com/@astrobykrishna"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-gray-600 to-gray-800 text-white rounded-lg hover:from-gray-700 hover:to-gray-900 transition text-sm"
-            >
-              <FaEye /> View All
-            </a>
-          </div>
-
-          {/* Photo Gallery */}
-          <div className="grid gap-4 grid-cols-1 md:grid-cols-3">
-            {featuredPhotos.map((photo, index) => (
-                <motion.div
-                    key={photo.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="group relative bg-gray-100 rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300"
-                    onClick={() => {
-                      setSelectedPhotoIndex(index);
-                      setShowLightbox(true);
-                    }}
-                >
-                  <div className="aspect-w-16 aspect-h-12 bg-gradient-to-br from-gray-200 to-gray-300">
-                    <img
-                        src={photo.url}
-                        alt={photo.title}
-                        className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <h4 className="font-semibold text-sm mb-1">{photo.title}</h4>
-                      <p className="text-xs opacity-90">{photo.location}</p>
-                    </div>
-                    <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2">
-                      <FaCamera className="text-white text-sm" />
-                    </div>
-                  </div>
-                </motion.div>
-            ))}
-          </div>
-
-          {/* Photo Lightbox */}
-          <AnimatePresence>
-            {showLightbox && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-                    onClick={() => setShowLightbox(false)}
-                >
-                  <motion.div
-                      initial={{ scale: 0.5, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 0.5, opacity: 0 }}
-                      className="max-w-4xl w-full bg-white rounded-2xl overflow-hidden"
-                      onClick={e => e.stopPropagation()}
-                  >
-                    <div className="relative">
-                      <img
-                          src={featuredPhotos[selectedPhotoIndex].url}
-                          alt={featuredPhotos[selectedPhotoIndex].title}
-                          className="w-full h-96 object-cover"
-                      />
-                      <button
-                          onClick={() => setShowLightbox(false)}
-                          className="absolute top-4 right-4 bg-black/50 text-white rounded-full p-2 hover:bg-black/70 transition"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {featuredPhotos[selectedPhotoIndex].title}
-                      </h3>
-                      <p className="text-gray-600 mb-4">{featuredPhotos[selectedPhotoIndex].story}</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                        <span><strong>Location:</strong> {featuredPhotos[selectedPhotoIndex].location}</span>
-                        <span><strong>Camera:</strong> {featuredPhotos[selectedPhotoIndex].camera}</span>
-                        <span><strong>Settings:</strong> {featuredPhotos[selectedPhotoIndex].settings}</span>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </FadeInWrapper>
-  );
-
   // Social Links & Contact
   const renderSocialSection = () => (
-      <FadeInWrapper delay={0.5}>
+      <FadeInWrapper delay={0.3}>
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-white/20 p-6 mb-8">
           <h3 className={`font-bold text-gray-800 mb-6 ${isMobile ? 'text-lg' : 'text-xl'}`}>
             🌐 Connect With Me
@@ -452,7 +313,7 @@ const About = () => {
 
   // App Information
   const renderAppSection = () => (
-      <FadeInWrapper delay={0.6}>
+      <FadeInWrapper delay={0.4}>
         <div className="bg-gradient-to-r from-gray-50 to-white p-6 rounded-2xl border border-gray-200 mb-8">
           <h3 className={`font-bold text-gray-800 mb-6 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
             🛠️ About This App
@@ -514,7 +375,7 @@ const About = () => {
 
   // Navigation Actions
   const renderNavigationSection = () => (
-      <FadeInWrapper delay={0.7}>
+      <FadeInWrapper delay={0.5}>
         <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-6 rounded-2xl text-white">
           <div className="text-center mb-6">
             <h3 className={`font-bold mb-2 ${isMobile ? 'text-xl' : 'text-2xl'}`}>
@@ -580,7 +441,7 @@ const About = () => {
 
   // Footer section
   const renderFooter = () => (
-      <FadeInWrapper delay={0.9}>
+      <FadeInWrapper delay={0.6}>
         <div className="text-center py-8 border-t border-gray-200">
           <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -617,9 +478,6 @@ const About = () => {
 
               {/* Stats Dashboard */}
               {renderStatsSection()}
-
-              {/* Featured Photography */}
-              {renderPhotographySection()}
 
               {/* Social & Contact */}
               {renderSocialSection()}

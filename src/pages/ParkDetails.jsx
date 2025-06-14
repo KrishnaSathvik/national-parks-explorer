@@ -406,7 +406,7 @@ const ActivitySection = ({ title, icon, items, park }) => {
                                             <div className="flex gap-2 flex-wrap">
                                                 <a
                                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                                                        item.name + " " + park.name
+                                                        park.name + " National Park " + park.state
                                                     )}`}
                                                     target="_blank"
                                                     rel="noreferrer"

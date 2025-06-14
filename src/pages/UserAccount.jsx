@@ -101,8 +101,10 @@
             collection(db, "reviews"),
             where("author", "==", userData.displayName || currentUser.email)
           );
+
           const reviewSnap = await getDocs(q);
           const reviews = reviewSnap.docs.map((doc) => doc.data());
+          console.log("Review data structure:", reviews[0]); // Check the first review
           setUserReviews(reviews);
 
           // Calculate enhanced stats
@@ -165,8 +167,8 @@
       showToast("❌ Removed park from favorites", "success");
     };
 
-    const handleRemoveEvent = async (eventId) => {
-      const event = favoriteEvents.find((e) => e.id === eventId);
+    const handleRemoveEvent = async (eventIndex) => {
+      const event = favoriteEvents[eventIndex];
       if (event) {
         await updateDoc(doc(db, "users", currentUser.uid), {
           favoriteEvents: arrayRemove(event),
@@ -579,20 +581,20 @@
                       ) : (
                         <div className="space-y-4">
                           {favoriteEvents.map((event, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
-                              <div className="flex-1">
-                                <h4 className="font-semibold text-blue-800">{event.title || "Event"}</h4>
-                                <div className="text-sm text-blue-600">
-                                  {event.start ? event.start.toLocaleDateString() : "Date TBD"}
+                              <div key={index} className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border border-blue-100">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-blue-800">{event.title || "Event"}</h4>
+                                  <div className="text-sm text-blue-600">
+                                    {event.start ? event.start.toLocaleDateString() : "Date TBD"}
+                                  </div>
                                 </div>
+                                <button
+                                    onClick={() => handleRemoveEvent(index)}  // Changed from event.id to index
+                                    className="text-blue-400 hover:text-blue-600 transition p-2"
+                                >
+                                  <FaTrash />
+                                </button>
                               </div>
-                              <button
-                                onClick={() => handleRemoveEvent(event.id)}
-                                className="text-blue-400 hover:text-blue-600 transition p-2"
-                              >
-                                <FaTrash />
-                              </button>
-                            </div>
                           ))}
                         </div>
                       )}
@@ -603,52 +605,58 @@
 
               {/* Reviews Tab */}
               {activeTab === 'reviews' && (
-                <FadeInWrapper delay={0.2}>
-                  <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-                    <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                      <FaStar className="text-yellow-500" />
-                      My Reviews ({userReviews.length})
-                    </h3>
-                    
-                    {userReviews.length === 0 ? (
-                      <div className="text-center py-12">
-                        <div className="text-6xl mb-4">⭐</div>
-                        <h4 className="text-lg font-semibold text-gray-600 mb-2">No reviews written yet</h4>
-                        <p className="text-gray-500 mb-6">Share your park experiences with the community!</p>
-                        <Link 
-                          to="/"
-                          className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition font-medium"
-                        >
-                          <FaStar />
-                          Explore & Review Parks
-                        </Link>
-                      </div>
-                    ) : (
-                      <div className="space-y-6">
-                        {userReviews.map((review, index) => (
-                          <div key={index} className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
-                            <div className="flex items-start justify-between mb-3">
-                              <h4 className="font-bold text-yellow-800 text-lg">{review.parkName || "Unnamed Park"}</h4>
-                              <div className="flex items-center gap-1">
-                                {Array.from({ length: 5 }, (_, i) => (
-                                  <FaStar
-                                    key={i}
-                                    className={i < review.rating ? "text-yellow-500" : "text-gray-300"}
-                                  />
-                                ))}
-                              </div>
-                            </div>
-                            <p className="text-gray-700 mb-3 leading-relaxed">{review.text}</p>
-                            <div className="text-xs text-yellow-600 flex items-center gap-2">
-                              <FaCalendarAlt />
-                              {review.date?.seconds ? new Date(review.date.seconds * 1000).toLocaleDateString() : "Unknown date"}
-                            </div>
+                  <FadeInWrapper delay={0.2}>
+                    <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+                      <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                        <FaStar className="text-yellow-500" />
+                        My Reviews ({userReviews.length})
+                      </h3>
+
+                      {userReviews.length === 0 ? (
+                          <div className="text-center py-12">
+                            <div className="text-6xl mb-4">⭐</div>
+                            <h4 className="text-lg font-semibold text-gray-600 mb-2">No reviews written yet</h4>
+                            <p className="text-gray-500 mb-6">Share your park experiences with the community!</p>
+                            <Link
+                                to="/"
+                                className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-6 py-3 rounded-xl hover:from-yellow-600 hover:to-orange-600 transition font-medium"
+                            >
+                              <FaStar />
+                              Explore & Review Parks
+                            </Link>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </FadeInWrapper>
+                      ) : (
+                          <div className="space-y-6">
+                            {userReviews.map((review, index) => (
+                                <div key={index} className="bg-gradient-to-r from-yellow-50 to-orange-50 p-6 rounded-xl border border-yellow-200">
+                                  <div className="flex items-start justify-between mb-3">
+                                    <h4 className="font-bold text-yellow-800 text-lg">
+                                      {review.parkName || review.park || review.location || "Unknown Park"}
+                                    </h4>
+                                    <div className="flex items-center gap-1">
+                                      {Array.from({ length: 5 }, (_, i) => (
+                                          <FaStar
+                                              key={i}
+                                              className={i < review.rating ? "text-yellow-500" : "text-gray-300"}
+                                          />
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <p className="text-gray-700 mb-3 leading-relaxed">{review.text}</p>
+                                  <div className="text-xs text-yellow-600 flex items-center gap-2">
+                                    <FaCalendarAlt />
+                                    {review.createdAt?.toDate?.()?.toLocaleDateString() ||
+                                    review.timestamp?.toDate?.()?.toLocaleDateString() ||
+                                    review.date?.seconds ? new Date(review.date.seconds * 1000).toLocaleDateString() :
+                                        review.date?.toDate?.()?.toLocaleDateString() ||
+                                        "Unknown date"}
+                                  </div>
+                                </div>
+                            ))}
+                          </div>
+                      )}
+                    </div>
+                  </FadeInWrapper>
               )}
 
               {/* Achievements Tab */}
