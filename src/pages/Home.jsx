@@ -6,6 +6,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import FadeInWrapper from "../components/FadeInWrapper";
 import Fuse from 'fuse.js';
 import {debounce} from 'lodash';
+import HybridParksService from '../services/HybridParksService';
 
 import {
     FaArrowRight,
@@ -474,6 +475,27 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
     const [search, setSearch] = useState("");
     const [selectedState, setSelectedState] = useState("All");
     const [selectedSeason, setSelectedSeason] = useState("All");
+    // 🆕 ADD THIS NEW STATE FOR INTERNAL PARKS DATA
+    const [internalParks, setInternalParks] = useState([]);
+    const [parksLoading, setParksLoading] = useState(true);
+    // 🆕 ADD THIS USEEFFECT RIGHT HERE
+    useEffect(() => {
+        const loadParks = async () => {
+            try {
+                setParksLoading(true);
+                const parksData = await HybridParksService.fetchAllParks();
+                setInternalParks(parksData);
+            } catch (error) {
+                console.error('Failed to load parks:', error);
+                // Fallback to props if API fails
+                setInternalParks(parks);
+            } finally {
+                setParksLoading(false);
+            }
+        };
+        loadParks();
+    }, []);
+    const activeParks = internalParks.length > 0 ? internalParks : parks;
     const [searchParams, setSearchParams] = useSearchParams();
     const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get("page") || "1"));
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -497,7 +519,7 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
     const parksPerPage = isMobile ? 6 : 9;
 
     // Fuzzy Search Setup
-    const fuse = useMemo(() => new Fuse(parks, {
+    const fuse = useMemo(() => new Fuse(activeParks, {
         keys: [
             { name: 'name', weight: 0.4 },
             { name: 'state', weight: 0.3 },
@@ -623,7 +645,7 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
     const seasons = ["All", "Spring", "Summer", "Fall", "Winter"];
 
     // Enhanced filtering logic
-    const filtered = parks.filter((p) => {
+    const filtered = activeParks.filter((p) => {
         const name = p.name?.toLowerCase() || "";
         const state = p.state?.toLowerCase() || "";
         const season = p.bestSeason?.toLowerCase() || "";
@@ -673,7 +695,7 @@ const EnhancedMobileHome = ({parks = [], favorites = [], toggleFavorite}) => {
                             🌍 National Parks Explorer
                         </h1>
                         <p className={`text-purple-100 ${isMobile ? 'text-sm' : 'text-base lg:text-xl'}`}>
-                            Explore {parks.length} magnificent national parks with smart recommendations and detailed information.
+                            Explore {activeParks.length} magnificent national parks with smart recommendations and detailed information.
                         </p>
                     </div>
                 </FadeInWrapper>
