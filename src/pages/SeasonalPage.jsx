@@ -1,3 +1,4 @@
+// 📁 src/components/EnhancedSeasonalPage.jsx
 // REPLACE your existing SeasonalPage with this updated version
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -96,9 +97,12 @@ const ErrorState = ({ message, onRetry }) => (
     </div>
 );
 
-// Updated Park Card - now works with hybrid data
 const EnhancedParkCard = ({ park, season, index, favorites = [], onToggleFavorite }) => {
-  // 🎯 NEW: Access seasonal info from hybrid service data
+  // 🎯 Image handling states
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const seasonalInfo = park.seasons?.[season.id] || {
     whyFamous: `Perfect ${season.name.toLowerCase()} destination with ideal weather and seasonal activities`,
     uniqueActivities: [`${season.name} hiking`, `${season.name} photography`, `${season.name} wildlife viewing`],
@@ -106,47 +110,123 @@ const EnhancedParkCard = ({ park, season, index, favorites = [], onToggleFavorit
   };
 
   const isFavorite = favorites.includes(park.id);
-  const [isExpanded, setIsExpanded] = useState(false);
   const bestSeasons = park.bestSeasons || [season.id];
   const isOptimalSeason = bestSeasons.includes(season.id);
-
-  // 🏆 NEW: Show data quality indicator
   const dataQuality = park.dataQuality || { tier: 'standard', accuracy: 75 };
   const qualityColor = dataQuality.tier === 'premium' ? 'text-green-600' : 'text-blue-600';
   const qualityIcon = dataQuality.tier === 'premium' ? '🏆' : '📊';
 
-  return (
-      <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group">
-        {/* Park Image */}
-        {park.imageUrl && (
-            <div className="relative h-48 overflow-hidden">
-              <img
-                  src={park.imageUrl}
-                  alt={park.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+  // 🎨 Gradient colors for when no image is available
+  const gradientColors = [
+    'from-blue-400 to-blue-600',
+    'from-green-400 to-green-600',
+    'from-purple-400 to-purple-600',
+    'from-orange-400 to-orange-600',
+    'from-red-400 to-red-600',
+    'from-teal-400 to-teal-600',
+    'from-indigo-400 to-indigo-600',
+    'from-pink-400 to-pink-600'
+  ];
 
-              {/* Data Quality Badge */}
-              <div className={`absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium ${qualityColor} flex items-center gap-1`}>
-                <span>{qualityIcon}</span>
-                <span>{dataQuality.accuracy}%</span>
+  const fallbackGradient = gradientColors[index % gradientColors.length];
+
+  // 🖼️ Image event handlers
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
+    setImageLoaded(false);
+  };
+
+  // 🎨 Render image section
+  const renderImageSection = () => {
+    const hasValidImage = park.imageUrl && !imageError;
+
+    return (
+        <div className="relative h-48 overflow-hidden">
+          {hasValidImage ? (
+              <>
+                {/* Real Image */}
+                <img
+                    src={park.imageUrl}
+                    alt={park.name}
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${
+                        imageLoaded ? 'opacity-100' : 'opacity-0'
+                    }`}
+                    loading="lazy"
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                />
+
+                {/* Loading placeholder while image loads */}
+                {!imageLoaded && (
+                    <div className={`absolute inset-0 bg-gradient-to-br ${fallbackGradient} animate-pulse flex items-center justify-center`}>
+                      <div className="text-white/80 text-center">
+                        <div className="text-3xl mb-2">📸</div>
+                        <div className="text-sm">Loading...</div>
+                      </div>
+                    </div>
+                )}
+              </>
+          ) : (
+              /* Fallback gradient design when no image or error */
+              <div className={`w-full h-full bg-gradient-to-br ${fallbackGradient} flex items-center justify-center relative overflow-hidden`}>
+                {/* Background pattern */}
+                <div className="absolute inset-0 opacity-20">
+                  <div className="absolute top-4 left-4 text-4xl">🏔️</div>
+                  <div className="absolute top-8 right-6 text-2xl">🌲</div>
+                  <div className="absolute bottom-6 left-8 text-3xl">🦅</div>
+                  <div className="absolute bottom-8 right-4 text-2xl">⭐</div>
+                </div>
+
+                {/* Center content */}
+                <div className="text-white text-center z-10">
+                  <div className="text-4xl mb-3">📷</div>
+                  <div className="text-lg font-bold">{park.name}</div>
+                  <div className="text-sm opacity-90 mt-1">{park.state}</div>
+                </div>
               </div>
+          )}
 
-              <button
-                  onClick={() => onToggleFavorite?.(park.id)}
-                  className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 ${
-                      isFavorite
-                          ? 'bg-red-500 text-white scale-110'
-                          : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
-                  }`}
-              >
-                {isFavorite ? <FaHeart /> : <FaRegHeart />}
-              </button>
-            </div>
-        )}
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
 
+          {/* Data Quality Badge */}
+          <div className={`absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-medium ${qualityColor} flex items-center gap-1`}>
+            <span>{qualityIcon}</span>
+            <span>{dataQuality.accuracy}%</span>
+          </div>
+
+          {/* Favorite Button */}
+          <button
+              onClick={() => onToggleFavorite?.(park.id)}
+              className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-200 ${
+                  isFavorite
+                      ? 'bg-red-500 text-white scale-110'
+                      : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
+              }`}
+          >
+            {isFavorite ? <FaHeart /> : <FaRegHeart />}
+          </button>
+        </div>
+    );
+  };
+
+  return (
+      <div
+          className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
+          style={{
+            animationDelay: `${index * 0.1}s`,
+            animation: 'fadeInUp 0.6s ease-out forwards'
+          }}
+      >
+        {/* Image Section */}
+        {renderImageSection()}
+
+        {/* Header Section */}
         <div className={`relative bg-gradient-to-r ${season.primaryColor} p-4 text-white`}>
           <div className="flex items-start justify-between">
             <div className="flex-1 min-w-0">
@@ -156,7 +236,7 @@ const EnhancedParkCard = ({ park, season, index, favorites = [], onToggleFavorit
               <div className="flex items-center gap-2 text-sm text-white/90">
                 <FaMapMarkerAlt className="text-xs flex-shrink-0" />
                 <span className="truncate">{park.state}</span>
-                {park.entryFee && (
+                {park.entryFee && park.entryFee !== '0' && (
                     <>
                       <span>•</span>
                       <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs font-medium">
@@ -184,6 +264,7 @@ const EnhancedParkCard = ({ park, season, index, favorites = [], onToggleFavorit
           </div>
         </div>
 
+        {/* Content Section */}
         <div className="p-4 md:p-6">
           <div className={`bg-gradient-to-r ${season.secondaryColor} p-4 rounded-xl mb-4 border-l-4 border-green-400`}>
             <div className="font-semibold text-gray-800 mb-2 flex items-center gap-2 text-sm md:text-base">
