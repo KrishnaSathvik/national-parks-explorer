@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { FaTimes, FaRoute, FaInfoCircle, FaCheckCircle } from 'react-icons/fa';
 import { useTripPlanner } from '../TripPlanner/core/TripPlannerProvider'; // ✅ Updated import
 import TripStepBasics from './steps/TripStepBasics';
-import TripStepParks from './TripStepParks';
-import TripStepReview from './TripStepReview';
+import TripStepParks from './steps/TripStepParks';
+import TripStepReview from './steps/TripStepReview';
 import MobileStatsCard from './TripStatsCard';
 import MobileErrorDisplay from './MobileErrorDisplay';
 import { validateTrip } from '../../utils/tripPlanner/tripHelpers'; // ✅ Updated import

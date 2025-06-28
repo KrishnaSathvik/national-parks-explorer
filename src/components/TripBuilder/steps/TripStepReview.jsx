@@ -2,8 +2,8 @@
 // src/components/TripBuilder/TripStepReview.jsx
 import React from 'react';
 import { FaCalendarAlt, FaMapMarkerAlt, FaClock, FaDollarSign, FaRoute, FaCar, FaPlane, FaInfoCircle } from 'react-icons/fa';
-import { formatDate, formatCurrency, formatDuration } from '../../utils/common/formatters'; // ✅ Updated import
-import { getCostBreakdown, generateTripItinerary } from '../../utils/tripPlanner/tripHelpers'; // ✅ Updated import
+import { formatDate, formatCurrency, formatDuration } from '../../../utils/common/formatters'; // ✅ Updated import
+import { getCostBreakdown, generateTripItinerary } from '../../../utils/tripPlanner/tripHelpers'; // ✅ Updated import
 
 const TripStepReview = ({ tripData }) => {
     const costBreakdown = getCostBreakdown(tripData);
