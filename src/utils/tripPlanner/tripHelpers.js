@@ -360,7 +360,7 @@ export const shareTrip = async (trip) => {
 };
 
 // Enhanced cost breakdown calculation
-const getCostBreakdown = (trip) => {
+export const getCostBreakdown = (trip) => {
     const duration = calculateTripDuration(trip.startDate, trip.endDate);
     const nights = Math.max(0, duration - 1);
     const distance = calculateTotalDistance(trip.parks);

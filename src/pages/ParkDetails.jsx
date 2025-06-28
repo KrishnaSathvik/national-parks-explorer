@@ -26,7 +26,7 @@ import {
     FaInfoCircle
 } from "react-icons/fa";
 import {AnimatePresence, motion} from "framer-motion";
-import SkeletonLoader from "../components/SkeletonLoader";
+import { TripCardSkeleton, TripPlannerPageSkeleton } from "../components/shared/ui/LoadingStates";
 import ShareButtons from "../components/ShareButtons";
 import FadeInWrapper from "../components/FadeInWrapper";
 import {useAuth} from "../context/AuthContext";

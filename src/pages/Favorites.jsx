@@ -47,7 +47,7 @@ import {
 
 import useIsMobile from "../hooks/useIsMobile";
 import FadeInWrapper from "../components/FadeInWrapper";
-import SkeletonLoader from "../components/SkeletonLoader";
+import { TripCardSkeleton, TripPlannerPageSkeleton } from "../components/shared/ui/LoadingStates";
 
 // Enhanced breadcrumb component
 const Breadcrumb = () => {

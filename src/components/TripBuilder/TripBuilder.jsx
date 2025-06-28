@@ -1,13 +1,13 @@
 // TripBuilder.jsx (Enhanced with new provider integration)
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaRoute, FaInfoCircle, FaCheckCircle } from 'react-icons/fa';
-import { useTripPlanner } from '../TripPlanner/core/TripPlannerProvider'; // ✅ Updated import
+import { useTripPlanner } from '../TripPlanner/core/TripPlannerProvider';
 import TripStepBasics from './steps/TripStepBasics';
 import TripStepParks from './steps/TripStepParks';
 import TripStepReview from './steps/TripStepReview';
-import MobileStatsCard from './TripStatsCard';
-import MobileErrorDisplay from './MobileErrorDisplay';
-import { validateTrip } from '../../utils/tripPlanner/tripHelpers'; // ✅ Updated import
+import TripStatsCard from '../shared/ui/TripStatsCard';  // ✅ Fixed
+import MobileErrorToast from '../shared/ui/MobileErrorToast';
+import { validateTrip } from '../../utils/tripPlanner/tripHelpers';
 
 const TripBuilder = ({ trip, allParks }) => {
   const {
@@ -127,8 +127,16 @@ const TripBuilder = ({ trip, allParks }) => {
 
   return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-        <MobileErrorDisplay errors={combinedErrors} onDismiss={dismissError} />
-
+        {Object.keys(combinedErrors).length > 0 && (
+            <MobileErrorToast
+                error={{
+                  type: 'validation',
+                  message: Object.values(combinedErrors)[0]
+                }}
+                onDismiss={() => dismissError(Object.keys(combinedErrors)[0])}
+                isVisible={true}
+            />
+        )}
         {/* Enhanced Header */}
         <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 sticky top-0 z-40">
           <div className="max-w-4xl mx-auto px-4 py-4">
@@ -196,7 +204,7 @@ const TripBuilder = ({ trip, allParks }) => {
             <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200">
               <div className="max-w-4xl mx-auto px-4 py-3">
                 <div className="grid grid-cols-4 gap-3">
-                  <MobileStatsCard
+                  <TripStatsCard
                       value={`${Math.round(currentTrip.totalDistance || 0)} mi`}
                       label="Distance"
                       color="from-blue-500 to-cyan-500"

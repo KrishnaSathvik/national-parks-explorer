@@ -42,7 +42,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
 import FadeInWrapper from "../components/FadeInWrapper";
-import SkeletonLoader from "../components/SkeletonLoader";
+import { TripCardSkeleton, TripPlannerPageSkeleton } from "../components/shared/ui/LoadingStates";
 import { db } from "../firebase";
 import {
   doc,

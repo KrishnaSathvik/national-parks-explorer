@@ -20,9 +20,36 @@ import {
     FaThermometerHalf,
     FaMountain
 } from 'react-icons/fa';
-import { TemplateSkeleton } from '../shared/ui/LoadingStates';
-import { CardFadeIn, StaggerGroup } from '../FadeInWrapper';
-import { useToast } from '../shared/ui/SmartToast';
+
+// Temporary simple loading component
+const SimpleTemplateSkeleton = ({ count = 4 }) => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {Array.from({ length: count }, (_, i) => (
+            <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 animate-pulse">
+                <div className="h-40 bg-gradient-to-br from-gray-200 to-gray-300"></div>
+                <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4 mb-4"></div>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                        <div className="h-8 bg-gray-200 rounded"></div>
+                        <div className="h-8 bg-gray-200 rounded"></div>
+                        <div className="h-8 bg-gray-200 rounded"></div>
+                    </div>
+                    <div className="h-10 bg-gray-200 rounded"></div>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+// Simple toast notification
+const useSimpleToast = () => {
+    return {
+        success: (message) => console.log('Success:', message),
+        error: (message) => console.error('Error:', message),
+        tripSaved: (message) => console.log('Trip saved:', message)
+    };
+};
 
 const EnhancedTripTemplates = ({
                                    templates = [],
@@ -44,7 +71,7 @@ const EnhancedTripTemplates = ({
     const [sortBy, setSortBy] = useState('popular');
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [favorites, setFavorites] = useState(new Set());
-    const { toast } = useToast();
+    const { success: toastSuccess, tripSaved: toastTripSaved } = useSimpleToast();
 
     // Filter and sort logic
     const filteredAndSortedTemplates = useMemo(() => {
@@ -170,10 +197,10 @@ const EnhancedTripTemplates = ({
         const newFavorites = new Set(favorites);
         if (newFavorites.has(templateId)) {
             newFavorites.delete(templateId);
-            toast.success('Removed from favorites');
+            toastSuccess('Removed from favorites');
         } else {
             newFavorites.add(templateId);
-            toast.success('Added to favorites');
+            toastSuccess('Added to favorites');
         }
         setFavorites(newFavorites);
     };
@@ -187,13 +214,13 @@ const EnhancedTripTemplates = ({
             });
         } else {
             navigator.clipboard.writeText(window.location.href);
-            toast.success('Link copied to clipboard!');
+            toastSuccess('Link copied to clipboard!');
         }
     };
 
     const handleSelectTemplate = (template) => {
         onSelectTemplate(template);
-        toast.tripSaved(template.title);
+        toastTripSaved(template.title);
     };
 
     const clearFilters = () => {
@@ -210,7 +237,7 @@ const EnhancedTripTemplates = ({
     if (loading) {
         return (
             <div className={`enhanced-trip-templates ${className}`}>
-                <TemplateSkeleton count={6} />
+                <SimpleTemplateSkeleton count={6} />
             </div>
         );
     }
@@ -344,9 +371,9 @@ const EnhancedTripTemplates = ({
                     </button>
                 </div>
             ) : (
-                <StaggerGroup staggerDelay={0.1} className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     {filteredAndSortedTemplates.map((template, index) => (
-                        <CardFadeIn key={template.id} index={index}>
+                        <div key={template.id}>
                             <TemplateCard
                                 template={template}
                                 isFavorite={favorites.has(template.id)}
@@ -356,9 +383,9 @@ const EnhancedTripTemplates = ({
                                 showFavorites={showFavorites}
                                 allowSharing={allowSharing}
                             />
-                        </CardFadeIn>
+                        </div>
                     ))}
-                </StaggerGroup>
+                </div>
             )}
         </div>
     );

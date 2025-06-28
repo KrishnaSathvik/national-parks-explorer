@@ -12,7 +12,7 @@ import useIsMobile from "./hooks/useIsMobile";
 import BottomNav from "./components/BottomNav";
 import AppIntegration from './components/AppIntegration';
 import {enhanceParkData} from './utils/parkDataHelpers';
-import {SkeletonCard, SkeletonHero} from "./components/SkeletonLoader";
+import { TripCardSkeleton, TripPlannerPageSkeleton } from "./components/shared/ui/LoadingStates";  // ✅ Fixed
 import FadeInWrapper from "./components/FadeInWrapper";
 
 import {
@@ -101,18 +101,12 @@ class AppErrorBoundary extends React.Component {
 // Enhanced Loading Component
 const AppLoadingFallback = ({type = "page"}) => {
     const {isMobile} = useIsMobile();
-
     const loadingComponents = {
         page: (
             <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
                 <div className="max-w-7xl mx-auto px-4 py-8">
                     <FadeInWrapper>
-                        <SkeletonHero/>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-                            {Array.from({length: isMobile ? 3 : 6}).map((_, i) => (
-                                <SkeletonCard key={i}/>
-                            ))}
-                        </div>
+                        <TripPlannerPageSkeleton />
                     </FadeInWrapper>
                 </div>
             </div>
