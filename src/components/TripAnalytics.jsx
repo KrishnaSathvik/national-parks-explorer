@@ -2,7 +2,7 @@
 // src/components/TripAnalytics.jsx
 import React from 'react';
 import { FaChartBar, FaRoute, FaMapMarkerAlt, FaDollarSign, FaBrain } from 'react-icons/fa';
-import { getTravelStats, getMostVisitedStates, getTransportationBreakdown } from '../utils/tripPlanner/tripAnalytics'; // ✅ Updated import
+import { getTravelStats, getMostVisitedStates, getTransportationBreakdown } from '../utils/tripPlanner/tripAnalytics';
 import { formatCurrency } from '../utils/common/formatters'; // ✅ Updated import
 
 const TripAnalytics = ({ trips }) => {
