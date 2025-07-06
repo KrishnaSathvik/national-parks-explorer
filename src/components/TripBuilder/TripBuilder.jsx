@@ -1,14 +1,194 @@
-// TripBuilder.jsx (Enhanced with new provider integration)
+// ✅ FIXED TripBuilder.jsx - React Error #130 Resolved
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaRoute, FaInfoCircle, FaCheckCircle } from 'react-icons/fa';
 import { useTripPlanner } from '../TripPlanner/core/TripPlannerProvider';
 import TripStepBasics from './steps/TripStepBasics';
 import TripStepParks from './steps/TripStepParks';
 import TripStepReview from './steps/TripStepReview';
-import TripStatsCard from '../shared/ui/TripStatsCard';  // ✅ Fixed
-import MobileErrorToast from '../shared/ui/MobileErrorToast';
+import LoadingSpinner from '../shared/ui/LoadingStates';
 import { validateTrip } from '../../utils/tripPlanner/tripHelpers';
 
+// ✅ FIXED: Create missing components inline to prevent undefined rendering
+
+// ✅ FIXED: TripStepDetails component (was missing and causing React Error #130)
+const TripStepDetails = ({ tripData, setTripData, errors, dismissError }) => {
+  const [localData, setLocalData] = useState({
+    title: tripData.title || '',
+    description: tripData.description || '',
+    startDate: tripData.startDate || '',
+    endDate: tripData.endDate || '',
+    transportationMode: tripData.transportationMode || 'driving'
+  });
+
+  const handleChange = (field, value) => {
+    const newData = { ...localData, [field]: value };
+    setLocalData(newData);
+    setTripData(newData);
+  };
+
+  return (
+      <div className="space-y-6">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Trip Details</h2>
+          <p className="text-gray-600">Let's start with the basics of your adventure</p>
+        </div>
+
+        {/* Trip Title */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Trip Title *
+          </label>
+          <input
+              type="text"
+              value={localData.title}
+              onChange={(e) => handleChange('title', e.target.value)}
+              placeholder="e.g., Utah's Big 5 Adventure"
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 ${
+                  errors.title ? 'border-red-300 bg-red-50' : 'border-gray-300'
+              }`}
+          />
+          {errors.title && (
+              <p className="mt-1 text-sm text-red-600">{errors.title}</p>
+          )}
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Description (Optional)
+          </label>
+          <textarea
+              value={localData.description}
+              onChange={(e) => handleChange('description', e.target.value)}
+              placeholder="Describe your trip..."
+              rows={3}
+              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500"
+          />
+        </div>
+
+        {/* Dates */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Start Date *
+            </label>
+            <input
+                type="date"
+                value={localData.startDate}
+                onChange={(e) => handleChange('startDate', e.target.value)}
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 ${
+                    errors.startDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
+            />
+            {errors.startDate && (
+                <p className="mt-1 text-sm text-red-600">{errors.startDate}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              End Date *
+            </label>
+            <input
+                type="date"
+                value={localData.endDate}
+                onChange={(e) => handleChange('endDate', e.target.value)}
+                className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500/20 focus:border-pink-500 ${
+                    errors.endDate ? 'border-red-300 bg-red-50' : 'border-gray-300'
+                }`}
+            />
+            {errors.endDate && (
+                <p className="mt-1 text-sm text-red-600">{errors.endDate}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Transportation Mode */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Transportation Method *
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button
+                type="button"
+                onClick={() => handleChange('transportationMode', 'driving')}
+                className={`p-4 border rounded-xl text-left transition-all ${
+                    localData.transportationMode === 'driving'
+                        ? 'border-green-500 bg-green-50 text-green-800'
+                        : 'border-gray-300 hover:border-gray-400'
+                }`}
+            >
+              <div className="font-semibold">🚗 Road Trip</div>
+              <div className="text-sm text-gray-600">Drive to all destinations</div>
+            </button>
+
+            <button
+                type="button"
+                onClick={() => handleChange('transportationMode', 'flying')}
+                className={`p-4 border rounded-xl text-left transition-all ${
+                    localData.transportationMode === 'flying'
+                        ? 'border-blue-500 bg-blue-50 text-blue-800'
+                        : 'border-gray-300 hover:border-gray-400'
+                }`}
+            >
+              <div className="font-semibold">✈️ Flying</div>
+              <div className="text-sm text-gray-600">Fly + rental cars</div>
+            </button>
+          </div>
+          {errors.transportationMode && (
+              <p className="mt-1 text-sm text-red-600">{errors.transportationMode}</p>
+          )}
+        </div>
+      </div>
+  );
+};
+
+// ✅ FIXED: MobileStatsCard component (was missing)
+const MobileStatsCard = ({ value, label, color }) => {
+  return (
+      <div className="text-center">
+        <div className={`text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+          {value}
+        </div>
+        <div className="text-xs text-gray-500">{label}</div>
+      </div>
+  );
+};
+
+// ✅ FIXED: TripStatsCard component (was missing)
+const TripStatsCard = ({ value, label, color }) => {
+  return (
+      <div className="text-center">
+        <div className={`text-sm font-bold bg-gradient-to-r ${color} bg-clip-text text-transparent`}>
+          {value}
+        </div>
+        <div className="text-xs text-gray-500">{label}</div>
+      </div>
+  );
+};
+
+// ✅ FIXED: MobileErrorToast component (was missing)
+const MobileErrorToast = ({ error, onDismiss, isVisible }) => {
+  if (!isVisible || !error) return null;
+
+  return (
+      <div className="fixed top-4 left-4 right-4 z-50 lg:hidden">
+        <div className="bg-red-500 text-white px-4 py-3 rounded-xl shadow-lg flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{error.message}</span>
+          </div>
+          <button
+              onClick={onDismiss}
+              className="text-white hover:text-red-200 transition-colors"
+          >
+            <FaTimes className="text-sm" />
+          </button>
+        </div>
+      </div>
+  );
+};
+
+// ✅ MAIN TripBuilder Component - Now with all dependencies resolved
 const TripBuilder = ({ trip, allParks }) => {
   const {
     currentTrip,
@@ -127,6 +307,7 @@ const TripBuilder = ({ trip, allParks }) => {
 
   return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        {/* ✅ FIXED: Error toast now uses properly defined component */}
         {Object.keys(combinedErrors).length > 0 && (
             <MobileErrorToast
                 error={{
@@ -137,6 +318,7 @@ const TripBuilder = ({ trip, allParks }) => {
                 isVisible={true}
             />
         )}
+
         {/* Enhanced Header */}
         <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200 sticky top-0 z-40">
           <div className="max-w-4xl mx-auto px-4 py-4">
@@ -234,6 +416,7 @@ const TripBuilder = ({ trip, allParks }) => {
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             {/* Step Content */}
             <div className="p-6">
+              {/* ✅ FIXED: Now using properly defined TripStepDetails component */}
               {currentStep === 1 && (
                   <TripStepDetails
                       tripData={currentTrip}
